@@ -90,6 +90,12 @@ class ReviewSchema(BaseResourceSchema):
             "customer-group": helpers.absmod(
                 __name__, ".customer_group.CustomerGroupReferenceSchema"
             ),
+            "customer-email-token": helpers.absmod(
+                __name__, ".customer.CustomerEmailTokenReferenceSchema"
+            ),
+            "customer-password-token": helpers.absmod(
+                __name__, ".customer.CustomerPasswordTokenReferenceSchema"
+            ),
             "customer": helpers.absmod(__name__, ".customer.CustomerReferenceSchema"),
             "discount-code": helpers.absmod(
                 __name__, ".discount_code.DiscountCodeReferenceSchema"
@@ -239,7 +245,6 @@ class ReviewDraftSchema(helpers.BaseSchema):
             "order-edit": helpers.absmod(
                 __name__, ".order_edit.OrderEditResourceIdentifierSchema"
             ),
-            "order": helpers.absmod(__name__, ".order.OrderResourceIdentifierSchema"),
             "payment": helpers.absmod(
                 __name__, ".payment.PaymentResourceIdentifierSchema"
             ),
@@ -599,7 +604,6 @@ class ReviewSetTargetActionSchema(ReviewUpdateActionSchema):
             "order-edit": helpers.absmod(
                 __name__, ".order_edit.OrderEditResourceIdentifierSchema"
             ),
-            "order": helpers.absmod(__name__, ".order.OrderResourceIdentifierSchema"),
             "payment": helpers.absmod(
                 __name__, ".payment.PaymentResourceIdentifierSchema"
             ),

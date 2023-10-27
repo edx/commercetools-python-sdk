@@ -44,22 +44,6 @@ from .type import FieldContainerField
 
 # Marshmallow Schemas
 class OrderEditSchema(BaseResourceSchema):
-    last_modified_by = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".common.LastModifiedBySchema"),
-        allow_none=True,
-        unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
-        load_default=None,
-        data_key="lastModifiedBy",
-    )
-    created_by = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".common.CreatedBySchema"),
-        allow_none=True,
-        unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
-        load_default=None,
-        data_key="createdBy",
-    )
     key = marshmallow.fields.String(
         allow_none=True, metadata={"omit_empty": True}, load_default=None
     )
@@ -218,6 +202,9 @@ class OrderEditSchema(BaseResourceSchema):
                 "setDeliveryItems": helpers.absmod(
                     __name__, ".StagedOrderSetDeliveryItemsActionSchema"
                 ),
+                "setDirectDiscounts": helpers.absmod(
+                    __name__, ".StagedOrderSetDirectDiscountsActionSchema"
+                ),
                 "setItemShippingAddressCustomField": helpers.absmod(
                     __name__,
                     ".StagedOrderSetItemShippingAddressCustomFieldActionSchema",
@@ -320,6 +307,9 @@ class OrderEditSchema(BaseResourceSchema):
                 "setShippingRateInput": helpers.absmod(
                     __name__, ".StagedOrderSetShippingRateInputActionSchema"
                 ),
+                "setStore": helpers.absmod(
+                    __name__, ".StagedOrderSetStoreActionSchema"
+                ),
                 "transitionCustomLineItemState": helpers.absmod(
                     __name__, ".StagedOrderTransitionCustomLineItemStateActionSchema"
                 ),
@@ -341,13 +331,6 @@ class OrderEditSchema(BaseResourceSchema):
         load_default=None,
         data_key="stagedActions",
     )
-    custom = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".type.CustomFieldsSchema"),
-        allow_none=True,
-        unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
-        load_default=None,
-    )
     result = helpers.Discriminator(
         allow_none=True,
         discriminator_field=("type", "type"),
@@ -365,6 +348,29 @@ class OrderEditSchema(BaseResourceSchema):
     )
     comment = marshmallow.fields.String(
         allow_none=True, metadata={"omit_empty": True}, load_default=None
+    )
+    custom = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".type.CustomFieldsSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
+    last_modified_by = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".common.LastModifiedBySchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="lastModifiedBy",
+    )
+    created_by = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".common.CreatedBySchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="createdBy",
     )
 
     class Meta:
@@ -550,6 +556,9 @@ class OrderEditDraftSchema(helpers.BaseSchema):
                 "setDeliveryItems": helpers.absmod(
                     __name__, ".StagedOrderSetDeliveryItemsActionSchema"
                 ),
+                "setDirectDiscounts": helpers.absmod(
+                    __name__, ".StagedOrderSetDirectDiscountsActionSchema"
+                ),
                 "setItemShippingAddressCustomField": helpers.absmod(
                     __name__,
                     ".StagedOrderSetItemShippingAddressCustomFieldActionSchema",
@@ -652,6 +661,9 @@ class OrderEditDraftSchema(helpers.BaseSchema):
                 "setShippingRateInput": helpers.absmod(
                     __name__, ".StagedOrderSetShippingRateInputActionSchema"
                 ),
+                "setStore": helpers.absmod(
+                    __name__, ".StagedOrderSetStoreActionSchema"
+                ),
                 "transitionCustomLineItemState": helpers.absmod(
                     __name__, ".StagedOrderTransitionCustomLineItemStateActionSchema"
                 ),
@@ -701,11 +713,11 @@ class OrderEditDraftSchema(helpers.BaseSchema):
 
 class OrderEditPagedQueryResponseSchema(helpers.BaseSchema):
     limit = marshmallow.fields.Integer(allow_none=True, load_default=None)
+    offset = marshmallow.fields.Integer(allow_none=True, load_default=None)
     count = marshmallow.fields.Integer(allow_none=True, load_default=None)
     total = marshmallow.fields.Integer(
         allow_none=True, metadata={"omit_empty": True}, load_default=None
     )
-    offset = marshmallow.fields.Integer(allow_none=True, load_default=None)
     results = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".OrderEditSchema"),
         allow_none=True,
@@ -825,6 +837,9 @@ class OrderEditPreviewFailureSchema(OrderEditResultSchema):
                 "ConcurrentModification": helpers.absmod(
                     __name__, ".error.ConcurrentModificationErrorSchema"
                 ),
+                "ContentTooLarge": helpers.absmod(
+                    __name__, ".error.ContentTooLargeErrorSchema"
+                ),
                 "CountryNotConfiguredInStore": helpers.absmod(
                     __name__, ".error.CountryNotConfiguredInStoreErrorSchema"
                 ),
@@ -931,8 +946,14 @@ class OrderEditPreviewFailureSchema(OrderEditResultSchema):
                 "MatchingPriceNotFound": helpers.absmod(
                     __name__, ".error.MatchingPriceNotFoundErrorSchema"
                 ),
+                "MaxCartDiscountsReached": helpers.absmod(
+                    __name__, ".error.MaxCartDiscountsReachedErrorSchema"
+                ),
                 "MaxResourceLimitExceeded": helpers.absmod(
                     __name__, ".error.MaxResourceLimitExceededErrorSchema"
+                ),
+                "MaxStoreReferencesReached": helpers.absmod(
+                    __name__, ".error.MaxStoreReferencesReachedErrorSchema"
                 ),
                 "MissingRoleOnChannel": helpers.absmod(
                     __name__, ".error.MissingRoleOnChannelErrorSchema"
@@ -1012,6 +1033,9 @@ class OrderEditPreviewFailureSchema(OrderEditResultSchema):
                 "ShippingMethodDoesNotMatchCart": helpers.absmod(
                     __name__, ".error.ShippingMethodDoesNotMatchCartErrorSchema"
                 ),
+                "StoreCartDiscountsLimitReached": helpers.absmod(
+                    __name__, ".error.StoreCartDiscountsLimitReachedErrorSchema"
+                ),
                 "SyntaxError": helpers.absmod(
                     __name__, ".error.SyntaxErrorErrorSchema"
                 ),
@@ -1042,6 +1066,42 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
             allow_none=True,
             discriminator_field=("type", "type"),
             discriminator_schemas={
+                "ApprovalFlowApproved": helpers.absmod(
+                    __name__, ".message.ApprovalFlowApprovedMessagePayloadSchema"
+                ),
+                "ApprovalFlowCompleted": helpers.absmod(
+                    __name__, ".message.ApprovalFlowCompletedMessagePayloadSchema"
+                ),
+                "ApprovalFlowCreated": helpers.absmod(
+                    __name__, ".message.ApprovalFlowCreatedMessagePayloadSchema"
+                ),
+                "ApprovalFlowRejected": helpers.absmod(
+                    __name__, ".message.ApprovalFlowRejectedMessagePayloadSchema"
+                ),
+                "ApprovalRuleApproversSet": helpers.absmod(
+                    __name__, ".message.ApprovalRuleApproversSetMessagePayloadSchema"
+                ),
+                "ApprovalRuleCreated": helpers.absmod(
+                    __name__, ".message.ApprovalRuleCreatedMessagePayloadSchema"
+                ),
+                "ApprovalRuleDescriptionSet": helpers.absmod(
+                    __name__, ".message.ApprovalRuleDescriptionSetMessagePayloadSchema"
+                ),
+                "ApprovalRuleKeySet": helpers.absmod(
+                    __name__, ".message.ApprovalRuleKeySetMessagePayloadSchema"
+                ),
+                "ApprovalRuleNameSet": helpers.absmod(
+                    __name__, ".message.ApprovalRuleNameSetMessagePayloadSchema"
+                ),
+                "ApprovalRulePredicateSet": helpers.absmod(
+                    __name__, ".message.ApprovalRulePredicateSetMessagePayloadSchema"
+                ),
+                "ApprovalRuleRequestersSet": helpers.absmod(
+                    __name__, ".message.ApprovalRuleRequestersSetMessagePayloadSchema"
+                ),
+                "ApprovalRuleStatusSet": helpers.absmod(
+                    __name__, ".message.ApprovalRuleStatusSetMessagePayloadSchema"
+                ),
                 "AssociateRoleBuyerAssignableChanged": helpers.absmod(
                     __name__,
                     ".message.AssociateRoleBuyerAssignableChangedMessagePayloadSchema",
@@ -1071,6 +1131,26 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 ),
                 "BusinessUnitAddressChanged": helpers.absmod(
                     __name__, ".message.BusinessUnitAddressChangedMessagePayloadSchema"
+                ),
+                "BusinessUnitAddressCustomFieldAdded": helpers.absmod(
+                    __name__,
+                    ".message.BusinessUnitAddressCustomFieldAddedMessagePayloadSchema",
+                ),
+                "BusinessUnitAddressCustomFieldChanged": helpers.absmod(
+                    __name__,
+                    ".message.BusinessUnitAddressCustomFieldChangedMessagePayloadSchema",
+                ),
+                "BusinessUnitAddressCustomFieldRemoved": helpers.absmod(
+                    __name__,
+                    ".message.BusinessUnitAddressCustomFieldRemovedMessagePayloadSchema",
+                ),
+                "BusinessUnitAddressCustomTypeRemoved": helpers.absmod(
+                    __name__,
+                    ".message.BusinessUnitAddressCustomTypeRemovedMessagePayloadSchema",
+                ),
+                "BusinessUnitAddressCustomTypeSet": helpers.absmod(
+                    __name__,
+                    ".message.BusinessUnitAddressCustomTypeSetMessagePayloadSchema",
                 ),
                 "BusinessUnitAddressRemoved": helpers.absmod(
                     __name__, ".message.BusinessUnitAddressRemovedMessagePayloadSchema"
@@ -1107,6 +1187,25 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 "BusinessUnitCreated": helpers.absmod(
                     __name__, ".message.BusinessUnitCreatedMessagePayloadSchema"
                 ),
+                "BusinessUnitCustomFieldAdded": helpers.absmod(
+                    __name__,
+                    ".message.BusinessUnitCustomFieldAddedMessagePayloadSchema",
+                ),
+                "BusinessUnitCustomFieldChanged": helpers.absmod(
+                    __name__,
+                    ".message.BusinessUnitCustomFieldChangedMessagePayloadSchema",
+                ),
+                "BusinessUnitCustomFieldRemoved": helpers.absmod(
+                    __name__,
+                    ".message.BusinessUnitCustomFieldRemovedMessagePayloadSchema",
+                ),
+                "BusinessUnitCustomTypeRemoved": helpers.absmod(
+                    __name__,
+                    ".message.BusinessUnitCustomTypeRemovedMessagePayloadSchema",
+                ),
+                "BusinessUnitCustomTypeSet": helpers.absmod(
+                    __name__, ".message.BusinessUnitCustomTypeSetMessagePayloadSchema"
+                ),
                 "BusinessUnitDefaultBillingAddressSet": helpers.absmod(
                     __name__,
                     ".message.BusinessUnitDefaultBillingAddressSetMessagePayloadSchema",
@@ -1121,9 +1220,8 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 "BusinessUnitNameChanged": helpers.absmod(
                     __name__, ".message.BusinessUnitNameChangedMessagePayloadSchema"
                 ),
-                "BusinessUnitParentUnitChanged": helpers.absmod(
-                    __name__,
-                    ".message.BusinessUnitParentUnitChangedMessagePayloadSchema",
+                "BusinessUnitParentChanged": helpers.absmod(
+                    __name__, ".message.BusinessUnitParentChangedMessagePayloadSchema"
                 ),
                 "BusinessUnitShippingAddressAdded": helpers.absmod(
                     __name__,
@@ -1161,6 +1259,26 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 "CustomerAddressChanged": helpers.absmod(
                     __name__, ".message.CustomerAddressChangedMessagePayloadSchema"
                 ),
+                "CustomerAddressCustomFieldAdded": helpers.absmod(
+                    __name__,
+                    ".message.CustomerAddressCustomFieldAddedMessagePayloadSchema",
+                ),
+                "CustomerAddressCustomFieldChanged": helpers.absmod(
+                    __name__,
+                    ".message.CustomerAddressCustomFieldChangedMessagePayloadSchema",
+                ),
+                "CustomerAddressCustomFieldRemoved": helpers.absmod(
+                    __name__,
+                    ".message.CustomerAddressCustomFieldRemovedMessagePayloadSchema",
+                ),
+                "CustomerAddressCustomTypeRemoved": helpers.absmod(
+                    __name__,
+                    ".message.CustomerAddressCustomTypeRemovedMessagePayloadSchema",
+                ),
+                "CustomerAddressCustomTypeSet": helpers.absmod(
+                    __name__,
+                    ".message.CustomerAddressCustomTypeSetMessagePayloadSchema",
+                ),
                 "CustomerAddressRemoved": helpers.absmod(
                     __name__, ".message.CustomerAddressRemovedMessagePayloadSchema"
                 ),
@@ -1169,6 +1287,21 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 ),
                 "CustomerCreated": helpers.absmod(
                     __name__, ".message.CustomerCreatedMessagePayloadSchema"
+                ),
+                "CustomerCustomFieldAdded": helpers.absmod(
+                    __name__, ".message.CustomerCustomFieldAddedMessagePayloadSchema"
+                ),
+                "CustomerCustomFieldChanged": helpers.absmod(
+                    __name__, ".message.CustomerCustomFieldChangedMessagePayloadSchema"
+                ),
+                "CustomerCustomFieldRemoved": helpers.absmod(
+                    __name__, ".message.CustomerCustomFieldRemovedMessagePayloadSchema"
+                ),
+                "CustomerCustomTypeRemoved": helpers.absmod(
+                    __name__, ".message.CustomerCustomTypeRemovedMessagePayloadSchema"
+                ),
+                "CustomerCustomTypeSet": helpers.absmod(
+                    __name__, ".message.CustomerCustomTypeSetMessagePayloadSchema"
                 ),
                 "CustomerDateOfBirthSet": helpers.absmod(
                     __name__, ".message.CustomerDateOfBirthSetMessagePayloadSchema"
@@ -1179,17 +1312,43 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 "CustomerEmailChanged": helpers.absmod(
                     __name__, ".message.CustomerEmailChangedMessagePayloadSchema"
                 ),
+                "CustomerEmailTokenCreated": helpers.absmod(
+                    __name__, ".message.CustomerEmailTokenCreatedMessagePayloadSchema"
+                ),
                 "CustomerEmailVerified": helpers.absmod(
                     __name__, ".message.CustomerEmailVerifiedMessagePayloadSchema"
                 ),
                 "CustomerFirstNameSet": helpers.absmod(
                     __name__, ".message.CustomerFirstNameSetMessagePayloadSchema"
                 ),
+                "CustomerGroupCustomFieldAdded": helpers.absmod(
+                    __name__,
+                    ".message.CustomerGroupCustomFieldAddedMessagePayloadSchema",
+                ),
+                "CustomerGroupCustomFieldChanged": helpers.absmod(
+                    __name__,
+                    ".message.CustomerGroupCustomFieldChangedMessagePayloadSchema",
+                ),
+                "CustomerGroupCustomFieldRemoved": helpers.absmod(
+                    __name__,
+                    ".message.CustomerGroupCustomFieldRemovedMessagePayloadSchema",
+                ),
+                "CustomerGroupCustomTypeRemoved": helpers.absmod(
+                    __name__,
+                    ".message.CustomerGroupCustomTypeRemovedMessagePayloadSchema",
+                ),
+                "CustomerGroupCustomTypeSet": helpers.absmod(
+                    __name__, ".message.CustomerGroupCustomTypeSetMessagePayloadSchema"
+                ),
                 "CustomerGroupSet": helpers.absmod(
                     __name__, ".message.CustomerGroupSetMessagePayloadSchema"
                 ),
                 "CustomerLastNameSet": helpers.absmod(
                     __name__, ".message.CustomerLastNameSetMessagePayloadSchema"
+                ),
+                "CustomerPasswordTokenCreated": helpers.absmod(
+                    __name__,
+                    ".message.CustomerPasswordTokenCreatedMessagePayloadSchema",
                 ),
                 "CustomerPasswordUpdated": helpers.absmod(
                     __name__, ".message.CustomerPasswordUpdatedMessagePayloadSchema"
@@ -1327,6 +1486,9 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 "QuoteDeleted": helpers.absmod(
                     __name__, ".message.QuoteDeletedMessagePayloadSchema"
                 ),
+                "QuoteRenegotiationRequested": helpers.absmod(
+                    __name__, ".message.QuoteRenegotiationRequestedMessagePayloadSchema"
+                ),
                 "QuoteRequestCreated": helpers.absmod(
                     __name__, ".message.QuoteRequestCreatedMessagePayloadSchema"
                 ),
@@ -1401,6 +1563,10 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 "StandalonePriceStagedChangesApplied": helpers.absmod(
                     __name__,
                     ".message.StandalonePriceStagedChangesAppliedMessagePayloadSchema",
+                ),
+                "StandalonePriceStagedChangesRemoved": helpers.absmod(
+                    __name__,
+                    ".message.StandalonePriceStagedChangesRemovedMessagePayloadSchema",
                 ),
                 "StandalonePriceTierAdded": helpers.absmod(
                     __name__, ".message.StandalonePriceTierAddedMessagePayloadSchema"
@@ -1713,6 +1879,9 @@ class OrderEditAddStagedActionActionSchema(OrderEditUpdateActionSchema):
             "setDeliveryItems": helpers.absmod(
                 __name__, ".StagedOrderSetDeliveryItemsActionSchema"
             ),
+            "setDirectDiscounts": helpers.absmod(
+                __name__, ".StagedOrderSetDirectDiscountsActionSchema"
+            ),
             "setItemShippingAddressCustomField": helpers.absmod(
                 __name__, ".StagedOrderSetItemShippingAddressCustomFieldActionSchema"
             ),
@@ -1811,6 +1980,7 @@ class OrderEditAddStagedActionActionSchema(OrderEditUpdateActionSchema):
             "setShippingRateInput": helpers.absmod(
                 __name__, ".StagedOrderSetShippingRateInputActionSchema"
             ),
+            "setStore": helpers.absmod(__name__, ".StagedOrderSetStoreActionSchema"),
             "transitionCustomLineItemState": helpers.absmod(
                 __name__, ".StagedOrderTransitionCustomLineItemStateActionSchema"
             ),
@@ -2057,6 +2227,9 @@ class OrderEditSetStagedActionsActionSchema(OrderEditUpdateActionSchema):
                 "setDeliveryItems": helpers.absmod(
                     __name__, ".StagedOrderSetDeliveryItemsActionSchema"
                 ),
+                "setDirectDiscounts": helpers.absmod(
+                    __name__, ".StagedOrderSetDirectDiscountsActionSchema"
+                ),
                 "setItemShippingAddressCustomField": helpers.absmod(
                     __name__,
                     ".StagedOrderSetItemShippingAddressCustomFieldActionSchema",
@@ -2159,6 +2332,9 @@ class OrderEditSetStagedActionsActionSchema(OrderEditUpdateActionSchema):
                 "setShippingRateInput": helpers.absmod(
                     __name__, ".StagedOrderSetShippingRateInputActionSchema"
                 ),
+                "setStore": helpers.absmod(
+                    __name__, ".StagedOrderSetStoreActionSchema"
+                ),
                 "transitionCustomLineItemState": helpers.absmod(
                     __name__, ".StagedOrderTransitionCustomLineItemStateActionSchema"
                 ),
@@ -2202,6 +2378,9 @@ class StagedOrderAddCustomLineItemActionSchema(StagedOrderUpdateActionSchema):
         values=marshmallow.fields.String(allow_none=True),
         load_default=None,
     )
+    key = marshmallow.fields.String(
+        allow_none=True, metadata={"omit_empty": True}, load_default=None
+    )
     quantity = marshmallow.fields.Integer(
         allow_none=True, metadata={"omit_empty": True}, load_default=None
     )
@@ -2216,13 +2395,6 @@ class StagedOrderAddCustomLineItemActionSchema(StagedOrderUpdateActionSchema):
         load_default=None,
         data_key="taxCategory",
     )
-    custom = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".type.CustomFieldsDraftSchema"),
-        allow_none=True,
-        unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
-        load_default=None,
-    )
     external_tax_rate = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".cart.ExternalTaxRateDraftSchema"),
         allow_none=True,
@@ -2231,6 +2403,14 @@ class StagedOrderAddCustomLineItemActionSchema(StagedOrderUpdateActionSchema):
         load_default=None,
         data_key="externalTaxRate",
     )
+    shipping_details = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".cart.ItemShippingDetailsDraftSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="shippingDetails",
+    )
     price_mode = marshmallow_enum.EnumField(
         CustomLineItemPriceMode,
         by_value=True,
@@ -2238,6 +2418,13 @@ class StagedOrderAddCustomLineItemActionSchema(StagedOrderUpdateActionSchema):
         metadata={"omit_empty": True},
         load_default=None,
         data_key="priceMode",
+    )
+    custom = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".type.CustomFieldsDraftSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
     )
 
     class Meta:
@@ -2255,6 +2442,12 @@ class StagedOrderAddDeliveryActionSchema(StagedOrderUpdateActionSchema):
         metadata={"omit_empty": True},
         load_default=None,
         data_key="deliveryKey",
+    )
+    shipping_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="shippingKey",
     )
     items = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".order.DeliveryItemSchema"),
@@ -2329,29 +2522,6 @@ class StagedOrderAddLineItemActionSchema(StagedOrderUpdateActionSchema):
     key = marshmallow.fields.String(
         allow_none=True, metadata={"omit_empty": True}, load_default=None
     )
-    custom = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".type.CustomFieldsDraftSchema"),
-        allow_none=True,
-        unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
-        load_default=None,
-    )
-    distribution_channel = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".channel.ChannelResourceIdentifierSchema"),
-        allow_none=True,
-        unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
-        load_default=None,
-        data_key="distributionChannel",
-    )
-    external_tax_rate = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".cart.ExternalTaxRateDraftSchema"),
-        allow_none=True,
-        unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
-        load_default=None,
-        data_key="externalTaxRate",
-    )
     product_id = marshmallow.fields.String(
         allow_none=True,
         metadata={"omit_empty": True},
@@ -2375,6 +2545,14 @@ class StagedOrderAddLineItemActionSchema(StagedOrderUpdateActionSchema):
         metadata={"omit_empty": True},
         load_default=None,
         data_key="addedAt",
+    )
+    distribution_channel = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".channel.ChannelResourceIdentifierSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="distributionChannel",
     )
     supply_channel = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".channel.ChannelResourceIdentifierSchema"),
@@ -2400,6 +2578,22 @@ class StagedOrderAddLineItemActionSchema(StagedOrderUpdateActionSchema):
         load_default=None,
         data_key="externalTotalPrice",
     )
+    external_tax_rate = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".cart.ExternalTaxRateDraftSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="externalTaxRate",
+    )
+    inventory_mode = marshmallow_enum.EnumField(
+        InventoryMode,
+        by_value=True,
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="inventoryMode",
+    )
     shipping_details = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".cart.ItemShippingDetailsDraftSchema"),
         allow_none=True,
@@ -2407,6 +2601,13 @@ class StagedOrderAddLineItemActionSchema(StagedOrderUpdateActionSchema):
         metadata={"omit_empty": True},
         load_default=None,
         data_key="shippingDetails",
+    )
+    custom = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".type.CustomFieldsDraftSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
     )
 
     class Meta:
@@ -2456,6 +2657,13 @@ class StagedOrderAddParcelToDeliveryActionSchema(StagedOrderUpdateActionSchema):
         nested=helpers.absmod(__name__, ".order.DeliveryItemSchema"),
         allow_none=True,
         many=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
+    custom = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".type.CustomFieldsDraftSchema"),
+        allow_none=True,
         unknown=marshmallow.EXCLUDE,
         metadata={"omit_empty": True},
         load_default=None,
@@ -2527,14 +2735,6 @@ class StagedOrderAddShoppingListActionSchema(StagedOrderUpdateActionSchema):
         load_default=None,
         data_key="shoppingList",
     )
-    supply_channel = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".channel.ChannelResourceIdentifierSchema"),
-        allow_none=True,
-        unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
-        load_default=None,
-        data_key="supplyChannel",
-    )
     distribution_channel = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".channel.ChannelResourceIdentifierSchema"),
         allow_none=True,
@@ -2542,6 +2742,14 @@ class StagedOrderAddShoppingListActionSchema(StagedOrderUpdateActionSchema):
         metadata={"omit_empty": True},
         load_default=None,
         data_key="distributionChannel",
+    )
+    supply_channel = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".channel.ChannelResourceIdentifierSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="supplyChannel",
     )
 
     class Meta:
@@ -2555,7 +2763,16 @@ class StagedOrderAddShoppingListActionSchema(StagedOrderUpdateActionSchema):
 
 class StagedOrderChangeCustomLineItemMoneyActionSchema(StagedOrderUpdateActionSchema):
     custom_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemId",
+    )
+    custom_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemKey",
     )
     money = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".common.MoneySchema"),
@@ -2577,7 +2794,16 @@ class StagedOrderChangeCustomLineItemQuantityActionSchema(
     StagedOrderUpdateActionSchema
 ):
     custom_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemId",
+    )
+    custom_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemKey",
     )
     quantity = marshmallow.fields.Integer(allow_none=True, load_default=None)
 
@@ -2653,7 +2879,6 @@ class StagedOrderChangePaymentStateActionSchema(StagedOrderUpdateActionSchema):
         PaymentState,
         by_value=True,
         allow_none=True,
-        metadata={"omit_empty": True},
         load_default=None,
         data_key="paymentState",
     )
@@ -2672,7 +2897,6 @@ class StagedOrderChangeShipmentStateActionSchema(StagedOrderUpdateActionSchema):
         ShipmentState,
         by_value=True,
         allow_none=True,
-        metadata={"omit_empty": True},
         load_default=None,
         data_key="shipmentState",
     )
@@ -2738,7 +2962,16 @@ class StagedOrderChangeTaxRoundingModeActionSchema(StagedOrderUpdateActionSchema
 
 class StagedOrderImportCustomLineItemStateActionSchema(StagedOrderUpdateActionSchema):
     custom_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemId",
+    )
+    custom_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemKey",
     )
     state = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".order.ItemStateSchema"),
@@ -2759,7 +2992,16 @@ class StagedOrderImportCustomLineItemStateActionSchema(StagedOrderUpdateActionSc
 
 class StagedOrderImportLineItemStateActionSchema(StagedOrderUpdateActionSchema):
     line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="lineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="lineItemId",
+    )
+    line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="lineItemKey",
     )
     state = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".order.ItemStateSchema"),
@@ -2780,7 +3022,16 @@ class StagedOrderImportLineItemStateActionSchema(StagedOrderUpdateActionSchema):
 
 class StagedOrderRemoveCustomLineItemActionSchema(StagedOrderUpdateActionSchema):
     custom_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemId",
+    )
+    custom_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemKey",
     )
 
     class Meta:
@@ -3029,7 +3280,16 @@ class StagedOrderSetCustomLineItemCustomFieldActionSchema(
     StagedOrderUpdateActionSchema
 ):
     custom_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemId",
+    )
+    custom_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemKey",
     )
     name = marshmallow.fields.String(allow_none=True, load_default=None)
     value = marshmallow.fields.Raw(
@@ -3047,7 +3307,16 @@ class StagedOrderSetCustomLineItemCustomFieldActionSchema(
 
 class StagedOrderSetCustomLineItemCustomTypeActionSchema(StagedOrderUpdateActionSchema):
     custom_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemId",
+    )
+    custom_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemKey",
     )
     type = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".type.TypeResourceIdentifierSchema"),
@@ -3076,7 +3345,16 @@ class StagedOrderSetCustomLineItemShippingDetailsActionSchema(
     StagedOrderUpdateActionSchema
 ):
     custom_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemId",
+    )
+    custom_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemKey",
     )
     shipping_details = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".cart.ItemShippingDetailsDraftSchema"),
@@ -3098,7 +3376,16 @@ class StagedOrderSetCustomLineItemShippingDetailsActionSchema(
 
 class StagedOrderSetCustomLineItemTaxAmountActionSchema(StagedOrderUpdateActionSchema):
     custom_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemId",
+    )
+    custom_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemKey",
     )
     external_tax_amount = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".cart.ExternalTaxAmountDraftSchema"),
@@ -3107,6 +3394,12 @@ class StagedOrderSetCustomLineItemTaxAmountActionSchema(StagedOrderUpdateActionS
         metadata={"omit_empty": True},
         load_default=None,
         data_key="externalTaxAmount",
+    )
+    shipping_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="shippingKey",
     )
 
     class Meta:
@@ -3120,7 +3413,16 @@ class StagedOrderSetCustomLineItemTaxAmountActionSchema(StagedOrderUpdateActionS
 
 class StagedOrderSetCustomLineItemTaxRateActionSchema(StagedOrderUpdateActionSchema):
     custom_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemId",
+    )
+    custom_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemKey",
     )
     external_tax_rate = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".cart.ExternalTaxRateDraftSchema"),
@@ -3129,6 +3431,12 @@ class StagedOrderSetCustomLineItemTaxRateActionSchema(StagedOrderUpdateActionSch
         metadata={"omit_empty": True},
         load_default=None,
         data_key="externalTaxRate",
+    )
+    shipping_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="shippingKey",
     )
 
     class Meta:
@@ -3443,6 +3751,24 @@ class StagedOrderSetDeliveryItemsActionSchema(StagedOrderUpdateActionSchema):
     def post_load(self, data, **kwargs):
         del data["action"]
         return models.StagedOrderSetDeliveryItemsAction(**data)
+
+
+class StagedOrderSetDirectDiscountsActionSchema(StagedOrderUpdateActionSchema):
+    discounts = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".cart.DirectDiscountDraftSchema"),
+        allow_none=True,
+        many=True,
+        unknown=marshmallow.EXCLUDE,
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.StagedOrderSetDirectDiscountsAction(**data)
 
 
 class StagedOrderSetItemShippingAddressCustomFieldActionSchema(
@@ -4007,7 +4333,16 @@ class StagedOrderSetReturnInfoActionSchema(StagedOrderUpdateActionSchema):
 
 class StagedOrderSetReturnItemCustomFieldActionSchema(StagedOrderUpdateActionSchema):
     return_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="returnItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="returnItemId",
+    )
+    return_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="returnItemKey",
     )
     name = marshmallow.fields.String(allow_none=True, load_default=None)
     value = marshmallow.fields.Raw(
@@ -4025,7 +4360,16 @@ class StagedOrderSetReturnItemCustomFieldActionSchema(StagedOrderUpdateActionSch
 
 class StagedOrderSetReturnItemCustomTypeActionSchema(StagedOrderUpdateActionSchema):
     return_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="returnItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="returnItemId",
+    )
+    return_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="returnItemKey",
     )
     type = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".type.TypeResourceIdentifierSchema"),
@@ -4052,7 +4396,16 @@ class StagedOrderSetReturnItemCustomTypeActionSchema(StagedOrderUpdateActionSche
 
 class StagedOrderSetReturnPaymentStateActionSchema(StagedOrderUpdateActionSchema):
     return_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="returnItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="returnItemId",
+    )
+    return_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="returnItemKey",
     )
     payment_state = marshmallow_enum.EnumField(
         ReturnPaymentState,
@@ -4073,7 +4426,16 @@ class StagedOrderSetReturnPaymentStateActionSchema(StagedOrderUpdateActionSchema
 
 class StagedOrderSetReturnShipmentStateActionSchema(StagedOrderUpdateActionSchema):
     return_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="returnItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="returnItemId",
+    )
+    return_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="returnItemKey",
     )
     shipment_state = marshmallow_enum.EnumField(
         ReturnShipmentState,
@@ -4342,11 +4704,38 @@ class StagedOrderSetShippingRateInputActionSchema(StagedOrderUpdateActionSchema)
         return models.StagedOrderSetShippingRateInputAction(**data)
 
 
+class StagedOrderSetStoreActionSchema(StagedOrderUpdateActionSchema):
+    store = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".store.StoreResourceIdentifierSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.StagedOrderSetStoreAction(**data)
+
+
 class StagedOrderTransitionCustomLineItemStateActionSchema(
     StagedOrderUpdateActionSchema
 ):
     custom_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemId",
+    )
+    custom_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="customLineItemKey",
     )
     quantity = marshmallow.fields.Integer(allow_none=True, load_default=None)
     from_state = helpers.LazyNestedField(
@@ -4381,7 +4770,16 @@ class StagedOrderTransitionCustomLineItemStateActionSchema(
 
 class StagedOrderTransitionLineItemStateActionSchema(StagedOrderUpdateActionSchema):
     line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="lineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="lineItemId",
+    )
+    line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="lineItemKey",
     )
     quantity = marshmallow.fields.Integer(allow_none=True, load_default=None)
     from_state = helpers.LazyNestedField(
@@ -4452,17 +4850,17 @@ class StagedOrderUpdateItemShippingAddressActionSchema(StagedOrderUpdateActionSc
 
 
 class StagedOrderUpdateSyncInfoActionSchema(StagedOrderUpdateActionSchema):
-    channel = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".channel.ChannelResourceIdentifierSchema"),
-        allow_none=True,
-        unknown=marshmallow.EXCLUDE,
-        load_default=None,
-    )
     external_id = marshmallow.fields.String(
         allow_none=True,
         metadata={"omit_empty": True},
         load_default=None,
         data_key="externalId",
+    )
+    channel = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".channel.ChannelResourceIdentifierSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        load_default=None,
     )
     synced_at = marshmallow.fields.DateTime(
         allow_none=True,

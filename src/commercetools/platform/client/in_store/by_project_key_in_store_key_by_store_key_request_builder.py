@@ -7,6 +7,9 @@
 import typing
 import warnings
 
+from ..cart_discounts.by_project_key_in_store_key_by_store_key_cart_discounts_request_builder import (
+    ByProjectKeyInStoreKeyByStoreKeyCartDiscountsRequestBuilder,
+)
 from ..carts.by_project_key_in_store_key_by_store_key_carts_request_builder import (
     ByProjectKeyInStoreKeyByStoreKeyCartsRequestBuilder,
 )
@@ -133,4 +136,13 @@ class ByProjectKeyInStoreKeyByStoreKeyRequestBuilder:
                 store_key=self._store_key,
                 client=self._client,
             )
+        )
+
+    def cart_discounts(
+        self,
+    ) -> ByProjectKeyInStoreKeyByStoreKeyCartDiscountsRequestBuilder:
+        return ByProjectKeyInStoreKeyByStoreKeyCartDiscountsRequestBuilder(
+            project_key=self._project_key,
+            store_key=self._store_key,
+            client=self._client,
         )

@@ -958,6 +958,8 @@ class ImportResourceType(enum.Enum):
     """The resource types that can be imported."""
 
     CATEGORY = "category"
+    CUSTOMER = "customer"
+    INVENTORY = "inventory"
     ORDER = "order"
     ORDER_PATCH = "order-patch"
     PRICE = "price"
@@ -966,8 +968,6 @@ class ImportResourceType(enum.Enum):
     PRODUCT_TYPE = "product-type"
     PRODUCT_VARIANT = "product-variant"
     PRODUCT_VARIANT_PATCH = "product-variant-patch"
-    CUSTOMER = "customer"
-    INVENTORY = "inventory"
     STANDALONE_PRICE = "standalone-price"
     TYPE = "type"
 
@@ -998,7 +998,7 @@ class ReferenceType(enum.Enum):
 
 
 class ProcessingState(enum.Enum):
-    """Every [Import Operation](/import-operation) is assigned with one of the following states."""
+    """Every [Import Operation](/import-operation) is assigned one of the following states."""
 
     PROCESSING = "processing"
     VALIDATION_FAILED = "validationFailed"
@@ -1006,6 +1006,7 @@ class ProcessingState(enum.Enum):
     WAIT_FOR_MASTER_VARIANT = "waitForMasterVariant"
     IMPORTED = "imported"
     REJECTED = "rejected"
+    CANCELED = "canceled"
 
 
 class Address(_BaseType):

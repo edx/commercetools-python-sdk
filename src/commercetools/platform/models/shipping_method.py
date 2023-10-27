@@ -98,7 +98,7 @@ class ShippingMethod(BaseResource):
     created_by: typing.Optional["CreatedBy"]
     #: User-defined unique identifier of the ShippingMethod.
     key: typing.Optional[str]
-    #: Name of the ShippingMethod.
+    #: Unique name of the ShippingMethod within a [Project](ctp:api:type:Project).
     name: str
     #: Localized name of the ShippingMethod.
     localized_name: typing.Optional["LocalizedString"]
@@ -172,7 +172,7 @@ class ShippingMethod(BaseResource):
 class ShippingMethodDraft(_BaseType):
     #: User-defined unique identifier for the ShippingMethod.
     key: typing.Optional[str]
-    #: Name of the ShippingMethod.
+    #: Unique name for the ShippingMethod within a [Project](ctp:api:type:Project).
     name: str
     #: Localized name of the ShippingMethod.
     localized_name: typing.Optional["LocalizedString"]
@@ -799,7 +799,7 @@ class ShippingMethodChangeIsDefaultAction(ShippingMethodUpdateAction):
 
 
 class ShippingMethodChangeNameAction(ShippingMethodUpdateAction):
-    #: Value to set. Must not be empty.
+    #: Unique value to set within a [Project](ctp:api:type:Project). Must not be empty.
     name: str
 
     def __init__(self, *, name: str):

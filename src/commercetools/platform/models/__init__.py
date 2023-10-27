@@ -7,6 +7,8 @@
 
 from . import *  # noqa
 from .api_client import *  # noqa
+from .approval_flow import *  # noqa
+from .approval_rule import *  # noqa
 from .associate_role import *  # noqa
 from .attribute_group import *  # noqa
 from .business_unit import *  # noqa

@@ -399,6 +399,16 @@ class CustomerDraftSchema(helpers.BaseSchema):
         return models.CustomerDraft(**data)
 
 
+class CustomerEmailTokenReferenceSchema(ReferenceSchema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["type_id"]
+        return models.CustomerEmailTokenReference(**data)
+
+
 class CustomerEmailVerifySchema(helpers.BaseSchema):
     version = marshmallow.fields.Integer(
         allow_none=True, metadata={"omit_empty": True}, load_default=None
@@ -436,6 +446,16 @@ class CustomerPagedQueryResponseSchema(helpers.BaseSchema):
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
         return models.CustomerPagedQueryResponse(**data)
+
+
+class CustomerPasswordTokenReferenceSchema(ReferenceSchema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["type_id"]
+        return models.CustomerPasswordTokenReference(**data)
 
 
 class CustomerReferenceSchema(ReferenceSchema):
@@ -556,6 +576,13 @@ class CustomerSigninSchema(helpers.BaseSchema):
 
 class CustomerTokenSchema(helpers.BaseSchema):
     id = marshmallow.fields.String(allow_none=True, load_default=None)
+    customer_id = marshmallow.fields.String(
+        allow_none=True, load_default=None, data_key="customerId"
+    )
+    value = marshmallow.fields.String(allow_none=True, load_default=None)
+    expires_at = marshmallow.fields.DateTime(
+        allow_none=True, load_default=None, data_key="expiresAt"
+    )
     created_at = marshmallow.fields.DateTime(
         allow_none=True, load_default=None, data_key="createdAt"
     )
@@ -565,13 +592,6 @@ class CustomerTokenSchema(helpers.BaseSchema):
         load_default=None,
         data_key="lastModifiedAt",
     )
-    customer_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="customerId"
-    )
-    expires_at = marshmallow.fields.DateTime(
-        allow_none=True, load_default=None, data_key="expiresAt"
-    )
-    value = marshmallow.fields.String(allow_none=True, load_default=None)
 
     class Meta:
         unknown = marshmallow.EXCLUDE

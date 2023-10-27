@@ -10,6 +10,8 @@ import enum
 import typing
 
 from ._abstract import _BaseType
+from .approval_flow import ApprovalFlowStatus
+from .approval_rule import ApprovalRuleStatus
 from .associate_role import Permission
 from .business_unit import (
     BusinessUnitAssociateMode,
@@ -26,6 +28,13 @@ from .quote_request import QuoteRequestState
 from .staged_quote import StagedQuoteState
 
 if typing.TYPE_CHECKING:
+    from .approval_flow import ApprovalFlow, ApprovalFlowStatus
+    from .approval_rule import (
+        ApprovalRule,
+        ApprovalRuleStatus,
+        ApproverHierarchy,
+        RuleRequester,
+    )
     from .associate_role import AssociateRole, Permission
     from .business_unit import (
         Associate,
@@ -71,6 +80,7 @@ if typing.TYPE_CHECKING:
         DeliveryItem,
         ItemState,
         Order,
+        OrderReference,
         OrderState,
         Parcel,
         ParcelMeasurements,
@@ -104,6 +114,30 @@ if typing.TYPE_CHECKING:
     from .type import CustomFields
 
 __all__ = [
+    "ApprovalFlowApprovedMessage",
+    "ApprovalFlowApprovedMessagePayload",
+    "ApprovalFlowCompletedMessage",
+    "ApprovalFlowCompletedMessagePayload",
+    "ApprovalFlowCreatedMessage",
+    "ApprovalFlowCreatedMessagePayload",
+    "ApprovalFlowRejectedMessage",
+    "ApprovalFlowRejectedMessagePayload",
+    "ApprovalRuleApproversSetMessage",
+    "ApprovalRuleApproversSetMessagePayload",
+    "ApprovalRuleCreatedMessage",
+    "ApprovalRuleCreatedMessagePayload",
+    "ApprovalRuleDescriptionSetMessage",
+    "ApprovalRuleDescriptionSetMessagePayload",
+    "ApprovalRuleKeySetMessage",
+    "ApprovalRuleKeySetMessagePayload",
+    "ApprovalRuleNameSetMessage",
+    "ApprovalRuleNameSetMessagePayload",
+    "ApprovalRulePredicateSetMessage",
+    "ApprovalRulePredicateSetMessagePayload",
+    "ApprovalRuleRequestersSetMessage",
+    "ApprovalRuleRequestersSetMessagePayload",
+    "ApprovalRuleStatusSetMessage",
+    "ApprovalRuleStatusSetMessagePayload",
     "AssociateRoleBuyerAssignableChangedMessage",
     "AssociateRoleBuyerAssignableChangedMessagePayload",
     "AssociateRoleCreatedMessage",
@@ -122,6 +156,16 @@ __all__ = [
     "BusinessUnitAddressAddedMessagePayload",
     "BusinessUnitAddressChangedMessage",
     "BusinessUnitAddressChangedMessagePayload",
+    "BusinessUnitAddressCustomFieldAddedMessage",
+    "BusinessUnitAddressCustomFieldAddedMessagePayload",
+    "BusinessUnitAddressCustomFieldChangedMessage",
+    "BusinessUnitAddressCustomFieldChangedMessagePayload",
+    "BusinessUnitAddressCustomFieldRemovedMessage",
+    "BusinessUnitAddressCustomFieldRemovedMessagePayload",
+    "BusinessUnitAddressCustomTypeRemovedMessage",
+    "BusinessUnitAddressCustomTypeRemovedMessagePayload",
+    "BusinessUnitAddressCustomTypeSetMessage",
+    "BusinessUnitAddressCustomTypeSetMessagePayload",
     "BusinessUnitAddressRemovedMessage",
     "BusinessUnitAddressRemovedMessagePayload",
     "BusinessUnitAssociateAddedMessage",
@@ -142,6 +186,16 @@ __all__ = [
     "BusinessUnitContactEmailSetMessagePayload",
     "BusinessUnitCreatedMessage",
     "BusinessUnitCreatedMessagePayload",
+    "BusinessUnitCustomFieldAddedMessage",
+    "BusinessUnitCustomFieldAddedMessagePayload",
+    "BusinessUnitCustomFieldChangedMessage",
+    "BusinessUnitCustomFieldChangedMessagePayload",
+    "BusinessUnitCustomFieldRemovedMessage",
+    "BusinessUnitCustomFieldRemovedMessagePayload",
+    "BusinessUnitCustomTypeRemovedMessage",
+    "BusinessUnitCustomTypeRemovedMessagePayload",
+    "BusinessUnitCustomTypeSetMessage",
+    "BusinessUnitCustomTypeSetMessagePayload",
     "BusinessUnitDefaultBillingAddressSetMessage",
     "BusinessUnitDefaultBillingAddressSetMessagePayload",
     "BusinessUnitDefaultShippingAddressSetMessage",
@@ -150,8 +204,8 @@ __all__ = [
     "BusinessUnitDeletedMessagePayload",
     "BusinessUnitNameChangedMessage",
     "BusinessUnitNameChangedMessagePayload",
-    "BusinessUnitParentUnitChangedMessage",
-    "BusinessUnitParentUnitChangedMessagePayload",
+    "BusinessUnitParentChangedMessage",
+    "BusinessUnitParentChangedMessagePayload",
     "BusinessUnitShippingAddressAddedMessage",
     "BusinessUnitShippingAddressAddedMessagePayload",
     "BusinessUnitShippingAddressRemovedMessage",
@@ -177,26 +231,60 @@ __all__ = [
     "CustomerAddressAddedMessagePayload",
     "CustomerAddressChangedMessage",
     "CustomerAddressChangedMessagePayload",
+    "CustomerAddressCustomFieldAddedMessage",
+    "CustomerAddressCustomFieldAddedMessagePayload",
+    "CustomerAddressCustomFieldChangedMessage",
+    "CustomerAddressCustomFieldChangedMessagePayload",
+    "CustomerAddressCustomFieldRemovedMessage",
+    "CustomerAddressCustomFieldRemovedMessagePayload",
+    "CustomerAddressCustomTypeRemovedMessage",
+    "CustomerAddressCustomTypeRemovedMessagePayload",
+    "CustomerAddressCustomTypeSetMessage",
+    "CustomerAddressCustomTypeSetMessagePayload",
     "CustomerAddressRemovedMessage",
     "CustomerAddressRemovedMessagePayload",
     "CustomerCompanyNameSetMessage",
     "CustomerCompanyNameSetMessagePayload",
     "CustomerCreatedMessage",
     "CustomerCreatedMessagePayload",
+    "CustomerCustomFieldAddedMessage",
+    "CustomerCustomFieldAddedMessagePayload",
+    "CustomerCustomFieldChangedMessage",
+    "CustomerCustomFieldChangedMessagePayload",
+    "CustomerCustomFieldRemovedMessage",
+    "CustomerCustomFieldRemovedMessagePayload",
+    "CustomerCustomTypeRemovedMessage",
+    "CustomerCustomTypeRemovedMessagePayload",
+    "CustomerCustomTypeSetMessage",
+    "CustomerCustomTypeSetMessagePayload",
     "CustomerDateOfBirthSetMessage",
     "CustomerDateOfBirthSetMessagePayload",
     "CustomerDeletedMessage",
     "CustomerDeletedMessagePayload",
     "CustomerEmailChangedMessage",
     "CustomerEmailChangedMessagePayload",
+    "CustomerEmailTokenCreatedMessage",
+    "CustomerEmailTokenCreatedMessagePayload",
     "CustomerEmailVerifiedMessage",
     "CustomerEmailVerifiedMessagePayload",
     "CustomerFirstNameSetMessage",
     "CustomerFirstNameSetMessagePayload",
+    "CustomerGroupCustomFieldAddedMessage",
+    "CustomerGroupCustomFieldAddedMessagePayload",
+    "CustomerGroupCustomFieldChangedMessage",
+    "CustomerGroupCustomFieldChangedMessagePayload",
+    "CustomerGroupCustomFieldRemovedMessage",
+    "CustomerGroupCustomFieldRemovedMessagePayload",
+    "CustomerGroupCustomTypeRemovedMessage",
+    "CustomerGroupCustomTypeRemovedMessagePayload",
+    "CustomerGroupCustomTypeSetMessage",
+    "CustomerGroupCustomTypeSetMessagePayload",
     "CustomerGroupSetMessage",
     "CustomerGroupSetMessagePayload",
     "CustomerLastNameSetMessage",
     "CustomerLastNameSetMessagePayload",
+    "CustomerPasswordTokenCreatedMessage",
+    "CustomerPasswordTokenCreatedMessagePayload",
     "CustomerPasswordUpdatedMessage",
     "CustomerPasswordUpdatedMessagePayload",
     "CustomerTitleSetMessage",
@@ -226,6 +314,12 @@ __all__ = [
     "OrderBillingAddressSetMessagePayload",
     "OrderCreatedMessage",
     "OrderCreatedMessagePayload",
+    "OrderCustomFieldAddedMessage",
+    "OrderCustomFieldAddedMessagePayload",
+    "OrderCustomFieldChangedMessage",
+    "OrderCustomFieldChangedMessagePayload",
+    "OrderCustomFieldRemovedMessage",
+    "OrderCustomFieldRemovedMessagePayload",
     "OrderCustomLineItemAddedMessage",
     "OrderCustomLineItemAddedMessagePayload",
     "OrderCustomLineItemDiscountSetMessage",
@@ -234,6 +328,10 @@ __all__ = [
     "OrderCustomLineItemQuantityChangedMessagePayload",
     "OrderCustomLineItemRemovedMessage",
     "OrderCustomLineItemRemovedMessagePayload",
+    "OrderCustomTypeRemovedMessage",
+    "OrderCustomTypeRemovedMessagePayload",
+    "OrderCustomTypeSetMessage",
+    "OrderCustomTypeSetMessagePayload",
     "OrderCustomerEmailSetMessage",
     "OrderCustomerEmailSetMessagePayload",
     "OrderCustomerGroupSetMessage",
@@ -367,6 +465,8 @@ __all__ = [
     "QuoteCustomerChangedMessagePayload",
     "QuoteDeletedMessage",
     "QuoteDeletedMessagePayload",
+    "QuoteRenegotiationRequestedMessage",
+    "QuoteRenegotiationRequestedMessagePayload",
     "QuoteRequestCreatedMessage",
     "QuoteRequestCreatedMessagePayload",
     "QuoteRequestCustomerChangedMessage",
@@ -418,6 +518,8 @@ __all__ = [
     "StandalonePriceKeySetMessagePayload",
     "StandalonePriceStagedChangesAppliedMessage",
     "StandalonePriceStagedChangesAppliedMessagePayload",
+    "StandalonePriceStagedChangesRemovedMessage",
+    "StandalonePriceStagedChangesRemovedMessagePayload",
     "StandalonePriceTierAddedMessage",
     "StandalonePriceTierAddedMessagePayload",
     "StandalonePriceTierRemovedMessage",
@@ -531,6 +633,54 @@ class Message(BaseResource):
 
     @classmethod
     def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "Message":
+        if data["type"] == "ApprovalFlowApproved":
+            from ._schemas.message import ApprovalFlowApprovedMessageSchema
+
+            return ApprovalFlowApprovedMessageSchema().load(data)
+        if data["type"] == "ApprovalFlowCompleted":
+            from ._schemas.message import ApprovalFlowCompletedMessageSchema
+
+            return ApprovalFlowCompletedMessageSchema().load(data)
+        if data["type"] == "ApprovalFlowCreated":
+            from ._schemas.message import ApprovalFlowCreatedMessageSchema
+
+            return ApprovalFlowCreatedMessageSchema().load(data)
+        if data["type"] == "ApprovalFlowRejected":
+            from ._schemas.message import ApprovalFlowRejectedMessageSchema
+
+            return ApprovalFlowRejectedMessageSchema().load(data)
+        if data["type"] == "ApprovalRuleApproversSet":
+            from ._schemas.message import ApprovalRuleApproversSetMessageSchema
+
+            return ApprovalRuleApproversSetMessageSchema().load(data)
+        if data["type"] == "ApprovalRuleCreated":
+            from ._schemas.message import ApprovalRuleCreatedMessageSchema
+
+            return ApprovalRuleCreatedMessageSchema().load(data)
+        if data["type"] == "ApprovalRuleDescriptionSet":
+            from ._schemas.message import ApprovalRuleDescriptionSetMessageSchema
+
+            return ApprovalRuleDescriptionSetMessageSchema().load(data)
+        if data["type"] == "ApprovalRuleKeySet":
+            from ._schemas.message import ApprovalRuleKeySetMessageSchema
+
+            return ApprovalRuleKeySetMessageSchema().load(data)
+        if data["type"] == "ApprovalRuleNameSet":
+            from ._schemas.message import ApprovalRuleNameSetMessageSchema
+
+            return ApprovalRuleNameSetMessageSchema().load(data)
+        if data["type"] == "ApprovalRulePredicateSet":
+            from ._schemas.message import ApprovalRulePredicateSetMessageSchema
+
+            return ApprovalRulePredicateSetMessageSchema().load(data)
+        if data["type"] == "ApprovalRuleRequestersSet":
+            from ._schemas.message import ApprovalRuleRequestersSetMessageSchema
+
+            return ApprovalRuleRequestersSetMessageSchema().load(data)
+        if data["type"] == "ApprovalRuleStatusSet":
+            from ._schemas.message import ApprovalRuleStatusSetMessageSchema
+
+            return ApprovalRuleStatusSetMessageSchema().load(data)
         if data["type"] == "AssociateRoleBuyerAssignableChanged":
             from ._schemas.message import (
                 AssociateRoleBuyerAssignableChangedMessageSchema,
@@ -569,6 +719,34 @@ class Message(BaseResource):
             from ._schemas.message import BusinessUnitAddressChangedMessageSchema
 
             return BusinessUnitAddressChangedMessageSchema().load(data)
+        if data["type"] == "BusinessUnitAddressCustomFieldAdded":
+            from ._schemas.message import (
+                BusinessUnitAddressCustomFieldAddedMessageSchema,
+            )
+
+            return BusinessUnitAddressCustomFieldAddedMessageSchema().load(data)
+        if data["type"] == "BusinessUnitAddressCustomFieldChanged":
+            from ._schemas.message import (
+                BusinessUnitAddressCustomFieldChangedMessageSchema,
+            )
+
+            return BusinessUnitAddressCustomFieldChangedMessageSchema().load(data)
+        if data["type"] == "BusinessUnitAddressCustomFieldRemoved":
+            from ._schemas.message import (
+                BusinessUnitAddressCustomFieldRemovedMessageSchema,
+            )
+
+            return BusinessUnitAddressCustomFieldRemovedMessageSchema().load(data)
+        if data["type"] == "BusinessUnitAddressCustomTypeRemoved":
+            from ._schemas.message import (
+                BusinessUnitAddressCustomTypeRemovedMessageSchema,
+            )
+
+            return BusinessUnitAddressCustomTypeRemovedMessageSchema().load(data)
+        if data["type"] == "BusinessUnitAddressCustomTypeSet":
+            from ._schemas.message import BusinessUnitAddressCustomTypeSetMessageSchema
+
+            return BusinessUnitAddressCustomTypeSetMessageSchema().load(data)
         if data["type"] == "BusinessUnitAddressRemoved":
             from ._schemas.message import BusinessUnitAddressRemovedMessageSchema
 
@@ -609,6 +787,26 @@ class Message(BaseResource):
             from ._schemas.message import BusinessUnitCreatedMessageSchema
 
             return BusinessUnitCreatedMessageSchema().load(data)
+        if data["type"] == "BusinessUnitCustomFieldAdded":
+            from ._schemas.message import BusinessUnitCustomFieldAddedMessageSchema
+
+            return BusinessUnitCustomFieldAddedMessageSchema().load(data)
+        if data["type"] == "BusinessUnitCustomFieldChanged":
+            from ._schemas.message import BusinessUnitCustomFieldChangedMessageSchema
+
+            return BusinessUnitCustomFieldChangedMessageSchema().load(data)
+        if data["type"] == "BusinessUnitCustomFieldRemoved":
+            from ._schemas.message import BusinessUnitCustomFieldRemovedMessageSchema
+
+            return BusinessUnitCustomFieldRemovedMessageSchema().load(data)
+        if data["type"] == "BusinessUnitCustomTypeRemoved":
+            from ._schemas.message import BusinessUnitCustomTypeRemovedMessageSchema
+
+            return BusinessUnitCustomTypeRemovedMessageSchema().load(data)
+        if data["type"] == "BusinessUnitCustomTypeSet":
+            from ._schemas.message import BusinessUnitCustomTypeSetMessageSchema
+
+            return BusinessUnitCustomTypeSetMessageSchema().load(data)
         if data["type"] == "BusinessUnitDefaultBillingAddressSet":
             from ._schemas.message import (
                 BusinessUnitDefaultBillingAddressSetMessageSchema,
@@ -629,10 +827,10 @@ class Message(BaseResource):
             from ._schemas.message import BusinessUnitNameChangedMessageSchema
 
             return BusinessUnitNameChangedMessageSchema().load(data)
-        if data["type"] == "BusinessUnitParentUnitChanged":
-            from ._schemas.message import BusinessUnitParentUnitChangedMessageSchema
+        if data["type"] == "BusinessUnitParentChanged":
+            from ._schemas.message import BusinessUnitParentChangedMessageSchema
 
-            return BusinessUnitParentUnitChangedMessageSchema().load(data)
+            return BusinessUnitParentChangedMessageSchema().load(data)
         if data["type"] == "BusinessUnitShippingAddressAdded":
             from ._schemas.message import BusinessUnitShippingAddressAddedMessageSchema
 
@@ -679,6 +877,26 @@ class Message(BaseResource):
             from ._schemas.message import CustomerAddressChangedMessageSchema
 
             return CustomerAddressChangedMessageSchema().load(data)
+        if data["type"] == "CustomerAddressCustomFieldAdded":
+            from ._schemas.message import CustomerAddressCustomFieldAddedMessageSchema
+
+            return CustomerAddressCustomFieldAddedMessageSchema().load(data)
+        if data["type"] == "CustomerAddressCustomFieldChanged":
+            from ._schemas.message import CustomerAddressCustomFieldChangedMessageSchema
+
+            return CustomerAddressCustomFieldChangedMessageSchema().load(data)
+        if data["type"] == "CustomerAddressCustomFieldRemoved":
+            from ._schemas.message import CustomerAddressCustomFieldRemovedMessageSchema
+
+            return CustomerAddressCustomFieldRemovedMessageSchema().load(data)
+        if data["type"] == "CustomerAddressCustomTypeRemoved":
+            from ._schemas.message import CustomerAddressCustomTypeRemovedMessageSchema
+
+            return CustomerAddressCustomTypeRemovedMessageSchema().load(data)
+        if data["type"] == "CustomerAddressCustomTypeSet":
+            from ._schemas.message import CustomerAddressCustomTypeSetMessageSchema
+
+            return CustomerAddressCustomTypeSetMessageSchema().load(data)
         if data["type"] == "CustomerAddressRemoved":
             from ._schemas.message import CustomerAddressRemovedMessageSchema
 
@@ -691,6 +909,26 @@ class Message(BaseResource):
             from ._schemas.message import CustomerCreatedMessageSchema
 
             return CustomerCreatedMessageSchema().load(data)
+        if data["type"] == "CustomerCustomFieldAdded":
+            from ._schemas.message import CustomerCustomFieldAddedMessageSchema
+
+            return CustomerCustomFieldAddedMessageSchema().load(data)
+        if data["type"] == "CustomerCustomFieldChanged":
+            from ._schemas.message import CustomerCustomFieldChangedMessageSchema
+
+            return CustomerCustomFieldChangedMessageSchema().load(data)
+        if data["type"] == "CustomerCustomFieldRemoved":
+            from ._schemas.message import CustomerCustomFieldRemovedMessageSchema
+
+            return CustomerCustomFieldRemovedMessageSchema().load(data)
+        if data["type"] == "CustomerCustomTypeRemoved":
+            from ._schemas.message import CustomerCustomTypeRemovedMessageSchema
+
+            return CustomerCustomTypeRemovedMessageSchema().load(data)
+        if data["type"] == "CustomerCustomTypeSet":
+            from ._schemas.message import CustomerCustomTypeSetMessageSchema
+
+            return CustomerCustomTypeSetMessageSchema().load(data)
         if data["type"] == "CustomerDateOfBirthSet":
             from ._schemas.message import CustomerDateOfBirthSetMessageSchema
 
@@ -703,6 +941,10 @@ class Message(BaseResource):
             from ._schemas.message import CustomerEmailChangedMessageSchema
 
             return CustomerEmailChangedMessageSchema().load(data)
+        if data["type"] == "CustomerEmailTokenCreated":
+            from ._schemas.message import CustomerEmailTokenCreatedMessageSchema
+
+            return CustomerEmailTokenCreatedMessageSchema().load(data)
         if data["type"] == "CustomerEmailVerified":
             from ._schemas.message import CustomerEmailVerifiedMessageSchema
 
@@ -711,6 +953,26 @@ class Message(BaseResource):
             from ._schemas.message import CustomerFirstNameSetMessageSchema
 
             return CustomerFirstNameSetMessageSchema().load(data)
+        if data["type"] == "CustomerGroupCustomFieldAdded":
+            from ._schemas.message import CustomerGroupCustomFieldAddedMessageSchema
+
+            return CustomerGroupCustomFieldAddedMessageSchema().load(data)
+        if data["type"] == "CustomerGroupCustomFieldChanged":
+            from ._schemas.message import CustomerGroupCustomFieldChangedMessageSchema
+
+            return CustomerGroupCustomFieldChangedMessageSchema().load(data)
+        if data["type"] == "CustomerGroupCustomFieldRemoved":
+            from ._schemas.message import CustomerGroupCustomFieldRemovedMessageSchema
+
+            return CustomerGroupCustomFieldRemovedMessageSchema().load(data)
+        if data["type"] == "CustomerGroupCustomTypeRemoved":
+            from ._schemas.message import CustomerGroupCustomTypeRemovedMessageSchema
+
+            return CustomerGroupCustomTypeRemovedMessageSchema().load(data)
+        if data["type"] == "CustomerGroupCustomTypeSet":
+            from ._schemas.message import CustomerGroupCustomTypeSetMessageSchema
+
+            return CustomerGroupCustomTypeSetMessageSchema().load(data)
         if data["type"] == "CustomerGroupSet":
             from ._schemas.message import CustomerGroupSetMessageSchema
 
@@ -719,6 +981,10 @@ class Message(BaseResource):
             from ._schemas.message import CustomerLastNameSetMessageSchema
 
             return CustomerLastNameSetMessageSchema().load(data)
+        if data["type"] == "CustomerPasswordTokenCreated":
+            from ._schemas.message import CustomerPasswordTokenCreatedMessageSchema
+
+            return CustomerPasswordTokenCreatedMessageSchema().load(data)
         if data["type"] == "CustomerPasswordUpdated":
             from ._schemas.message import CustomerPasswordUpdatedMessageSchema
 
@@ -891,6 +1157,10 @@ class Message(BaseResource):
             from ._schemas.message import QuoteDeletedMessageSchema
 
             return QuoteDeletedMessageSchema().load(data)
+        if data["type"] == "QuoteRenegotiationRequested":
+            from ._schemas.message import QuoteRenegotiationRequestedMessageSchema
+
+            return QuoteRenegotiationRequestedMessageSchema().load(data)
         if data["type"] == "QuoteRequestCreated":
             from ._schemas.message import QuoteRequestCreatedMessageSchema
 
@@ -987,6 +1257,12 @@ class Message(BaseResource):
             )
 
             return StandalonePriceStagedChangesAppliedMessageSchema().load(data)
+        if data["type"] == "StandalonePriceStagedChangesRemoved":
+            from ._schemas.message import (
+                StandalonePriceStagedChangesRemovedMessageSchema,
+            )
+
+            return StandalonePriceStagedChangesRemovedMessageSchema().load(data)
         if data["type"] == "StandalonePriceTierAdded":
             from ._schemas.message import StandalonePriceTierAddedMessageSchema
 
@@ -1054,6 +1330,686 @@ class Message(BaseResource):
         from ._schemas.message import MessageSchema
 
         return MessageSchema().dump(self)
+
+
+class ApprovalFlowApprovedMessage(Message):
+    """Generated after an [approval in the Approval Flow](/projects/approval-flows#approve)."""
+
+    #: [Reference](ctp:api:type:Reference) to the [Customer](ctp:api:type:Customer) who approved the [Approval Flow](/projects/approval-flows).
+    associate: "CustomerReference"
+    #: [Reference](ctp:api:type:Reference) to the [Order](ctp:api:type:Order) that received the approval.
+    order: "OrderReference"
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        associate: "CustomerReference",
+        order: "OrderReference"
+    ):
+        self.associate = associate
+        self.order = order
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalFlowApproved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalFlowApprovedMessage":
+        from ._schemas.message import ApprovalFlowApprovedMessageSchema
+
+        return ApprovalFlowApprovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalFlowApprovedMessageSchema
+
+        return ApprovalFlowApprovedMessageSchema().dump(self)
+
+
+class ApprovalFlowCompletedMessage(Message):
+    """Generated after an [Approval Flow](ctp:api:type:ApprovalFlow) is completed and reaches a final status."""
+
+    #: Final status of the [Approval Flow](ctp:api:type:ApprovalFlow).
+    status: "ApprovalFlowStatus"
+    #: [Reference](ctp:api:type:Reference) to the [Order](ctp:api:type:Order) related to the completed [Approval Flow](ctp:api:type:ApprovalFlow).
+    order: "OrderReference"
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        status: "ApprovalFlowStatus",
+        order: "OrderReference"
+    ):
+        self.status = status
+        self.order = order
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalFlowCompleted",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalFlowCompletedMessage":
+        from ._schemas.message import ApprovalFlowCompletedMessageSchema
+
+        return ApprovalFlowCompletedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalFlowCompletedMessageSchema
+
+        return ApprovalFlowCompletedMessageSchema().dump(self)
+
+
+class ApprovalFlowCreatedMessage(Message):
+    """Generated after an [Approval Flow](ctp:api:type:ApprovalFlow) is created."""
+
+    #: The [Approval Flow](ctp:api:type:ApprovalFlow) that was created.
+    approval_flow: "ApprovalFlow"
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        approval_flow: "ApprovalFlow"
+    ):
+        self.approval_flow = approval_flow
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalFlowCreated",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalFlowCreatedMessage":
+        from ._schemas.message import ApprovalFlowCreatedMessageSchema
+
+        return ApprovalFlowCreatedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalFlowCreatedMessageSchema
+
+        return ApprovalFlowCreatedMessageSchema().dump(self)
+
+
+class ApprovalFlowRejectedMessage(Message):
+    """Generated after an [Approval Flow is rejected](/projects/approval-flows#reject)."""
+
+    #: [Reference](ctp:api:type:Reference) to the [Customer](ctp:api:type:Customer) who rejected the [Approval Flow](/projects/approval-flows).
+    associate: "CustomerReference"
+    #: Description of the reason why the [Approval Flow](ctp:api:type:ApprovalFlow) was rejected.
+    rejection_reason: typing.Optional[str]
+    #: [Reference](ctp:api:type:Reference) to the [Order](ctp:api:type:Order) that received the rejection.
+    order: "OrderReference"
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        associate: "CustomerReference",
+        rejection_reason: typing.Optional[str] = None,
+        order: "OrderReference"
+    ):
+        self.associate = associate
+        self.rejection_reason = rejection_reason
+        self.order = order
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalFlowRejected",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalFlowRejectedMessage":
+        from ._schemas.message import ApprovalFlowRejectedMessageSchema
+
+        return ApprovalFlowRejectedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalFlowRejectedMessageSchema
+
+        return ApprovalFlowRejectedMessageSchema().dump(self)
+
+
+class ApprovalRuleApproversSetMessage(Message):
+    """Generated after a successful [Set Approvers](ctp:api:type:ApprovalRuleSetApproversAction) update action."""
+
+    #: Approver hierarchy of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Approvers](ctp:api:type:ApprovalRuleSetApproversAction) update action.
+    approvers: "ApproverHierarchy"
+    #: Approver hierarchy of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Approvers](ctp:api:type:ApprovalRuleSetApproversAction) update action.
+    old_approvers: "ApproverHierarchy"
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        approvers: "ApproverHierarchy",
+        old_approvers: "ApproverHierarchy"
+    ):
+        self.approvers = approvers
+        self.old_approvers = old_approvers
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalRuleApproversSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleApproversSetMessage":
+        from ._schemas.message import ApprovalRuleApproversSetMessageSchema
+
+        return ApprovalRuleApproversSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleApproversSetMessageSchema
+
+        return ApprovalRuleApproversSetMessageSchema().dump(self)
+
+
+class ApprovalRuleCreatedMessage(Message):
+    """Generated after an [Approval Rule](ctp:api:type:ApprovalRule) is created."""
+
+    #: The [Approval Rule](ctp:api:type:ApprovalRule) that was created.
+    approval_rule: "ApprovalRule"
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        approval_rule: "ApprovalRule"
+    ):
+        self.approval_rule = approval_rule
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalRuleCreated",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleCreatedMessage":
+        from ._schemas.message import ApprovalRuleCreatedMessageSchema
+
+        return ApprovalRuleCreatedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleCreatedMessageSchema
+
+        return ApprovalRuleCreatedMessageSchema().dump(self)
+
+
+class ApprovalRuleDescriptionSetMessage(Message):
+    """Generated after a successful [Set Description](ctp:api:type:ApprovalRuleSetDescriptionAction) update action."""
+
+    #: Description of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Description](ctp:api:type:ApprovalRuleSetDescriptionAction) update action.
+    description: typing.Optional[str]
+    #: Description of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Description](ctp:api:type:ApprovalRuleSetDescriptionAction) update action.
+    old_description: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        description: typing.Optional[str] = None,
+        old_description: typing.Optional[str] = None
+    ):
+        self.description = description
+        self.old_description = old_description
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalRuleDescriptionSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleDescriptionSetMessage":
+        from ._schemas.message import ApprovalRuleDescriptionSetMessageSchema
+
+        return ApprovalRuleDescriptionSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleDescriptionSetMessageSchema
+
+        return ApprovalRuleDescriptionSetMessageSchema().dump(self)
+
+
+class ApprovalRuleKeySetMessage(Message):
+    """Generated after a successful [Set Key](ctp:api:type:ApprovalRuleSetKeyAction) update action."""
+
+    #: Description of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Key](ctp:api:type:ApprovalRuleSetKeyAction) update action.
+    key: typing.Optional[str]
+    #: Description of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Key](ctp:api:type:ApprovalRuleSetKeyAction) update action.
+    old_key: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        key: typing.Optional[str] = None,
+        old_key: typing.Optional[str] = None
+    ):
+        self.key = key
+        self.old_key = old_key
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalRuleKeySet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleKeySetMessage":
+        from ._schemas.message import ApprovalRuleKeySetMessageSchema
+
+        return ApprovalRuleKeySetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleKeySetMessageSchema
+
+        return ApprovalRuleKeySetMessageSchema().dump(self)
+
+
+class ApprovalRuleNameSetMessage(Message):
+    """Generated after a successful [Set Name](ctp:api:type:ApprovalRuleSetNameAction) update action."""
+
+    #: Name of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Name](ctp:api:type:ApprovalRuleSetNameAction) update action.
+    name: str
+    #: Name of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Name](ctp:api:type:ApprovalRuleSetNameAction) update action.
+    old_name: str
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        old_name: str
+    ):
+        self.name = name
+        self.old_name = old_name
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalRuleNameSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleNameSetMessage":
+        from ._schemas.message import ApprovalRuleNameSetMessageSchema
+
+        return ApprovalRuleNameSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleNameSetMessageSchema
+
+        return ApprovalRuleNameSetMessageSchema().dump(self)
+
+
+class ApprovalRulePredicateSetMessage(Message):
+    """Generated after a successful [Set Predicate](ctp:api:type:ApprovalRuleSetPredicateAction) update action."""
+
+    #: Name of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Predicate](ctp:api:type:ApprovalRuleSetPredicateAction) update action.
+    predicate: str
+    #: Name of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Predicate](ctp:api:type:ApprovalRuleSetPredicateAction) update action.
+    old_predicate: str
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        predicate: str,
+        old_predicate: str
+    ):
+        self.predicate = predicate
+        self.old_predicate = old_predicate
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalRulePredicateSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRulePredicateSetMessage":
+        from ._schemas.message import ApprovalRulePredicateSetMessageSchema
+
+        return ApprovalRulePredicateSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRulePredicateSetMessageSchema
+
+        return ApprovalRulePredicateSetMessageSchema().dump(self)
+
+
+class ApprovalRuleRequestersSetMessage(Message):
+    """Generated after a successful [Set Requester](ctp:api:type:ApprovalRuleSetRequestersAction) update action."""
+
+    #: RuleRequester of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Requester](ctp:api:type:ApprovalRuleSetRequestersAction) update action.
+    requesters: typing.List["RuleRequester"]
+    #: RuleRequester of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Requester](ctp:api:type:ApprovalRuleSetRequestersAction) update action.
+    old_requesters: typing.List["RuleRequester"]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        requesters: typing.List["RuleRequester"],
+        old_requesters: typing.List["RuleRequester"]
+    ):
+        self.requesters = requesters
+        self.old_requesters = old_requesters
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalRuleRequestersSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleRequestersSetMessage":
+        from ._schemas.message import ApprovalRuleRequestersSetMessageSchema
+
+        return ApprovalRuleRequestersSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleRequestersSetMessageSchema
+
+        return ApprovalRuleRequestersSetMessageSchema().dump(self)
+
+
+class ApprovalRuleStatusSetMessage(Message):
+    """Generated after a successful [Set Status](ctp:api:type:ApprovalRuleSetStatusAction) update action."""
+
+    #: Status of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Status](ctp:api:type:ApprovalRuleSetStatusAction) update action.
+    status: "ApprovalRuleStatus"
+    #: Status of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Status](ctp:api:type:ApprovalRuleSetStatusAction) update action.
+    old_status: "ApprovalRuleStatus"
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        status: "ApprovalRuleStatus",
+        old_status: "ApprovalRuleStatus"
+    ):
+        self.status = status
+        self.old_status = old_status
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="ApprovalRuleStatusSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleStatusSetMessage":
+        from ._schemas.message import ApprovalRuleStatusSetMessageSchema
+
+        return ApprovalRuleStatusSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleStatusSetMessageSchema
+
+        return ApprovalRuleStatusSetMessageSchema().dump(self)
 
 
 class AssociateRoleBuyerAssignableChangedMessage(Message):
@@ -1525,6 +2481,287 @@ class BusinessUnitAddressChangedMessage(Message):
         from ._schemas.message import BusinessUnitAddressChangedMessageSchema
 
         return BusinessUnitAddressChangedMessageSchema().dump(self)
+
+
+class BusinessUnitAddressCustomFieldAddedMessage(Message):
+    """Generated after adding a Custom Field to an address of a Business Unit using the [Set Address CustomField](ctp:api:type:BusinessUnitSetAddressCustomFieldAction) update action. If a Custom Field already exists with the same name, a [BusinessUnitAddressCustomFieldChanged](ctp:api:type:BusinessUnitAddressCustomFieldChangedMessage) Message is generated instead."""
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any
+    ):
+        self.name = name
+        self.value = value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="BusinessUnitAddressCustomFieldAdded",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitAddressCustomFieldAddedMessage":
+        from ._schemas.message import BusinessUnitAddressCustomFieldAddedMessageSchema
+
+        return BusinessUnitAddressCustomFieldAddedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitAddressCustomFieldAddedMessageSchema
+
+        return BusinessUnitAddressCustomFieldAddedMessageSchema().dump(self)
+
+
+class BusinessUnitAddressCustomFieldChangedMessage(Message):
+    """Generated after changing an existing Custom Field on an address of a Business Unit using the [Set Address CustomField](ctp:api:type:BusinessUnitSetAddressCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:BusinessUnitSetAddressCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:BusinessUnitSetAddressCustomFieldAction) update action.
+    old_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any,
+        old_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.old_value = old_value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="BusinessUnitAddressCustomFieldChanged",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitAddressCustomFieldChangedMessage":
+        from ._schemas.message import BusinessUnitAddressCustomFieldChangedMessageSchema
+
+        return BusinessUnitAddressCustomFieldChangedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitAddressCustomFieldChangedMessageSchema
+
+        return BusinessUnitAddressCustomFieldChangedMessageSchema().dump(self)
+
+
+class BusinessUnitAddressCustomFieldRemovedMessage(Message):
+    """Generated after removing a Custom Field from an address of a Business Unit using the [Set Address CustomField](ctp:api:type:BusinessUnitSetAddressCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str
+    ):
+        self.name = name
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="BusinessUnitAddressCustomFieldRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitAddressCustomFieldRemovedMessage":
+        from ._schemas.message import BusinessUnitAddressCustomFieldRemovedMessageSchema
+
+        return BusinessUnitAddressCustomFieldRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitAddressCustomFieldRemovedMessageSchema
+
+        return BusinessUnitAddressCustomFieldRemovedMessageSchema().dump(self)
+
+
+class BusinessUnitAddressCustomTypeRemovedMessage(Message):
+    """Generated after removing a Custom Type from an address of a Business Unit using the [Set Custom Type in Address](ctp:api:type:BusinessUnitSetAddressCustomTypeAction) update action."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        old_type_id: typing.Optional[str] = None
+    ):
+        self.old_type_id = old_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="BusinessUnitAddressCustomTypeRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitAddressCustomTypeRemovedMessage":
+        from ._schemas.message import BusinessUnitAddressCustomTypeRemovedMessageSchema
+
+        return BusinessUnitAddressCustomTypeRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitAddressCustomTypeRemovedMessageSchema
+
+        return BusinessUnitAddressCustomTypeRemovedMessageSchema().dump(self)
+
+
+class BusinessUnitAddressCustomTypeSetMessage(Message):
+    """Generated after adding a Custom Type to an address of a Business Unit using the [Set Custom Type in Address](ctp:api:type:BusinessUnitSetAddressCustomTypeAction) update action."""
+
+    #: The Custom Fields that were set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        custom_fields: "CustomFields",
+        old_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.old_type_id = old_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="BusinessUnitAddressCustomTypeSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitAddressCustomTypeSetMessage":
+        from ._schemas.message import BusinessUnitAddressCustomTypeSetMessageSchema
+
+        return BusinessUnitAddressCustomTypeSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitAddressCustomTypeSetMessageSchema
+
+        return BusinessUnitAddressCustomTypeSetMessageSchema().dump(self)
 
 
 class BusinessUnitAddressRemovedMessage(Message):
@@ -2009,7 +3246,7 @@ class BusinessUnitContactEmailSetMessage(Message):
 
 
 class BusinessUnitCreatedMessage(Message):
-    """Generated after a successful [Create Business Unit](/projects/business-units#create-businessunit) request."""
+    """Generated after a successful [Create BusinessUnit](/projects/business-units#create-businessunit) request."""
 
     #: The [Business Unit](ctp:api:type:BusinessUnit) that was created.
     business_unit: "BusinessUnit"
@@ -2059,6 +3296,287 @@ class BusinessUnitCreatedMessage(Message):
         from ._schemas.message import BusinessUnitCreatedMessageSchema
 
         return BusinessUnitCreatedMessageSchema().dump(self)
+
+
+class BusinessUnitCustomFieldAddedMessage(Message):
+    """Generated after adding a Custom Field to a Business Unit using the [Set CustomField](ctp:api:type:BusinessUnitSetCustomFieldAction) update action. If a Custom Field already exists with the same name, a [BusinessUnitCustomFieldChanged](ctp:api:type:BusinessUnitCustomFieldChangedMessage) Message is generated instead."""
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any
+    ):
+        self.name = name
+        self.value = value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="BusinessUnitCustomFieldAdded",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitCustomFieldAddedMessage":
+        from ._schemas.message import BusinessUnitCustomFieldAddedMessageSchema
+
+        return BusinessUnitCustomFieldAddedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitCustomFieldAddedMessageSchema
+
+        return BusinessUnitCustomFieldAddedMessageSchema().dump(self)
+
+
+class BusinessUnitCustomFieldChangedMessage(Message):
+    """Generated after changing an existing Custom Field on a Business Unit using the [Set CustomField](ctp:api:type:BusinessUnitSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:BusinessUnitSetCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:BusinessUnitSetCustomFieldAction) update action.
+    old_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any,
+        old_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.old_value = old_value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="BusinessUnitCustomFieldChanged",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitCustomFieldChangedMessage":
+        from ._schemas.message import BusinessUnitCustomFieldChangedMessageSchema
+
+        return BusinessUnitCustomFieldChangedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitCustomFieldChangedMessageSchema
+
+        return BusinessUnitCustomFieldChangedMessageSchema().dump(self)
+
+
+class BusinessUnitCustomFieldRemovedMessage(Message):
+    """Generated after removing a Custom Field from a Business Unit using the [Set CustomField](ctp:api:type:BusinessUnitSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str
+    ):
+        self.name = name
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="BusinessUnitCustomFieldRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitCustomFieldRemovedMessage":
+        from ._schemas.message import BusinessUnitCustomFieldRemovedMessageSchema
+
+        return BusinessUnitCustomFieldRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitCustomFieldRemovedMessageSchema
+
+        return BusinessUnitCustomFieldRemovedMessageSchema().dump(self)
+
+
+class BusinessUnitCustomTypeRemovedMessage(Message):
+    """Generated after removing a Custom Type from a Business Unit using the [Set Custom Type](ctp:api:type:BusinessUnitSetCustomTypeAction) update action."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        old_type_id: typing.Optional[str] = None
+    ):
+        self.old_type_id = old_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="BusinessUnitCustomTypeRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitCustomTypeRemovedMessage":
+        from ._schemas.message import BusinessUnitCustomTypeRemovedMessageSchema
+
+        return BusinessUnitCustomTypeRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitCustomTypeRemovedMessageSchema
+
+        return BusinessUnitCustomTypeRemovedMessageSchema().dump(self)
+
+
+class BusinessUnitCustomTypeSetMessage(Message):
+    """Generated after adding a Custom Type to a Business Unit using the [Set Custom Type](ctp:api:type:BusinessUnitSetCustomTypeAction) update action."""
+
+    #: The Custom Fields that were set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        custom_fields: "CustomFields",
+        old_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.old_type_id = old_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="BusinessUnitCustomTypeSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitCustomTypeSetMessage":
+        from ._schemas.message import BusinessUnitCustomTypeSetMessageSchema
+
+        return BusinessUnitCustomTypeSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitCustomTypeSetMessageSchema
+
+        return BusinessUnitCustomTypeSetMessageSchema().dump(self)
 
 
 class BusinessUnitDefaultBillingAddressSetMessage(Message):
@@ -2168,7 +3686,7 @@ class BusinessUnitDefaultShippingAddressSetMessage(Message):
 
 
 class BusinessUnitDeletedMessage(Message):
-    """Generated after a successful [Delete Business Unit](/projects/business-units#delete-businessunit) request."""
+    """Generated after a successful [Delete BusinessUnit](/projects/business-units#delete-businessunit) request."""
 
     def __init__(
         self,
@@ -2267,7 +3785,7 @@ class BusinessUnitNameChangedMessage(Message):
         return BusinessUnitNameChangedMessageSchema().dump(self)
 
 
-class BusinessUnitParentUnitChangedMessage(Message):
+class BusinessUnitParentChangedMessage(Message):
     """Generated after a successful [Change Parent Unit](ctp:api:type:BusinessUnitChangeParentUnitAction) update action."""
 
     #: Parent unit of the [Business Unit](ctp:api:type:BusinessUnit) before the [Change Parent Unit](ctp:api:type:BusinessUnitChangeParentUnitAction) update action.
@@ -2307,21 +3825,21 @@ class BusinessUnitParentUnitChangedMessage(Message):
             resource=resource,
             resource_version=resource_version,
             resource_user_provided_identifiers=resource_user_provided_identifiers,
-            type="BusinessUnitParentUnitChanged",
+            type="BusinessUnitParentChanged",
         )
 
     @classmethod
     def deserialize(
         cls, data: typing.Dict[str, typing.Any]
-    ) -> "BusinessUnitParentUnitChangedMessage":
-        from ._schemas.message import BusinessUnitParentUnitChangedMessageSchema
+    ) -> "BusinessUnitParentChangedMessage":
+        from ._schemas.message import BusinessUnitParentChangedMessageSchema
 
-        return BusinessUnitParentUnitChangedMessageSchema().load(data)
+        return BusinessUnitParentChangedMessageSchema().load(data)
 
     def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.message import BusinessUnitParentUnitChangedMessageSchema
+        from ._schemas.message import BusinessUnitParentChangedMessageSchema
 
-        return BusinessUnitParentUnitChangedMessageSchema().dump(self)
+        return BusinessUnitParentChangedMessageSchema().dump(self)
 
 
 class BusinessUnitShippingAddressAddedMessage(Message):
@@ -2602,6 +4120,8 @@ class BusinessUnitStoreModeChangedMessage(Message):
 
 
 class BusinessUnitStoreRemovedMessage(Message):
+    """Generated after a successful [Remove Store](ctp:api:type:BusinessUnitRemoveStoreAction) update action."""
+
     #: The [Store](ctp:api:type:Store) that was removed from the [Business Unit](ctp:api:type:BusinessUnit).
     store: "StoreKeyReference"
 
@@ -2921,6 +4441,291 @@ class CustomerAddressChangedMessage(Message):
         return CustomerAddressChangedMessageSchema().dump(self)
 
 
+class CustomerAddressCustomFieldAddedMessage(Message):
+    """Generated after adding a Custom Field to an Address of a Customer using the [Set CustomField in Address](ctp:api:type:CustomerSetAddressCustomFieldAction) update action.
+    If a Custom Field already exists with the same name, a [CustomerAddressCustomFieldChanged](ctp:api:type:CustomerAddressCustomFieldChangedMessage) Message is generated instead.
+
+    """
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any
+    ):
+        self.name = name
+        self.value = value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerAddressCustomFieldAdded",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerAddressCustomFieldAddedMessage":
+        from ._schemas.message import CustomerAddressCustomFieldAddedMessageSchema
+
+        return CustomerAddressCustomFieldAddedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerAddressCustomFieldAddedMessageSchema
+
+        return CustomerAddressCustomFieldAddedMessageSchema().dump(self)
+
+
+class CustomerAddressCustomFieldChangedMessage(Message):
+    """Generated after changing an existing Custom Field on an Address of a Customer using the [Set CustomField in Address](ctp:api:type:CustomerSetAddressCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:CustomerSetAddressCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:CustomerSetAddressCustomFieldAction) update action.
+    #: When there has not been a Custom Field with the `name` on the Customer Address before, a [Customer Address Custom Field Added](ctp:api:type:CustomerAddressCustomFieldAddedMessage) Message is generated instead.
+    previous_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any,
+        previous_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.previous_value = previous_value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerAddressCustomFieldChanged",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerAddressCustomFieldChangedMessage":
+        from ._schemas.message import CustomerAddressCustomFieldChangedMessageSchema
+
+        return CustomerAddressCustomFieldChangedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerAddressCustomFieldChangedMessageSchema
+
+        return CustomerAddressCustomFieldChangedMessageSchema().dump(self)
+
+
+class CustomerAddressCustomFieldRemovedMessage(Message):
+    """Generated after removing a Custom Field from an Address of a Customer using the [Set CustomField in Address](ctp:api:type:CustomerSetAddressCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str
+    ):
+        self.name = name
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerAddressCustomFieldRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerAddressCustomFieldRemovedMessage":
+        from ._schemas.message import CustomerAddressCustomFieldRemovedMessageSchema
+
+        return CustomerAddressCustomFieldRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerAddressCustomFieldRemovedMessageSchema
+
+        return CustomerAddressCustomFieldRemovedMessageSchema().dump(self)
+
+
+class CustomerAddressCustomTypeRemovedMessage(Message):
+    """Generated after removing a Custom Type from an Address of a Customer using the [Set Custom Type in Address](ctp:api:type:CustomerSetAddressCustomTypeAction) update action."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        previous_type_id: typing.Optional[str] = None
+    ):
+        self.previous_type_id = previous_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerAddressCustomTypeRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerAddressCustomTypeRemovedMessage":
+        from ._schemas.message import CustomerAddressCustomTypeRemovedMessageSchema
+
+        return CustomerAddressCustomTypeRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerAddressCustomTypeRemovedMessageSchema
+
+        return CustomerAddressCustomTypeRemovedMessageSchema().dump(self)
+
+
+class CustomerAddressCustomTypeSetMessage(Message):
+    """Generated after adding a Custom Type to an Address of a Customer using the [Set Custom Type in Address](ctp:api:type:CustomerSetAddressCustomTypeAction) update action."""
+
+    #: The Custom Fields that have been set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        custom_fields: "CustomFields",
+        previous_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.previous_type_id = previous_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerAddressCustomTypeSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerAddressCustomTypeSetMessage":
+        from ._schemas.message import CustomerAddressCustomTypeSetMessageSchema
+
+        return CustomerAddressCustomTypeSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerAddressCustomTypeSetMessageSchema
+
+        return CustomerAddressCustomTypeSetMessageSchema().dump(self)
+
+
 class CustomerAddressRemovedMessage(Message):
     """Generated after a successful [Remove Address](ctp:api:type:CustomerRemoveAddressAction) update action."""
 
@@ -3080,6 +4885,291 @@ class CustomerCreatedMessage(Message):
         return CustomerCreatedMessageSchema().dump(self)
 
 
+class CustomerCustomFieldAddedMessage(Message):
+    """Generated after adding a Custom Field to a Customer using the [Set CustomField](ctp:api:type:CustomerSetCustomFieldAction) update action.
+    If a Custom Field already exists with the same name, a [CustomerCustomFieldChanged](ctp:api:type:CustomerCustomFieldChangedMessage) Message is generated instead.
+
+    """
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any
+    ):
+        self.name = name
+        self.value = value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerCustomFieldAdded",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerCustomFieldAddedMessage":
+        from ._schemas.message import CustomerCustomFieldAddedMessageSchema
+
+        return CustomerCustomFieldAddedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerCustomFieldAddedMessageSchema
+
+        return CustomerCustomFieldAddedMessageSchema().dump(self)
+
+
+class CustomerCustomFieldChangedMessage(Message):
+    """Generated after changing an existing Custom Field on a Customer using the [Set CustomField](ctp:api:type:CustomerSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:CustomerSetCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:CustomerSetCustomFieldAction) update action.
+    #: When there has not been a Custom Field with the `name` on the Customer before, a [Customer Custom Field Added](ctp:api:type:CustomerCustomFieldAddedMessage) Message is generated instead.
+    previous_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any,
+        previous_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.previous_value = previous_value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerCustomFieldChanged",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerCustomFieldChangedMessage":
+        from ._schemas.message import CustomerCustomFieldChangedMessageSchema
+
+        return CustomerCustomFieldChangedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerCustomFieldChangedMessageSchema
+
+        return CustomerCustomFieldChangedMessageSchema().dump(self)
+
+
+class CustomerCustomFieldRemovedMessage(Message):
+    """Generated after removing a Custom Field from a Customer using the [Set CustomField](ctp:api:type:CustomerSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str
+    ):
+        self.name = name
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerCustomFieldRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerCustomFieldRemovedMessage":
+        from ._schemas.message import CustomerCustomFieldRemovedMessageSchema
+
+        return CustomerCustomFieldRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerCustomFieldRemovedMessageSchema
+
+        return CustomerCustomFieldRemovedMessageSchema().dump(self)
+
+
+class CustomerCustomTypeRemovedMessage(Message):
+    """Generated after removing a Custom Type from a Customer using the [Set Custom Type](ctp:api:type:CustomerSetCustomTypeAction) update action with empty parameters."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        previous_type_id: typing.Optional[str] = None
+    ):
+        self.previous_type_id = previous_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerCustomTypeRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerCustomTypeRemovedMessage":
+        from ._schemas.message import CustomerCustomTypeRemovedMessageSchema
+
+        return CustomerCustomTypeRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerCustomTypeRemovedMessageSchema
+
+        return CustomerCustomTypeRemovedMessageSchema().dump(self)
+
+
+class CustomerCustomTypeSetMessage(Message):
+    """Generated after adding a Custom Type to a Customer using the [Set Custom Type](ctp:api:type:CustomerSetCustomTypeAction) update action."""
+
+    #: The Custom Fields that have been set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        custom_fields: "CustomFields",
+        previous_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.previous_type_id = previous_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerCustomTypeSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerCustomTypeSetMessage":
+        from ._schemas.message import CustomerCustomTypeSetMessageSchema
+
+        return CustomerCustomTypeSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerCustomTypeSetMessageSchema
+
+        return CustomerCustomTypeSetMessageSchema().dump(self)
+
+
 class CustomerDateOfBirthSetMessage(Message):
     """Generated after a successful [Set Date of Birth](ctp:api:type:CustomerSetDateOfBirthAction) update action."""
 
@@ -3233,6 +5323,63 @@ class CustomerEmailChangedMessage(Message):
         return CustomerEmailChangedMessageSchema().dump(self)
 
 
+class CustomerEmailTokenCreatedMessage(Message):
+    """Generated after a successful [Create email token for Customer](/../api/projects/customers#create-email-token-for-customer) request. The `resource` property of the Message is a [CustomerEmailTokenReference](ctp:api:type:CustomerEmailTokenReference)."""
+
+    #: Unique identifier of the Customer.
+    customer_id: str
+    #: Date and time (UTC) the email token expires.
+    expires_at: datetime.datetime
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        customer_id: str,
+        expires_at: datetime.datetime
+    ):
+        self.customer_id = customer_id
+        self.expires_at = expires_at
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerEmailTokenCreated",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerEmailTokenCreatedMessage":
+        from ._schemas.message import CustomerEmailTokenCreatedMessageSchema
+
+        return CustomerEmailTokenCreatedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerEmailTokenCreatedMessageSchema
+
+        return CustomerEmailTokenCreatedMessageSchema().dump(self)
+
+
 class CustomerEmailVerifiedMessage(Message):
     """Generated after a successful [Verify Customer's Email](/../api/projects/customers#verify-email-of-customer) request."""
 
@@ -3331,6 +5478,290 @@ class CustomerFirstNameSetMessage(Message):
         from ._schemas.message import CustomerFirstNameSetMessageSchema
 
         return CustomerFirstNameSetMessageSchema().dump(self)
+
+
+class CustomerGroupCustomFieldAddedMessage(Message):
+    """Generated after adding a Custom Field to a Customer Group using the [Set CustomField](ctp:api:type:CustomerGroupSetCustomFieldAction) update action.
+    If a Custom Field already exists with the same name, a [CustomerGroupCustomFieldChanged](ctp:api:type:CustomerGroupCustomFieldChangedMessage) Message is generated instead.
+
+    """
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any
+    ):
+        self.name = name
+        self.value = value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerGroupCustomFieldAdded",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerGroupCustomFieldAddedMessage":
+        from ._schemas.message import CustomerGroupCustomFieldAddedMessageSchema
+
+        return CustomerGroupCustomFieldAddedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerGroupCustomFieldAddedMessageSchema
+
+        return CustomerGroupCustomFieldAddedMessageSchema().dump(self)
+
+
+class CustomerGroupCustomFieldChangedMessage(Message):
+    """Generated after changing an existing Custom Field on a Customer Group using the [Set CustomField](ctp:api:type:CustomerGroupSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:CustomerGroupSetCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:CustomerGroupSetCustomFieldAction) update action.
+    old_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any,
+        old_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.old_value = old_value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerGroupCustomFieldChanged",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerGroupCustomFieldChangedMessage":
+        from ._schemas.message import CustomerGroupCustomFieldChangedMessageSchema
+
+        return CustomerGroupCustomFieldChangedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerGroupCustomFieldChangedMessageSchema
+
+        return CustomerGroupCustomFieldChangedMessageSchema().dump(self)
+
+
+class CustomerGroupCustomFieldRemovedMessage(Message):
+    """Generated after removing a Custom Field from a Customer Group using the [Set CustomField](ctp:api:type:CustomerGroupSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str
+    ):
+        self.name = name
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerGroupCustomFieldRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerGroupCustomFieldRemovedMessage":
+        from ._schemas.message import CustomerGroupCustomFieldRemovedMessageSchema
+
+        return CustomerGroupCustomFieldRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerGroupCustomFieldRemovedMessageSchema
+
+        return CustomerGroupCustomFieldRemovedMessageSchema().dump(self)
+
+
+class CustomerGroupCustomTypeRemovedMessage(Message):
+    """Generated after removing a Custom Type from a Customer Group using the [Set Custom Type](ctp:api:type:CustomerGroupSetCustomTypeAction) update action with empty parameters."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        old_type_id: typing.Optional[str] = None
+    ):
+        self.old_type_id = old_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerGroupCustomTypeRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerGroupCustomTypeRemovedMessage":
+        from ._schemas.message import CustomerGroupCustomTypeRemovedMessageSchema
+
+        return CustomerGroupCustomTypeRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerGroupCustomTypeRemovedMessageSchema
+
+        return CustomerGroupCustomTypeRemovedMessageSchema().dump(self)
+
+
+class CustomerGroupCustomTypeSetMessage(Message):
+    """Generated after adding a Custom Type to a Customer Group using the [Set Custom Type](ctp:api:type:CustomerGroupSetCustomTypeAction) update action."""
+
+    #: The Custom Fields that have been set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        custom_fields: "CustomFields",
+        old_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.old_type_id = old_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerGroupCustomTypeSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerGroupCustomTypeSetMessage":
+        from ._schemas.message import CustomerGroupCustomTypeSetMessageSchema
+
+        return CustomerGroupCustomTypeSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerGroupCustomTypeSetMessageSchema
+
+        return CustomerGroupCustomTypeSetMessageSchema().dump(self)
 
 
 class CustomerGroupSetMessage(Message):
@@ -3437,6 +5868,63 @@ class CustomerLastNameSetMessage(Message):
         from ._schemas.message import CustomerLastNameSetMessageSchema
 
         return CustomerLastNameSetMessageSchema().dump(self)
+
+
+class CustomerPasswordTokenCreatedMessage(Message):
+    """Generated after a successful [Create password reset token for Customer](/../api/projects/customers#create-password-reset-token-for-customer) request.  The `resource` property of the Message is a [CustomerPasswordTokenReference](ctp:api:type:CustomerPasswordTokenReference)."""
+
+    #: Unique identifier of the Customer.
+    customer_id: str
+    #: Date and time (UTC) the password token expires.
+    expires_at: datetime.datetime
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        customer_id: str,
+        expires_at: datetime.datetime
+    ):
+        self.customer_id = customer_id
+        self.expires_at = expires_at
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="CustomerPasswordTokenCreated",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerPasswordTokenCreatedMessage":
+        from ._schemas.message import CustomerPasswordTokenCreatedMessageSchema
+
+        return CustomerPasswordTokenCreatedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerPasswordTokenCreatedMessageSchema
+
+        return CustomerPasswordTokenCreatedMessageSchema().dump(self)
 
 
 class CustomerPasswordUpdatedMessage(Message):
@@ -3900,6 +6388,18 @@ class OrderMessage(Message):
             from ._schemas.message import OrderCreatedMessageSchema
 
             return OrderCreatedMessageSchema().load(data)
+        if data["type"] == "OrderCustomFieldAdded":
+            from ._schemas.message import OrderCustomFieldAddedMessageSchema
+
+            return OrderCustomFieldAddedMessageSchema().load(data)
+        if data["type"] == "OrderCustomFieldChanged":
+            from ._schemas.message import OrderCustomFieldChangedMessageSchema
+
+            return OrderCustomFieldChangedMessageSchema().load(data)
+        if data["type"] == "OrderCustomFieldRemoved":
+            from ._schemas.message import OrderCustomFieldRemovedMessageSchema
+
+            return OrderCustomFieldRemovedMessageSchema().load(data)
         if data["type"] == "OrderCustomLineItemAdded":
             from ._schemas.message import OrderCustomLineItemAddedMessageSchema
 
@@ -3918,6 +6418,14 @@ class OrderMessage(Message):
             from ._schemas.message import OrderCustomLineItemRemovedMessageSchema
 
             return OrderCustomLineItemRemovedMessageSchema().load(data)
+        if data["type"] == "OrderCustomTypeRemoved":
+            from ._schemas.message import OrderCustomTypeRemovedMessageSchema
+
+            return OrderCustomTypeRemovedMessageSchema().load(data)
+        if data["type"] == "OrderCustomTypeSet":
+            from ._schemas.message import OrderCustomTypeSetMessageSchema
+
+            return OrderCustomTypeSetMessageSchema().load(data)
         if data["type"] == "OrderCustomerEmailSet":
             from ._schemas.message import OrderCustomerEmailSetMessageSchema
 
@@ -4048,10 +6556,12 @@ class OrderMessage(Message):
 
 
 class CustomLineItemStateTransitionMessage(OrderMessage):
-    """Generated after a successful [Transition Custom Line Item State](ctp:api:type:OrderTransitionCustomLineItemStateAction) update action."""
+    """Generated after a successful [Transition CustomLineItem State](ctp:api:type:OrderTransitionCustomLineItemStateAction) update action."""
 
     #: Unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
     custom_line_item_id: str
+    #: User-defined unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
+    custom_line_item_key: typing.Optional[str]
     #: Date and time (UTC) when the transition of the [Custom Line Item](ctp:api:type:CustomLineItem) [State](ctp:api:type:State) was performed.
     transition_date: datetime.datetime
     #: Number of [Custom Line Items](ctp:api:type:CustomLineItem) for which the [State](ctp:api:type:State) was transitioned.
@@ -4077,12 +6587,14 @@ class CustomLineItemStateTransitionMessage(OrderMessage):
             "UserProvidedIdentifiers"
         ] = None,
         custom_line_item_id: str,
+        custom_line_item_key: typing.Optional[str] = None,
         transition_date: datetime.datetime,
         quantity: int,
         from_state: "StateReference",
         to_state: "StateReference"
     ):
         self.custom_line_item_id = custom_line_item_id
+        self.custom_line_item_key = custom_line_item_key
         self.transition_date = transition_date
         self.quantity = quantity
         self.from_state = from_state
@@ -4119,9 +6631,9 @@ class CustomLineItemStateTransitionMessage(OrderMessage):
 class DeliveryAddedMessage(OrderMessage):
     """Generated after a successful [Add Delivery](ctp:api:type:OrderAddDeliveryAction) update action."""
 
-    #: [Delivery](ctp:api:type:Delivery) that was added to the [Order](ctp:api:type:Order). The [Delivery](ctp:api:type:Delivery) in the Message body does not contain [Parcels](ctp:api:type:Parcel) if those were part of the initial [Add Delivery](ctp:api:type:OrderAddDeliveryAction) update action. In that case, the update action produces an additional [ParcelAddedToDelivery](ctp:api:type:ParcelAddedToDeliveryMessage) Message containing information about the [Parcels](ctp:api:type:Parcel).
+    #: [Delivery](ctp:api:type:Delivery) that was added to the [Order](ctp:api:type:Order). The [Delivery](ctp:api:type:Delivery) in the Message body does not contain [Parcels](ctp:api:type:Parcel) if those were part of the initial [Add Delivery](ctp:api:type:OrderAddDeliveryAction) update action. In that case, the update action produces an additional [Parcel Added To Delivery](ctp:api:type:ParcelAddedToDeliveryMessage) Message containing information about the [Parcels](ctp:api:type:Parcel).
     delivery: "Delivery"
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -4180,7 +6692,7 @@ class DeliveryAddressSetMessage(OrderMessage):
     address: typing.Optional["Address"]
     #: [Address](ctp:api:type:Address) before the [Set Delivery Address](ctp:api:type:OrderSetDeliveryAddressAction) update action.
     old_address: typing.Optional["Address"]
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -4245,7 +6757,7 @@ class DeliveryItemsUpdatedMessage(OrderMessage):
     items: typing.List["DeliveryItem"]
     #: [Delivery Items](ctp:api:type:DeliveryItem) before the [Set Delivery Items](ctp:api:type:OrderSetDeliveryItemsAction) update action.
     old_items: typing.List["DeliveryItem"]
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -4306,7 +6818,7 @@ class DeliveryRemovedMessage(OrderMessage):
 
     #: The [Delivery](ctp:api:type:Delivery) that was removed from the [Order](ctp:api:type:Order).
     delivery: "Delivery"
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -4359,10 +6871,12 @@ class DeliveryRemovedMessage(OrderMessage):
 
 
 class LineItemStateTransitionMessage(OrderMessage):
-    """Generated after a successful [Transition Line Item State](ctp:api:type:OrderTransitionLineItemStateAction) update action."""
+    """Generated after a successful [Transition LineItem State](ctp:api:type:OrderTransitionLineItemStateAction) update action."""
 
     #: Unique identifier of the [Line Item](ctp:api:type:LineItem).
     line_item_id: str
+    #: User-defined unique identifier of the LineItem.
+    line_item_key: typing.Optional[str]
     #: Date and time (UTC) when the transition of the [Line Item](ctp:api:type:LineItem) [State](ctp:api:type:State) was performed.
     transition_date: datetime.datetime
     #: Number of [Line Items](ctp:api:type:LineItem) for which the [State](ctp:api:type:State) was transitioned.
@@ -4388,12 +6902,14 @@ class LineItemStateTransitionMessage(OrderMessage):
             "UserProvidedIdentifiers"
         ] = None,
         line_item_id: str,
+        line_item_key: typing.Optional[str] = None,
         transition_date: datetime.datetime,
         quantity: int,
         from_state: "StateReference",
         to_state: "StateReference"
     ):
         self.line_item_id = line_item_id
+        self.line_item_key = line_item_key
         self.transition_date = transition_date
         self.quantity = quantity
         self.from_state = from_state
@@ -4535,8 +7051,180 @@ class OrderCreatedMessage(OrderMessage):
         return OrderCreatedMessageSchema().dump(self)
 
 
+class OrderCustomFieldAddedMessage(OrderMessage):
+    """Generated after adding a Custom Field using the [Set CustomField](ctp:api:type:OrderSetCustomFieldAction)."""
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any
+    ):
+        self.name = name
+        self.value = value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="OrderCustomFieldAdded",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "OrderCustomFieldAddedMessage":
+        from ._schemas.message import OrderCustomFieldAddedMessageSchema
+
+        return OrderCustomFieldAddedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import OrderCustomFieldAddedMessageSchema
+
+        return OrderCustomFieldAddedMessageSchema().dump(self)
+
+
+class OrderCustomFieldChangedMessage(OrderMessage):
+    """Generated when an existing Custom Field has been changed using the [Set CustomField](ctp:api:type:OrderSetCustomFieldAction) action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:OrderSetCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:OrderSetCustomFieldAction) update action.
+    #: When there has not been a Custom Field with the `name` on the Order before, an [Order Custom Field Added](ctp:api:type:OrderCustomFieldAddedMessage) Message is generated instead.
+    previous_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str,
+        value: typing.Any,
+        previous_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.previous_value = previous_value
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="OrderCustomFieldChanged",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "OrderCustomFieldChangedMessage":
+        from ._schemas.message import OrderCustomFieldChangedMessageSchema
+
+        return OrderCustomFieldChangedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import OrderCustomFieldChangedMessageSchema
+
+        return OrderCustomFieldChangedMessageSchema().dump(self)
+
+
+class OrderCustomFieldRemovedMessage(OrderMessage):
+    """Generated when a Custom Field has been removed from the Order using the [Set CustomField](ctp:api:type:OrderSetCustomFieldAction) action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        name: str
+    ):
+        self.name = name
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="OrderCustomFieldRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "OrderCustomFieldRemovedMessage":
+        from ._schemas.message import OrderCustomFieldRemovedMessageSchema
+
+        return OrderCustomFieldRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import OrderCustomFieldRemovedMessageSchema
+
+        return OrderCustomFieldRemovedMessageSchema().dump(self)
+
+
 class OrderCustomLineItemAddedMessage(OrderMessage):
-    """Generated after a successful [Add Custom Line Item](ctp:api:type:StagedOrderAddCustomLineItemAction) update action."""
+    """Generated after a successful [Add CustomLineItem](ctp:api:type:StagedOrderAddCustomLineItemAction) update action."""
 
     #: [Custom Line Item](ctp:api:type:CustomLineItem) that was added to the [Order](ctp:api:type:Order).
     custom_line_item: "CustomLineItem"
@@ -4593,6 +7281,8 @@ class OrderCustomLineItemDiscountSetMessage(OrderMessage):
 
     #: Unique identifier for the [Custom Line Item](ctp:api:type:CustomLineItem).
     custom_line_item_id: str
+    #: User-defined unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
+    custom_line_item_key: typing.Optional[str]
     #: Array of [DiscountedLineItemPriceForQuantity](ctp:api:type:DiscountedLineItemPriceForQuantity) after the Discount recalculation.
     discounted_price_per_quantity: typing.List["DiscountedLineItemPriceForQuantity"]
     #: [TaxedItemPrice](ctp:api:type:TaxedItemPrice) of the [Custom Line Item](ctp:api:type:CustomLineItem) after the Discount recalculation.
@@ -4614,12 +7304,14 @@ class OrderCustomLineItemDiscountSetMessage(OrderMessage):
             "UserProvidedIdentifiers"
         ] = None,
         custom_line_item_id: str,
+        custom_line_item_key: typing.Optional[str] = None,
         discounted_price_per_quantity: typing.List[
             "DiscountedLineItemPriceForQuantity"
         ],
         taxed_price: typing.Optional["TaxedItemPrice"] = None
     ):
         self.custom_line_item_id = custom_line_item_id
+        self.custom_line_item_key = custom_line_item_key
         self.discounted_price_per_quantity = discounted_price_per_quantity
         self.taxed_price = taxed_price
 
@@ -4652,10 +7344,12 @@ class OrderCustomLineItemDiscountSetMessage(OrderMessage):
 
 
 class OrderCustomLineItemQuantityChangedMessage(OrderMessage):
-    """Generated after a successful [Change Custom Line Item Quantity](ctp:api:type:StagedOrderChangeCustomLineItemQuantityAction) update action."""
+    """Generated after a successful [Change CustomLineItem Quantity](ctp:api:type:StagedOrderChangeCustomLineItemQuantityAction) update action."""
 
     #: Unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
     custom_line_item_id: str
+    #: User-defined unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
+    custom_line_item_key: typing.Optional[str]
     #: [Custom Line Item](ctp:api:type:CustomLineItem) quantity after the [Change Custom Line Item Quantity](ctp:api:type:StagedOrderChangeCustomLineItemQuantityAction) update action.
     quantity: int
     #: [Custom Line Item](ctp:api:type:CustomLineItem) quantity before the [Change Custom Line Item Quantity](ctp:api:type:StagedOrderChangeCustomLineItemQuantityAction) update action.
@@ -4677,10 +7371,12 @@ class OrderCustomLineItemQuantityChangedMessage(OrderMessage):
             "UserProvidedIdentifiers"
         ] = None,
         custom_line_item_id: str,
+        custom_line_item_key: typing.Optional[str] = None,
         quantity: int,
         old_quantity: int
     ):
         self.custom_line_item_id = custom_line_item_id
+        self.custom_line_item_key = custom_line_item_key
         self.quantity = quantity
         self.old_quantity = old_quantity
 
@@ -4713,10 +7409,12 @@ class OrderCustomLineItemQuantityChangedMessage(OrderMessage):
 
 
 class OrderCustomLineItemRemovedMessage(OrderMessage):
-    """Generated after a successful [Remove Custom Line Item](ctp:api:type:StagedOrderRemoveCustomLineItemAction) update action."""
+    """Generated after a successful [Remove CustomLineItem](ctp:api:type:StagedOrderRemoveCustomLineItemAction) update action."""
 
     #: Unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
     custom_line_item_id: str
+    #: User-defined unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
+    custom_line_item_key: typing.Optional[str]
     #: [Custom Line Item](ctp:api:type:CustomLineItem) that was removed from the [Order](ctp:api:type:Order).
     custom_line_item: "CustomLineItem"
 
@@ -4736,9 +7434,11 @@ class OrderCustomLineItemRemovedMessage(OrderMessage):
             "UserProvidedIdentifiers"
         ] = None,
         custom_line_item_id: str,
+        custom_line_item_key: typing.Optional[str] = None,
         custom_line_item: "CustomLineItem"
     ):
         self.custom_line_item_id = custom_line_item_id
+        self.custom_line_item_key = custom_line_item_key
         self.custom_line_item = custom_line_item
 
         super().__init__(
@@ -4767,6 +7467,116 @@ class OrderCustomLineItemRemovedMessage(OrderMessage):
         from ._schemas.message import OrderCustomLineItemRemovedMessageSchema
 
         return OrderCustomLineItemRemovedMessageSchema().dump(self)
+
+
+class OrderCustomTypeRemovedMessage(OrderMessage):
+    """Generated after a successful [Set Custom Type](ctp:api:type:OrderSetCustomTypeAction) with empty parameters."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        previous_type_id: typing.Optional[str] = None
+    ):
+        self.previous_type_id = previous_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="OrderCustomTypeRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "OrderCustomTypeRemovedMessage":
+        from ._schemas.message import OrderCustomTypeRemovedMessageSchema
+
+        return OrderCustomTypeRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import OrderCustomTypeRemovedMessageSchema
+
+        return OrderCustomTypeRemovedMessageSchema().dump(self)
+
+
+class OrderCustomTypeSetMessage(OrderMessage):
+    """Generated after a successful [Set Custom Type](ctp:api:type:OrderSetCustomTypeAction)."""
+
+    #: The Custom Fields that have been set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        custom_fields: "CustomFields",
+        previous_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.previous_type_id = previous_type_id
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="OrderCustomTypeSet",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "OrderCustomTypeSetMessage":
+        from ._schemas.message import OrderCustomTypeSetMessageSchema
+
+        return OrderCustomTypeSetMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import OrderCustomTypeSetMessageSchema
+
+        return OrderCustomTypeSetMessageSchema().dump(self)
 
 
 class OrderCustomerEmailSetMessage(OrderMessage):
@@ -4884,15 +7694,15 @@ class OrderCustomerGroupSetMessage(OrderMessage):
 
 
 class OrderCustomerSetMessage(OrderMessage):
-    """Generated after a successful [Set Customer Id](ctp:api:type:OrderSetCustomerIdAction) update action."""
+    """Generated after a successful [Set Customer ID](ctp:api:type:OrderSetCustomerIdAction) update action."""
 
-    #: [Customer](ctp:api:type:Customer) on the [Order](ctp:api:type:Order) after the [Set Customer Id](ctp:api:type:OrderSetCustomerIdAction) update action.
+    #: [Customer](ctp:api:type:Customer) on the [Order](ctp:api:type:Order) after the [Set Customer ID](ctp:api:type:OrderSetCustomerIdAction) update action.
     customer: typing.Optional["CustomerReference"]
-    #: [CustomerGroup](ctp:api:type:CustomerGroup) on the [Order](ctp:api:type:Order) after the [Set Customer Id](ctp:api:type:OrderSetCustomerIdAction) update action.
+    #: [CustomerGroup](ctp:api:type:CustomerGroup) on the [Order](ctp:api:type:Order) after the [Set Customer ID](ctp:api:type:OrderSetCustomerIdAction) update action.
     customer_group: typing.Optional["CustomerGroupReference"]
-    #: [Customer](ctp:api:type:Customer) on the [Order](ctp:api:type:Order) before the [Set Customer Id](ctp:api:type:OrderSetCustomerIdAction) update action.
+    #: [Customer](ctp:api:type:Customer) on the [Order](ctp:api:type:Order) before the [Set Customer ID](ctp:api:type:OrderSetCustomerIdAction) update action.
     old_customer: typing.Optional["CustomerReference"]
-    #: [CustomerGroup](ctp:api:type:CustomerGroup) on the [Order](ctp:api:type:Order) before the [Set Customer Id](ctp:api:type:OrderSetCustomerIdAction) update action.
+    #: [CustomerGroup](ctp:api:type:CustomerGroup) on the [Order](ctp:api:type:Order) before the [Set Customer ID](ctp:api:type:OrderSetCustomerIdAction) update action.
     old_customer_group: typing.Optional["CustomerGroupReference"]
 
     def __init__(
@@ -5000,7 +7810,7 @@ class OrderDeletedMessage(OrderMessage):
 
 
 class OrderDiscountCodeAddedMessage(OrderMessage):
-    """Generated after a successful [Add Discount Code](ctp:api:type:StagedOrderAddDiscountCodeAction) update action."""
+    """Generated after a successful [Add DiscountCode](ctp:api:type:StagedOrderAddDiscountCodeAction) update action."""
 
     #: [DiscountCode](ctp:api:type:DiscountCode) that was added.
     discount_code: "DiscountCodeReference"
@@ -5053,7 +7863,7 @@ class OrderDiscountCodeAddedMessage(OrderMessage):
 
 
 class OrderDiscountCodeRemovedMessage(OrderMessage):
-    """Generated after a successful [Remove Discount Code](ctp:api:type:StagedOrderRemoveDiscountCodeAction) update action."""
+    """Generated after a successful [Remove DiscountCode](ctp:api:type:StagedOrderRemoveDiscountCodeAction) update action."""
 
     #: [DiscountCode](ctp:api:type:DiscountCode) that was removed.
     discount_code: "DiscountCodeReference"
@@ -5167,7 +7977,7 @@ class OrderDiscountCodeStateSetMessage(OrderMessage):
 
 
 class OrderEditAppliedMessage(OrderMessage):
-    """Generated after a successfully applying an [OrderEdit](/../api/projects/order-edits#apply-an-orderedit)."""
+    """Generated after successfully [applying an OrderEdit](ctp:api:endpoint:/{projectKey}/orders/edits/{id}/apply:POST)."""
 
     #: [OrderEdit](ctp:api:type:OrderEdit) that was applied.
     edit: "OrderEdit"
@@ -5224,7 +8034,7 @@ class OrderEditAppliedMessage(OrderMessage):
 
 
 class OrderImportedMessage(OrderMessage):
-    """Generated after a successful [Order Import](/../api/projects/orders-import#create-an-order-by-import)."""
+    """Generated after a successful [Order Import](ctp:api:endpoint:/{projectKey}/orders/import:POST)."""
 
     #: [Order](ctp:api:type:Order) that was imported.
     order: "Order"
@@ -5275,7 +8085,7 @@ class OrderImportedMessage(OrderMessage):
 
 
 class OrderLineItemAddedMessage(OrderMessage):
-    """Generated after a successful [Add Line Item](ctp:api:type:StagedOrderAddLineItemAction) update action."""
+    """Generated after a successful [Add LineItem](ctp:api:type:StagedOrderAddLineItemAction) update action."""
 
     #: [Line Item](ctp:api:type:LineItem) that was added to the [Order](ctp:api:type:Order).
     line_item: "LineItem"
@@ -5336,13 +8146,15 @@ class OrderLineItemDiscountSetMessage(OrderMessage):
 
     #: Unique identifier for the [Line Item](ctp:api:type:LineItem).
     line_item_id: str
+    #: User-defined unique identifier of the LineItem.
+    line_item_key: typing.Optional[str]
     #: Array of [DiscountedLineItemPriceForQuantity](ctp:api:type:DiscountedLineItemPriceForQuantity) after the Discount recalculation.
     discounted_price_per_quantity: typing.List["DiscountedLineItemPriceForQuantity"]
     #: Total Price of the [Line Item](ctp:api:type:LineItem) after the Discount recalculation.
     total_price: "Money"
     #: [TaxedItemPrice](ctp:api:type:TaxedItemPrice) of the [Line Item](ctp:api:type:LineItem) after the Discount recalculation.
     taxed_price: typing.Optional["TaxedItemPrice"]
-    #: Taxed price of the Shipping Methods in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: Taxed price of the Shipping Methods in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     taxed_price_portions: typing.List["MethodTaxedPrice"]
 
     def __init__(
@@ -5361,6 +8173,7 @@ class OrderLineItemDiscountSetMessage(OrderMessage):
             "UserProvidedIdentifiers"
         ] = None,
         line_item_id: str,
+        line_item_key: typing.Optional[str] = None,
         discounted_price_per_quantity: typing.List[
             "DiscountedLineItemPriceForQuantity"
         ],
@@ -5369,6 +8182,7 @@ class OrderLineItemDiscountSetMessage(OrderMessage):
         taxed_price_portions: typing.List["MethodTaxedPrice"]
     ):
         self.line_item_id = line_item_id
+        self.line_item_key = line_item_key
         self.discounted_price_per_quantity = discounted_price_per_quantity
         self.total_price = total_price
         self.taxed_price = taxed_price
@@ -5403,10 +8217,12 @@ class OrderLineItemDiscountSetMessage(OrderMessage):
 
 
 class OrderLineItemDistributionChannelSetMessage(OrderMessage):
-    """Generated after a successful [Set Line Item Distribution Channel](/../api/projects/order-edits#set-lineitem-distributionchannel) update action."""
+    """Generated after a successful [Set LineItem DistributionChannel](/../api/projects/order-edits#set-lineitem-distributionchannel) update action."""
 
     #: Unique identifier of the [Line Item](ctp:api:type:LineItem).
     line_item_id: str
+    #: User-defined unique identifier of the LineItem.
+    line_item_key: typing.Optional[str]
     #: [Distribution Channel](ctp:api:type:Channel) that was set.
     distribution_channel: typing.Optional["ChannelReference"]
 
@@ -5426,9 +8242,11 @@ class OrderLineItemDistributionChannelSetMessage(OrderMessage):
             "UserProvidedIdentifiers"
         ] = None,
         line_item_id: str,
+        line_item_key: typing.Optional[str] = None,
         distribution_channel: typing.Optional["ChannelReference"] = None
     ):
         self.line_item_id = line_item_id
+        self.line_item_key = line_item_key
         self.distribution_channel = distribution_channel
 
         super().__init__(
@@ -5460,10 +8278,12 @@ class OrderLineItemDistributionChannelSetMessage(OrderMessage):
 
 
 class OrderLineItemRemovedMessage(OrderMessage):
-    """Generated after a successful [Remove Line Item](ctp:api:type:StagedOrderRemoveLineItemAction) update action."""
+    """Generated after a successful [Remove LineItem](ctp:api:type:StagedOrderRemoveLineItemAction) update action."""
 
     #: Unique identifier of the [Line Item](ctp:api:type:LineItem).
     line_item_id: str
+    #: User-defined unique identifier of the LineItem.
+    line_item_key: typing.Optional[str]
     #: Quantity of [Line Items](ctp:api:type:LineItem) that were removed during the [Remove Line Item](ctp:api:type:StagedOrderRemoveLineItemAction) update action.
     removed_quantity: int
     #: [Line Item](ctp:api:type:LineItem) quantity after the [Remove Line Item](ctp:api:type:StagedOrderRemoveLineItemAction) update action.
@@ -5495,6 +8315,7 @@ class OrderLineItemRemovedMessage(OrderMessage):
             "UserProvidedIdentifiers"
         ] = None,
         line_item_id: str,
+        line_item_key: typing.Optional[str] = None,
         removed_quantity: int,
         new_quantity: int,
         new_state: typing.List["ItemState"],
@@ -5504,6 +8325,7 @@ class OrderLineItemRemovedMessage(OrderMessage):
         new_shipping_detail: typing.Optional["ItemShippingDetails"] = None
     ):
         self.line_item_id = line_item_id
+        self.line_item_key = line_item_key
         self.removed_quantity = removed_quantity
         self.new_quantity = new_quantity
         self.new_state = new_state
@@ -5594,7 +8416,7 @@ class OrderPaymentAddedMessage(Message):
 
 
 class OrderPaymentStateChangedMessage(OrderMessage):
-    """Generated after a successful [Change Payment State](ctp:api:type:OrderChangePaymentStateAction) update action."""
+    """Generated after a successful [Change PaymentState](ctp:api:type:OrderChangePaymentStateAction) update action."""
 
     #: [PaymentState](ctp:api:type:PaymentState) after the [Change Payment State](ctp:api:type:OrderChangePaymentStateAction) update action.
     payment_state: "PaymentState"
@@ -5651,11 +8473,11 @@ class OrderPaymentStateChangedMessage(OrderMessage):
 
 
 class OrderPurchaseOrderNumberSetMessage(OrderMessage):
-    """Generated after a successful [Set PurchaseOrderNumber](/../api/projects/orders#set-purchase-order-number) update action."""
+    """Generated after a successful [Set Purchase Order Number](ctp:api:type:OrderSetPurchaseOrderNumberAction) update action."""
 
-    #: Purchase order number on the [Order](ctp:api:type:Order) after the [Set PurchaseOrderNumber](/../api/projects/orders#set-purchase-order-number) update action.
+    #: Purchase order number on the [Order](ctp:api:type:Order) after the [Set Purchase Order Number](ctp:api:type:OrderSetPurchaseOrderNumberAction) update action.
     purchase_order_number: typing.Optional[str]
-    #: Purchase order number on the [Order](ctp:api:type:Order) before the [Set PurchaseOrderNumber](/../api/projects/orders#set-purchase-order-number) update action.
+    #: Purchase order number on the [Order](ctp:api:type:Order) before the [Set Purchase Order Number](ctp:api:type:OrderSetPurchaseOrderNumberAction) update action.
     old_purchase_order_number: typing.Optional[str]
 
     def __init__(
@@ -5708,7 +8530,7 @@ class OrderPurchaseOrderNumberSetMessage(OrderMessage):
 
 
 class OrderReturnShipmentStateChangedMessage(OrderMessage):
-    """Generated after a successful [Set Return Shipment State](ctp:api:type:OrderSetReturnShipmentStateAction) update action."""
+    """Generated after a successful [Set ReturnShipmentState](ctp:api:type:OrderSetReturnShipmentStateAction) update action."""
 
     #: Unique identifier of the [ReturnItem](ctp:api:type:ReturnItem).
     return_item_id: str
@@ -5765,7 +8587,7 @@ class OrderReturnShipmentStateChangedMessage(OrderMessage):
 
 
 class OrderShipmentStateChangedMessage(OrderMessage):
-    """Generated after a successful [Change Shipment State](ctp:api:type:OrderChangeShipmentStateAction) update action."""
+    """Generated after a successful [Change ShipmentState](ctp:api:type:OrderChangeShipmentStateAction) update action."""
 
     #: [ShipmentState](ctp:api:type:ShipmentState) after the [Change Shipment State](ctp:api:type:OrderChangeShipmentStateAction) update action.
     shipment_state: "ShipmentState"
@@ -5879,7 +8701,7 @@ class OrderShippingAddressSetMessage(OrderMessage):
 
 
 class OrderShippingInfoSetMessage(OrderMessage):
-    """Generated after a successful [Set Shipping Method](ctp:api:type:StagedOrderSetShippingMethodAction) and [Set Custom Shipping Method](ctp:api:type:StagedOrderSetCustomShippingMethodAction) update actions."""
+    """Generated after a successful [Set ShippingMethod](ctp:api:type:StagedOrderSetShippingMethodAction) and [Set Custom ShippingMethod](ctp:api:type:StagedOrderSetCustomShippingMethodAction) update actions."""
 
     #: [ShippingInfo](ctp:api:type:ShippingInfo) after the [Set Shipping Method](ctp:api:type:StagedOrderSetShippingMethodAction) or [Set Custom Shipping Method](ctp:api:type:StagedOrderSetCustomShippingMethodAction) update action.
     shipping_info: typing.Optional["ShippingInfo"]
@@ -5993,7 +8815,7 @@ class OrderShippingRateInputSetMessage(OrderMessage):
 
 
 class OrderStateChangedMessage(OrderMessage):
-    """Generated after a successful [Change Order State](ctp:api:type:OrderChangeOrderStateAction) update action."""
+    """Generated after a successful [Change OrderState](ctp:api:type:OrderChangeOrderStateAction) update action."""
 
     #: [OrderState](ctp:api:type:OrderState) after the [Change Order State](ctp:api:type:OrderChangeOrderStateAction) update action.
     order_state: "OrderState"
@@ -6162,13 +8984,13 @@ class OrderStoreSetMessage(OrderMessage):
 
 
 class ParcelAddedToDeliveryMessage(OrderMessage):
-    """Generated after a successful [Add Parcel To Delivery](ctp:api:type:OrderAddParcelToDeliveryAction) update action."""
+    """Generated after a successful [Add Parcel to Delivery](ctp:api:type:OrderAddParcelToDeliveryAction) update action."""
 
     #: Unique identifier of the [Delivery](ctp:api:type:Delivery).
     delivery: "Delivery"
     #: [Parcel](ctp:api:type:Parcel) that was added to the [Delivery](ctp:api:type:Delivery).
     parcel: "Parcel"
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -6233,7 +9055,7 @@ class ParcelItemsUpdatedMessage(OrderMessage):
     items: typing.List["DeliveryItem"]
     #: [Delivery Items](ctp:api:type:DeliveryItem) before the [Set Parcel Items](ctp:api:type:OrderSetParcelItemsAction) update action.
     old_items: typing.List["DeliveryItem"]
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -6300,7 +9122,7 @@ class ParcelMeasurementsUpdatedMessage(OrderMessage):
     parcel_id: str
     #: The [Parcel Measurements](ctp:api:type:ParcelMeasurements) that were set on the [Parcel](ctp:api:type:Parcel).
     measurements: typing.Optional["ParcelMeasurements"]
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -6357,13 +9179,13 @@ class ParcelMeasurementsUpdatedMessage(OrderMessage):
 
 
 class ParcelRemovedFromDeliveryMessage(OrderMessage):
-    """Generated after a successful [Remove Parcel From Delivery](ctp:api:type:OrderRemoveParcelFromDeliveryAction) update action."""
+    """Generated after a successful [Remove Parcel from Delivery](ctp:api:type:OrderRemoveParcelFromDeliveryAction) update action."""
 
     #: Unique identifier of the [Delivery](ctp:api:type:Delivery).
     delivery_id: str
     #: [Parcel](ctp:api:type:Parcel) that was removed from the [Delivery](ctp:api:type:Delivery).
     parcel: "Parcel"
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -6418,7 +9240,7 @@ class ParcelRemovedFromDeliveryMessage(OrderMessage):
 
 
 class ParcelTrackingDataUpdatedMessage(OrderMessage):
-    """Generated after a successful [Set Parcel TrackingData](ctp:api:type:OrderSetParcelTrackingDataAction) update action."""
+    """Generated after a successful [Set Parcel Tracking Data](ctp:api:type:OrderSetParcelTrackingDataAction) update action."""
 
     #: Unique identifier of the [Delivery](ctp:api:type:Delivery).
     delivery_id: str
@@ -6426,7 +9248,7 @@ class ParcelTrackingDataUpdatedMessage(OrderMessage):
     parcel_id: str
     #: The [Tracking Data](ctp:api:type:TrackingData) that was added to the [Parcel](ctp:api:type:Parcel).
     tracking_data: typing.Optional["TrackingData"]
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -6754,7 +9576,7 @@ class PaymentTransactionAddedMessage(Message):
 
 
 class PaymentTransactionStateChangedMessage(Message):
-    """Generated after a successful [Change Transaction State](ctp:api:type:PaymentChangeTransactionStateAction) update action."""
+    """Generated after a successful [Change TransactionState](ctp:api:type:PaymentChangeTransactionStateAction) update action."""
 
     #: Unique identifier for the [Transaction](ctp:api:type:Transaction) for which the [Transaction State](ctp:api:type:TransactionState) changed.
     transaction_id: str
@@ -6811,7 +9633,7 @@ class PaymentTransactionStateChangedMessage(Message):
 
 
 class ProductAddedToCategoryMessage(Message):
-    """Generated after a successful [Add To Category](ctp:api:type:ProductAddToCategoryAction) update action."""
+    """Generated after a successful [Add to Category](ctp:api:type:ProductAddToCategoryAction) update action."""
 
     #: [Category](ctp:api:type:Category) the [Product](ctp:api:type:Product) was added to.
     category: "CategoryReference"
@@ -7035,7 +9857,7 @@ class ProductImageAddedMessage(Message):
 
 
 class ProductPriceAddedMessage(Message):
-    """Generated after a successful [Add Embedded Price](ctp:api:type:ProductAddPriceAction) update action."""
+    """Generated after a successful [Add Price](ctp:api:type:ProductAddPriceAction) update action."""
 
     #: Unique identifier of the [ProductVariant](ctp:api:type:ProductVariant) for which the Price was added.
     variant_id: int
@@ -7096,7 +9918,7 @@ class ProductPriceAddedMessage(Message):
 
 
 class ProductPriceChangedMessage(Message):
-    """Generated after a successful [Change Embedded Price](ctp:api:type:ProductChangePriceAction) update action."""
+    """Generated after a successful [Change Price](ctp:api:type:ProductChangePriceAction) update action."""
 
     #: Unique identifier of the [ProductVariant](ctp:api:type:ProductVariant) for which the Price was changed.
     variant_id: int
@@ -7218,7 +10040,7 @@ class ProductPriceDiscountsSetMessage(Message):
 
 
 class ProductPriceDiscountsSetUpdatedPrice(_BaseType):
-    """Details about a [Embedded Price](/projects/products#embedded-price) that was updated due to a Discount. Specific to [ProductPriceDiscountsSet](ctp:api:type:ProductPriceDiscountsSetMessage) Message."""
+    """Details about a [Embedded Price](/projects/products#embedded-price) that was updated due to a Discount. Specific to [Product Price Discounts Set](ctp:api:type:ProductPriceDiscountsSetMessage) Message."""
 
     #: Unique identifier of the [ProductVariant](ctp:api:type:ProductVariant) for which the Discount was set.
     variant_id: int
@@ -7267,7 +10089,7 @@ class ProductPriceDiscountsSetUpdatedPrice(_BaseType):
 
 
 class ProductPriceExternalDiscountSetMessage(Message):
-    """Generated after a successful [Set Discounted Embedded Price](ctp:api:type:ProductSetDiscountedPriceAction) update action."""
+    """Generated after a successful [Set Discounted Price](ctp:api:type:ProductSetDiscountedPriceAction) update action."""
 
     #: Unique identifier of the [Product Variant](ctp:api:type:ProductVariant) for which the Discount was set.
     variant_id: int
@@ -7461,7 +10283,7 @@ class ProductPriceModeSetMessage(Message):
 
 
 class ProductPriceRemovedMessage(Message):
-    """Generated after a successful [Remove Embedded Price](ctp:api:type:ProductRemovePriceAction) update action."""
+    """Generated after a successful [Remove Price](ctp:api:type:ProductRemovePriceAction) update action."""
 
     #: Unique identifier of the [ProductVariant](ctp:api:type:ProductVariant) for which the Price was removed.
     variant_id: int
@@ -7522,7 +10344,7 @@ class ProductPriceRemovedMessage(Message):
 
 
 class ProductPricesSetMessage(Message):
-    """Generated after a successful [Set Embedded Prices](ctp:api:type:ProductSetPricesAction) update action."""
+    """Generated after a successful [Set Prices](ctp:api:type:ProductSetPricesAction) update action."""
 
     #: Unique identifier of the [ProductVariant](ctp:api:type:ProductVariant) for which the Price was set.
     variant_id: int
@@ -7644,7 +10466,7 @@ class ProductPublishedMessage(Message):
 
 
 class ProductRemovedFromCategoryMessage(Message):
-    """Generated after a successful [Remove From Category](ctp:api:type:ProductRemoveFromCategoryAction) update action."""
+    """Generated after a successful [Remove from Category](ctp:api:type:ProductRemoveFromCategoryAction) update action."""
 
     #: [Category](ctp:api:type:Category) the [Product](ctp:api:type:Product) was removed from.
     category: "CategoryReference"
@@ -7754,7 +10576,7 @@ class ProductRevertedStagedChangesMessage(Message):
 
 
 class ProductSelectionCreatedMessage(Message):
-    """Generated after a successful [Create Product Selection](/../api/projects/product-selections#create-product-selection) request."""
+    """Generated after a successful [Create Product Selection](/../api/projects/product-selections#create-productselection) request."""
 
     #: [Product Selection](ctp:api:type:ProductSelection) that was created.
     product_selection: "ProductSelection"
@@ -7807,7 +10629,7 @@ class ProductSelectionCreatedMessage(Message):
 
 
 class ProductSelectionDeletedMessage(Message):
-    """Generated after a successful [Delete Product Selection](/../api/projects/product-selections#create-product-selection) request."""
+    """Generated after a successful [Delete Product Selection](/../api/projects/product-selections#delete-productselection) request."""
 
     def __init__(
         self,
@@ -8312,7 +11134,7 @@ class ProductUnpublishedMessage(Message):
 
 
 class ProductVariantAddedMessage(Message):
-    """Generated after a successful [Add Product Variant](ctp:api:type:ProductAddVariantAction) update action."""
+    """Generated after a successful [Add ProductVariant](ctp:api:type:ProductAddVariantAction) update action."""
 
     #: Unique identifier of the [Product Variant](ctp:api:type:ProductVariant) that was added.
     variant: "ProductVariant"
@@ -8369,7 +11191,7 @@ class ProductVariantAddedMessage(Message):
 
 
 class ProductVariantDeletedMessage(Message):
-    """Generated after a successful [Remove Product Variant](ctp:api:type:ProductRemoveVariantAction) update action."""
+    """Generated after a successful [Remove ProductVariant](ctp:api:type:ProductRemoveVariantAction) update action."""
 
     #: Unique identifier of the [Product Variant](ctp:api:type:ProductVariant) that was added.
     variant: typing.Optional["ProductVariant"]
@@ -8578,8 +11400,61 @@ class QuoteDeletedMessage(Message):
         return QuoteDeletedMessageSchema().dump(self)
 
 
+class QuoteRenegotiationRequestedMessage(Message):
+    """Generated after a successful [Request Quote Renegotiation](ctp:api:type:QuoteRequestQuoteRenegotiationAction) update action."""
+
+    #: Message from the [Buyer](/api/quotes-overview#buyer) regarding the Quote renegotiation request.
+    buyer_comment: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        buyer_comment: typing.Optional[str] = None
+    ):
+        self.buyer_comment = buyer_comment
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="QuoteRenegotiationRequested",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "QuoteRenegotiationRequestedMessage":
+        from ._schemas.message import QuoteRenegotiationRequestedMessageSchema
+
+        return QuoteRenegotiationRequestedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import QuoteRenegotiationRequestedMessageSchema
+
+        return QuoteRenegotiationRequestedMessageSchema().dump(self)
+
+
 class QuoteRequestCreatedMessage(Message):
-    """Generated after a successful [Create Quote Request](/../api/projects/quote-requests#create-quoterequest) request."""
+    """Generated after a successful [Create QuoteRequest](/../api/projects/quote-requests#create-quoterequest) request."""
 
     #: [Quote Request](/../api/projects/quote-requests) that was created.
     quote_request: "QuoteRequest"
@@ -8689,7 +11564,7 @@ class QuoteRequestCustomerChangedMessage(Message):
 
 
 class QuoteRequestDeletedMessage(Message):
-    """Generated after a successful [Delete Quote Request](/../api/projects/quote-requests#delete-quoterequest) request."""
+    """Generated after a successful [Delete QuoteRequest](/../api/projects/quote-requests#delete-quoterequest) request."""
 
     def __init__(
         self,
@@ -8972,7 +11847,7 @@ class QuoteStateTransitionMessage(Message):
 
 
 class ReturnInfoAddedMessage(OrderMessage):
-    """Generated after a successful [Add Return Info](ctp:api:type:OrderAddReturnInfoAction) update action."""
+    """Generated after a successful [Add ReturnInfo](ctp:api:type:OrderAddReturnInfoAction) update action."""
 
     #: The [ReturnInfo](ctp:api:type:ReturnInfo) that was added to the [Order](ctp:api:type:Order).
     return_info: "ReturnInfo"
@@ -9025,7 +11900,7 @@ class ReturnInfoAddedMessage(OrderMessage):
 
 
 class ReturnInfoSetMessage(OrderMessage):
-    """Generated after a successful [Set Return Info](ctp:api:type:OrderSetReturnInfoAction) update action on [Orders](ctp:api:type:Order) and [Order Edits](ctp:api:type:OrderEdit)."""
+    """Generated after a successful [Set ReturnInfo](ctp:api:type:OrderSetReturnInfoAction) update action on [Orders](ctp:api:type:Order) and [Order Edits](ctp:api:type:OrderEdit)."""
 
     #: The [ReturnInfo](ctp:api:type:ReturnInfo) that was set on the [Order](ctp:api:type:Order) or [Order Edit](ctp:api:type:OrderEdit).
     return_info: typing.Optional[typing.List["ReturnInfo"]]
@@ -9076,7 +11951,7 @@ class ReturnInfoSetMessage(OrderMessage):
 
 
 class ReviewCreatedMessage(Message):
-    """Generated after a successful [Create Review](/../api/projects/reviews#create-a-review) request."""
+    """Generated after a successful [Create Review](/../api/projects/reviews#create-review) request."""
 
     #: [Review](ctp:api:type:Review) that was created.
     review: "Review"
@@ -9265,7 +12140,7 @@ class ReviewStateTransitionMessage(Message):
 
 
 class StagedQuoteCreatedMessage(Message):
-    """Generated after a successful [Create Staged Quote](/../api/projects/staged-quotes#create-stagedquote) request."""
+    """Generated after a successful [Create StagedQuote](/../api/projects/staged-quotes#create-stagedquote) request."""
 
     #: [Staged Quote](/../api/projects/staged-quotes) that was created.
     staged_quote: "StagedQuote"
@@ -9318,7 +12193,7 @@ class StagedQuoteCreatedMessage(Message):
 
 
 class StagedQuoteDeletedMessage(Message):
-    """Generated after a successful [Delete Staged Quote](/../api/projects/staged-quotes#delete-stagedquote) request."""
+    """Generated after a successful [Delete StagedQuote](/../api/projects/staged-quotes#delete-stagedquote) request."""
 
     def __init__(
         self,
@@ -9965,6 +12840,59 @@ class StandalonePriceStagedChangesAppliedMessage(Message):
         from ._schemas.message import StandalonePriceStagedChangesAppliedMessageSchema
 
         return StandalonePriceStagedChangesAppliedMessageSchema().dump(self)
+
+
+class StandalonePriceStagedChangesRemovedMessage(Message):
+    """Generated after a successful [Remove Staged Changes](ctp:api:type:StandalonePriceRemoveStagedChangesAction) update action."""
+
+    #: Removed changes of the [StandalonePrice](ctp:api:type:StandalonePrice) after the [Remove Staged Changes](ctp:api:type:StandalonePriceRemoveStagedChangesAction) update action.
+    staged_changes: "StagedStandalonePrice"
+
+    def __init__(
+        self,
+        *,
+        id: str,
+        version: int,
+        created_at: datetime.datetime,
+        last_modified_at: datetime.datetime,
+        last_modified_by: typing.Optional["LastModifiedBy"] = None,
+        created_by: typing.Optional["CreatedBy"] = None,
+        sequence_number: int,
+        resource: "Reference",
+        resource_version: int,
+        resource_user_provided_identifiers: typing.Optional[
+            "UserProvidedIdentifiers"
+        ] = None,
+        staged_changes: "StagedStandalonePrice"
+    ):
+        self.staged_changes = staged_changes
+
+        super().__init__(
+            id=id,
+            version=version,
+            created_at=created_at,
+            last_modified_at=last_modified_at,
+            last_modified_by=last_modified_by,
+            created_by=created_by,
+            sequence_number=sequence_number,
+            resource=resource,
+            resource_version=resource_version,
+            resource_user_provided_identifiers=resource_user_provided_identifiers,
+            type="StandalonePriceStagedChangesRemoved",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "StandalonePriceStagedChangesRemovedMessage":
+        from ._schemas.message import StandalonePriceStagedChangesRemovedMessageSchema
+
+        return StandalonePriceStagedChangesRemovedMessageSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import StandalonePriceStagedChangesRemovedMessageSchema
+
+        return StandalonePriceStagedChangesRemovedMessageSchema().dump(self)
 
 
 class StandalonePriceTierAddedMessage(Message):
@@ -10925,6 +13853,54 @@ class MessagePayload(_BaseType):
 
     @classmethod
     def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "MessagePayload":
+        if data["type"] == "ApprovalFlowApproved":
+            from ._schemas.message import ApprovalFlowApprovedMessagePayloadSchema
+
+            return ApprovalFlowApprovedMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalFlowCompleted":
+            from ._schemas.message import ApprovalFlowCompletedMessagePayloadSchema
+
+            return ApprovalFlowCompletedMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalFlowCreated":
+            from ._schemas.message import ApprovalFlowCreatedMessagePayloadSchema
+
+            return ApprovalFlowCreatedMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalFlowRejected":
+            from ._schemas.message import ApprovalFlowRejectedMessagePayloadSchema
+
+            return ApprovalFlowRejectedMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalRuleApproversSet":
+            from ._schemas.message import ApprovalRuleApproversSetMessagePayloadSchema
+
+            return ApprovalRuleApproversSetMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalRuleCreated":
+            from ._schemas.message import ApprovalRuleCreatedMessagePayloadSchema
+
+            return ApprovalRuleCreatedMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalRuleDescriptionSet":
+            from ._schemas.message import ApprovalRuleDescriptionSetMessagePayloadSchema
+
+            return ApprovalRuleDescriptionSetMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalRuleKeySet":
+            from ._schemas.message import ApprovalRuleKeySetMessagePayloadSchema
+
+            return ApprovalRuleKeySetMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalRuleNameSet":
+            from ._schemas.message import ApprovalRuleNameSetMessagePayloadSchema
+
+            return ApprovalRuleNameSetMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalRulePredicateSet":
+            from ._schemas.message import ApprovalRulePredicateSetMessagePayloadSchema
+
+            return ApprovalRulePredicateSetMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalRuleRequestersSet":
+            from ._schemas.message import ApprovalRuleRequestersSetMessagePayloadSchema
+
+            return ApprovalRuleRequestersSetMessagePayloadSchema().load(data)
+        if data["type"] == "ApprovalRuleStatusSet":
+            from ._schemas.message import ApprovalRuleStatusSetMessagePayloadSchema
+
+            return ApprovalRuleStatusSetMessagePayloadSchema().load(data)
         if data["type"] == "AssociateRoleBuyerAssignableChanged":
             from ._schemas.message import (
                 AssociateRoleBuyerAssignableChangedMessagePayloadSchema,
@@ -10969,6 +13945,40 @@ class MessagePayload(_BaseType):
             from ._schemas.message import BusinessUnitAddressChangedMessagePayloadSchema
 
             return BusinessUnitAddressChangedMessagePayloadSchema().load(data)
+        if data["type"] == "BusinessUnitAddressCustomFieldAdded":
+            from ._schemas.message import (
+                BusinessUnitAddressCustomFieldAddedMessagePayloadSchema,
+            )
+
+            return BusinessUnitAddressCustomFieldAddedMessagePayloadSchema().load(data)
+        if data["type"] == "BusinessUnitAddressCustomFieldChanged":
+            from ._schemas.message import (
+                BusinessUnitAddressCustomFieldChangedMessagePayloadSchema,
+            )
+
+            return BusinessUnitAddressCustomFieldChangedMessagePayloadSchema().load(
+                data
+            )
+        if data["type"] == "BusinessUnitAddressCustomFieldRemoved":
+            from ._schemas.message import (
+                BusinessUnitAddressCustomFieldRemovedMessagePayloadSchema,
+            )
+
+            return BusinessUnitAddressCustomFieldRemovedMessagePayloadSchema().load(
+                data
+            )
+        if data["type"] == "BusinessUnitAddressCustomTypeRemoved":
+            from ._schemas.message import (
+                BusinessUnitAddressCustomTypeRemovedMessagePayloadSchema,
+            )
+
+            return BusinessUnitAddressCustomTypeRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "BusinessUnitAddressCustomTypeSet":
+            from ._schemas.message import (
+                BusinessUnitAddressCustomTypeSetMessagePayloadSchema,
+            )
+
+            return BusinessUnitAddressCustomTypeSetMessagePayloadSchema().load(data)
         if data["type"] == "BusinessUnitAddressRemoved":
             from ._schemas.message import BusinessUnitAddressRemovedMessagePayloadSchema
 
@@ -11021,6 +14031,34 @@ class MessagePayload(_BaseType):
             from ._schemas.message import BusinessUnitCreatedMessagePayloadSchema
 
             return BusinessUnitCreatedMessagePayloadSchema().load(data)
+        if data["type"] == "BusinessUnitCustomFieldAdded":
+            from ._schemas.message import (
+                BusinessUnitCustomFieldAddedMessagePayloadSchema,
+            )
+
+            return BusinessUnitCustomFieldAddedMessagePayloadSchema().load(data)
+        if data["type"] == "BusinessUnitCustomFieldChanged":
+            from ._schemas.message import (
+                BusinessUnitCustomFieldChangedMessagePayloadSchema,
+            )
+
+            return BusinessUnitCustomFieldChangedMessagePayloadSchema().load(data)
+        if data["type"] == "BusinessUnitCustomFieldRemoved":
+            from ._schemas.message import (
+                BusinessUnitCustomFieldRemovedMessagePayloadSchema,
+            )
+
+            return BusinessUnitCustomFieldRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "BusinessUnitCustomTypeRemoved":
+            from ._schemas.message import (
+                BusinessUnitCustomTypeRemovedMessagePayloadSchema,
+            )
+
+            return BusinessUnitCustomTypeRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "BusinessUnitCustomTypeSet":
+            from ._schemas.message import BusinessUnitCustomTypeSetMessagePayloadSchema
+
+            return BusinessUnitCustomTypeSetMessagePayloadSchema().load(data)
         if data["type"] == "BusinessUnitDefaultBillingAddressSet":
             from ._schemas.message import (
                 BusinessUnitDefaultBillingAddressSetMessagePayloadSchema,
@@ -11043,12 +14081,10 @@ class MessagePayload(_BaseType):
             from ._schemas.message import BusinessUnitNameChangedMessagePayloadSchema
 
             return BusinessUnitNameChangedMessagePayloadSchema().load(data)
-        if data["type"] == "BusinessUnitParentUnitChanged":
-            from ._schemas.message import (
-                BusinessUnitParentUnitChangedMessagePayloadSchema,
-            )
+        if data["type"] == "BusinessUnitParentChanged":
+            from ._schemas.message import BusinessUnitParentChangedMessagePayloadSchema
 
-            return BusinessUnitParentUnitChangedMessagePayloadSchema().load(data)
+            return BusinessUnitParentChangedMessagePayloadSchema().load(data)
         if data["type"] == "BusinessUnitShippingAddressAdded":
             from ._schemas.message import (
                 BusinessUnitShippingAddressAddedMessagePayloadSchema,
@@ -11099,6 +14135,36 @@ class MessagePayload(_BaseType):
             from ._schemas.message import CustomerAddressChangedMessagePayloadSchema
 
             return CustomerAddressChangedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerAddressCustomFieldAdded":
+            from ._schemas.message import (
+                CustomerAddressCustomFieldAddedMessagePayloadSchema,
+            )
+
+            return CustomerAddressCustomFieldAddedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerAddressCustomFieldChanged":
+            from ._schemas.message import (
+                CustomerAddressCustomFieldChangedMessagePayloadSchema,
+            )
+
+            return CustomerAddressCustomFieldChangedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerAddressCustomFieldRemoved":
+            from ._schemas.message import (
+                CustomerAddressCustomFieldRemovedMessagePayloadSchema,
+            )
+
+            return CustomerAddressCustomFieldRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerAddressCustomTypeRemoved":
+            from ._schemas.message import (
+                CustomerAddressCustomTypeRemovedMessagePayloadSchema,
+            )
+
+            return CustomerAddressCustomTypeRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerAddressCustomTypeSet":
+            from ._schemas.message import (
+                CustomerAddressCustomTypeSetMessagePayloadSchema,
+            )
+
+            return CustomerAddressCustomTypeSetMessagePayloadSchema().load(data)
         if data["type"] == "CustomerAddressRemoved":
             from ._schemas.message import CustomerAddressRemovedMessagePayloadSchema
 
@@ -11111,6 +14177,26 @@ class MessagePayload(_BaseType):
             from ._schemas.message import CustomerCreatedMessagePayloadSchema
 
             return CustomerCreatedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerCustomFieldAdded":
+            from ._schemas.message import CustomerCustomFieldAddedMessagePayloadSchema
+
+            return CustomerCustomFieldAddedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerCustomFieldChanged":
+            from ._schemas.message import CustomerCustomFieldChangedMessagePayloadSchema
+
+            return CustomerCustomFieldChangedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerCustomFieldRemoved":
+            from ._schemas.message import CustomerCustomFieldRemovedMessagePayloadSchema
+
+            return CustomerCustomFieldRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerCustomTypeRemoved":
+            from ._schemas.message import CustomerCustomTypeRemovedMessagePayloadSchema
+
+            return CustomerCustomTypeRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerCustomTypeSet":
+            from ._schemas.message import CustomerCustomTypeSetMessagePayloadSchema
+
+            return CustomerCustomTypeSetMessagePayloadSchema().load(data)
         if data["type"] == "CustomerDateOfBirthSet":
             from ._schemas.message import CustomerDateOfBirthSetMessagePayloadSchema
 
@@ -11123,6 +14209,10 @@ class MessagePayload(_BaseType):
             from ._schemas.message import CustomerEmailChangedMessagePayloadSchema
 
             return CustomerEmailChangedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerEmailTokenCreated":
+            from ._schemas.message import CustomerEmailTokenCreatedMessagePayloadSchema
+
+            return CustomerEmailTokenCreatedMessagePayloadSchema().load(data)
         if data["type"] == "CustomerEmailVerified":
             from ._schemas.message import CustomerEmailVerifiedMessagePayloadSchema
 
@@ -11131,6 +14221,34 @@ class MessagePayload(_BaseType):
             from ._schemas.message import CustomerFirstNameSetMessagePayloadSchema
 
             return CustomerFirstNameSetMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerGroupCustomFieldAdded":
+            from ._schemas.message import (
+                CustomerGroupCustomFieldAddedMessagePayloadSchema,
+            )
+
+            return CustomerGroupCustomFieldAddedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerGroupCustomFieldChanged":
+            from ._schemas.message import (
+                CustomerGroupCustomFieldChangedMessagePayloadSchema,
+            )
+
+            return CustomerGroupCustomFieldChangedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerGroupCustomFieldRemoved":
+            from ._schemas.message import (
+                CustomerGroupCustomFieldRemovedMessagePayloadSchema,
+            )
+
+            return CustomerGroupCustomFieldRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerGroupCustomTypeRemoved":
+            from ._schemas.message import (
+                CustomerGroupCustomTypeRemovedMessagePayloadSchema,
+            )
+
+            return CustomerGroupCustomTypeRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerGroupCustomTypeSet":
+            from ._schemas.message import CustomerGroupCustomTypeSetMessagePayloadSchema
+
+            return CustomerGroupCustomTypeSetMessagePayloadSchema().load(data)
         if data["type"] == "CustomerGroupSet":
             from ._schemas.message import CustomerGroupSetMessagePayloadSchema
 
@@ -11139,6 +14257,12 @@ class MessagePayload(_BaseType):
             from ._schemas.message import CustomerLastNameSetMessagePayloadSchema
 
             return CustomerLastNameSetMessagePayloadSchema().load(data)
+        if data["type"] == "CustomerPasswordTokenCreated":
+            from ._schemas.message import (
+                CustomerPasswordTokenCreatedMessagePayloadSchema,
+            )
+
+            return CustomerPasswordTokenCreatedMessagePayloadSchema().load(data)
         if data["type"] == "CustomerPasswordUpdated":
             from ._schemas.message import CustomerPasswordUpdatedMessagePayloadSchema
 
@@ -11331,6 +14455,12 @@ class MessagePayload(_BaseType):
             from ._schemas.message import QuoteDeletedMessagePayloadSchema
 
             return QuoteDeletedMessagePayloadSchema().load(data)
+        if data["type"] == "QuoteRenegotiationRequested":
+            from ._schemas.message import (
+                QuoteRenegotiationRequestedMessagePayloadSchema,
+            )
+
+            return QuoteRenegotiationRequestedMessagePayloadSchema().load(data)
         if data["type"] == "QuoteRequestCreated":
             from ._schemas.message import QuoteRequestCreatedMessagePayloadSchema
 
@@ -11439,6 +14569,12 @@ class MessagePayload(_BaseType):
             )
 
             return StandalonePriceStagedChangesAppliedMessagePayloadSchema().load(data)
+        if data["type"] == "StandalonePriceStagedChangesRemoved":
+            from ._schemas.message import (
+                StandalonePriceStagedChangesRemovedMessagePayloadSchema,
+            )
+
+            return StandalonePriceStagedChangesRemovedMessagePayloadSchema().load(data)
         if data["type"] == "StandalonePriceTierAdded":
             from ._schemas.message import StandalonePriceTierAddedMessagePayloadSchema
 
@@ -11516,6 +14652,361 @@ class MessagePayload(_BaseType):
         from ._schemas.message import MessagePayloadSchema
 
         return MessagePayloadSchema().dump(self)
+
+
+class ApprovalFlowApprovedMessagePayload(MessagePayload):
+    """Generated after an [approval in the Approval Flow](/projects/approval-flows#approve)."""
+
+    #: [Reference](ctp:api:type:Reference) to the [Customer](ctp:api:type:Customer) who approved the [Approval Flow](/projects/approval-flows).
+    associate: "CustomerReference"
+    #: [Reference](ctp:api:type:Reference) to the [Order](ctp:api:type:Order) that received the approval.
+    order: "OrderReference"
+
+    def __init__(self, *, associate: "CustomerReference", order: "OrderReference"):
+        self.associate = associate
+        self.order = order
+
+        super().__init__(type="ApprovalFlowApproved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalFlowApprovedMessagePayload":
+        from ._schemas.message import ApprovalFlowApprovedMessagePayloadSchema
+
+        return ApprovalFlowApprovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalFlowApprovedMessagePayloadSchema
+
+        return ApprovalFlowApprovedMessagePayloadSchema().dump(self)
+
+
+class ApprovalFlowCompletedMessagePayload(MessagePayload):
+    """Generated after an [Approval Flow](ctp:api:type:ApprovalFlow) is completed and reaches a final status."""
+
+    #: Final status of the [Approval Flow](ctp:api:type:ApprovalFlow).
+    status: "ApprovalFlowStatus"
+    #: [Reference](ctp:api:type:Reference) to the [Order](ctp:api:type:Order) related to the completed [Approval Flow](ctp:api:type:ApprovalFlow).
+    order: "OrderReference"
+
+    def __init__(self, *, status: "ApprovalFlowStatus", order: "OrderReference"):
+        self.status = status
+        self.order = order
+
+        super().__init__(type="ApprovalFlowCompleted")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalFlowCompletedMessagePayload":
+        from ._schemas.message import ApprovalFlowCompletedMessagePayloadSchema
+
+        return ApprovalFlowCompletedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalFlowCompletedMessagePayloadSchema
+
+        return ApprovalFlowCompletedMessagePayloadSchema().dump(self)
+
+
+class ApprovalFlowCreatedMessagePayload(MessagePayload):
+    """Generated after an [Approval Flow](ctp:api:type:ApprovalFlow) is created."""
+
+    #: The [Approval Flow](ctp:api:type:ApprovalFlow) that was created.
+    approval_flow: "ApprovalFlow"
+
+    def __init__(self, *, approval_flow: "ApprovalFlow"):
+        self.approval_flow = approval_flow
+
+        super().__init__(type="ApprovalFlowCreated")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalFlowCreatedMessagePayload":
+        from ._schemas.message import ApprovalFlowCreatedMessagePayloadSchema
+
+        return ApprovalFlowCreatedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalFlowCreatedMessagePayloadSchema
+
+        return ApprovalFlowCreatedMessagePayloadSchema().dump(self)
+
+
+class ApprovalFlowRejectedMessagePayload(MessagePayload):
+    """Generated after an [Approval Flow is rejected](/projects/approval-flows#reject)."""
+
+    #: [Reference](ctp:api:type:Reference) to the [Customer](ctp:api:type:Customer) who rejected the [Approval Flow](/projects/approval-flows).
+    associate: "CustomerReference"
+    #: Description of the reason why the [Approval Flow](ctp:api:type:ApprovalFlow) was rejected.
+    rejection_reason: typing.Optional[str]
+    #: [Reference](ctp:api:type:Reference) to the [Order](ctp:api:type:Order) that received the rejection.
+    order: "OrderReference"
+
+    def __init__(
+        self,
+        *,
+        associate: "CustomerReference",
+        rejection_reason: typing.Optional[str] = None,
+        order: "OrderReference"
+    ):
+        self.associate = associate
+        self.rejection_reason = rejection_reason
+        self.order = order
+
+        super().__init__(type="ApprovalFlowRejected")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalFlowRejectedMessagePayload":
+        from ._schemas.message import ApprovalFlowRejectedMessagePayloadSchema
+
+        return ApprovalFlowRejectedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalFlowRejectedMessagePayloadSchema
+
+        return ApprovalFlowRejectedMessagePayloadSchema().dump(self)
+
+
+class ApprovalRuleApproversSetMessagePayload(MessagePayload):
+    """Generated after a successful [Set Approvers](ctp:api:type:ApprovalRuleSetApproversAction) update action."""
+
+    #: Approver hierarchy of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Approvers](ctp:api:type:ApprovalRuleSetApproversAction) update action.
+    approvers: "ApproverHierarchy"
+    #: Approver hierarchy of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Approvers](ctp:api:type:ApprovalRuleSetApproversAction) update action.
+    old_approvers: "ApproverHierarchy"
+
+    def __init__(
+        self, *, approvers: "ApproverHierarchy", old_approvers: "ApproverHierarchy"
+    ):
+        self.approvers = approvers
+        self.old_approvers = old_approvers
+
+        super().__init__(type="ApprovalRuleApproversSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleApproversSetMessagePayload":
+        from ._schemas.message import ApprovalRuleApproversSetMessagePayloadSchema
+
+        return ApprovalRuleApproversSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleApproversSetMessagePayloadSchema
+
+        return ApprovalRuleApproversSetMessagePayloadSchema().dump(self)
+
+
+class ApprovalRuleCreatedMessagePayload(MessagePayload):
+    """Generated after an [Approval Rule](ctp:api:type:ApprovalRule) is created."""
+
+    #: The [Approval Rule](ctp:api:type:ApprovalRule) that was created.
+    approval_rule: "ApprovalRule"
+
+    def __init__(self, *, approval_rule: "ApprovalRule"):
+        self.approval_rule = approval_rule
+
+        super().__init__(type="ApprovalRuleCreated")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleCreatedMessagePayload":
+        from ._schemas.message import ApprovalRuleCreatedMessagePayloadSchema
+
+        return ApprovalRuleCreatedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleCreatedMessagePayloadSchema
+
+        return ApprovalRuleCreatedMessagePayloadSchema().dump(self)
+
+
+class ApprovalRuleDescriptionSetMessagePayload(MessagePayload):
+    """Generated after a successful [Set Description](ctp:api:type:ApprovalRuleSetDescriptionAction) update action."""
+
+    #: Description of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Description](ctp:api:type:ApprovalRuleSetDescriptionAction) update action.
+    description: typing.Optional[str]
+    #: Description of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Description](ctp:api:type:ApprovalRuleSetDescriptionAction) update action.
+    old_description: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        description: typing.Optional[str] = None,
+        old_description: typing.Optional[str] = None
+    ):
+        self.description = description
+        self.old_description = old_description
+
+        super().__init__(type="ApprovalRuleDescriptionSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleDescriptionSetMessagePayload":
+        from ._schemas.message import ApprovalRuleDescriptionSetMessagePayloadSchema
+
+        return ApprovalRuleDescriptionSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleDescriptionSetMessagePayloadSchema
+
+        return ApprovalRuleDescriptionSetMessagePayloadSchema().dump(self)
+
+
+class ApprovalRuleKeySetMessagePayload(MessagePayload):
+    """Generated after a successful [Set Key](ctp:api:type:ApprovalRuleSetKeyAction) update action."""
+
+    #: Description of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Key](ctp:api:type:ApprovalRuleSetKeyAction) update action.
+    key: typing.Optional[str]
+    #: Description of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Key](ctp:api:type:ApprovalRuleSetKeyAction) update action.
+    old_key: typing.Optional[str]
+
+    def __init__(
+        self, *, key: typing.Optional[str] = None, old_key: typing.Optional[str] = None
+    ):
+        self.key = key
+        self.old_key = old_key
+
+        super().__init__(type="ApprovalRuleKeySet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleKeySetMessagePayload":
+        from ._schemas.message import ApprovalRuleKeySetMessagePayloadSchema
+
+        return ApprovalRuleKeySetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleKeySetMessagePayloadSchema
+
+        return ApprovalRuleKeySetMessagePayloadSchema().dump(self)
+
+
+class ApprovalRuleNameSetMessagePayload(MessagePayload):
+    """Generated after a successful [Set Name](ctp:api:type:ApprovalRuleSetNameAction) update action."""
+
+    #: Name of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Name](ctp:api:type:ApprovalRuleSetNameAction) update action.
+    name: str
+    #: Name of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Name](ctp:api:type:ApprovalRuleSetNameAction) update action.
+    old_name: str
+
+    def __init__(self, *, name: str, old_name: str):
+        self.name = name
+        self.old_name = old_name
+
+        super().__init__(type="ApprovalRuleNameSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleNameSetMessagePayload":
+        from ._schemas.message import ApprovalRuleNameSetMessagePayloadSchema
+
+        return ApprovalRuleNameSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleNameSetMessagePayloadSchema
+
+        return ApprovalRuleNameSetMessagePayloadSchema().dump(self)
+
+
+class ApprovalRulePredicateSetMessagePayload(MessagePayload):
+    """Generated after a successful [Set Predicate](ctp:api:type:ApprovalRuleSetPredicateAction) update action."""
+
+    #: Name of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Predicate](ctp:api:type:ApprovalRuleSetPredicateAction) update action.
+    predicate: str
+    #: Name of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Predicate](ctp:api:type:ApprovalRuleSetPredicateAction) update action.
+    old_predicate: str
+
+    def __init__(self, *, predicate: str, old_predicate: str):
+        self.predicate = predicate
+        self.old_predicate = old_predicate
+
+        super().__init__(type="ApprovalRulePredicateSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRulePredicateSetMessagePayload":
+        from ._schemas.message import ApprovalRulePredicateSetMessagePayloadSchema
+
+        return ApprovalRulePredicateSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRulePredicateSetMessagePayloadSchema
+
+        return ApprovalRulePredicateSetMessagePayloadSchema().dump(self)
+
+
+class ApprovalRuleRequestersSetMessagePayload(MessagePayload):
+    """Generated after a successful [Set Requester](ctp:api:type:ApprovalRuleSetRequestersAction) update action."""
+
+    #: RuleRequester of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Requester](ctp:api:type:ApprovalRuleSetRequestersAction) update action.
+    requesters: typing.List["RuleRequester"]
+    #: RuleRequester of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Requester](ctp:api:type:ApprovalRuleSetRequestersAction) update action.
+    old_requesters: typing.List["RuleRequester"]
+
+    def __init__(
+        self,
+        *,
+        requesters: typing.List["RuleRequester"],
+        old_requesters: typing.List["RuleRequester"]
+    ):
+        self.requesters = requesters
+        self.old_requesters = old_requesters
+
+        super().__init__(type="ApprovalRuleRequestersSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleRequestersSetMessagePayload":
+        from ._schemas.message import ApprovalRuleRequestersSetMessagePayloadSchema
+
+        return ApprovalRuleRequestersSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleRequestersSetMessagePayloadSchema
+
+        return ApprovalRuleRequestersSetMessagePayloadSchema().dump(self)
+
+
+class ApprovalRuleStatusSetMessagePayload(MessagePayload):
+    """Generated after a successful [Set Status](ctp:api:type:ApprovalRuleSetStatusAction) update action."""
+
+    #: Status of the [ApprovalRule](ctp:api:type:ApprovalRule) after the [Set Status](ctp:api:type:ApprovalRuleSetStatusAction) update action.
+    status: "ApprovalRuleStatus"
+    #: Status of the [ApprovalRule](ctp:api:type:ApprovalRule) before the [Set Status](ctp:api:type:ApprovalRuleSetStatusAction) update action.
+    old_status: "ApprovalRuleStatus"
+
+    def __init__(
+        self, *, status: "ApprovalRuleStatus", old_status: "ApprovalRuleStatus"
+    ):
+        self.status = status
+        self.old_status = old_status
+
+        super().__init__(type="ApprovalRuleStatusSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalRuleStatusSetMessagePayload":
+        from ._schemas.message import ApprovalRuleStatusSetMessagePayloadSchema
+
+        return ApprovalRuleStatusSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import ApprovalRuleStatusSetMessagePayloadSchema
+
+        return ApprovalRuleStatusSetMessagePayloadSchema().dump(self)
 
 
 class AssociateRoleBuyerAssignableChangedMessagePayload(MessagePayload):
@@ -11740,6 +15231,171 @@ class BusinessUnitAddressChangedMessagePayload(MessagePayload):
         from ._schemas.message import BusinessUnitAddressChangedMessagePayloadSchema
 
         return BusinessUnitAddressChangedMessagePayloadSchema().dump(self)
+
+
+class BusinessUnitAddressCustomFieldAddedMessagePayload(MessagePayload):
+    """Generated after adding a Custom Field to an address of a Business Unit using the [Set Address CustomField](ctp:api:type:BusinessUnitSetAddressCustomFieldAction) update action. If a Custom Field already exists with the same name, a [BusinessUnitAddressCustomFieldChanged](ctp:api:type:BusinessUnitAddressCustomFieldChangedMessage) Message is generated instead."""
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(self, *, name: str, value: typing.Any):
+        self.name = name
+        self.value = value
+
+        super().__init__(type="BusinessUnitAddressCustomFieldAdded")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitAddressCustomFieldAddedMessagePayload":
+        from ._schemas.message import (
+            BusinessUnitAddressCustomFieldAddedMessagePayloadSchema,
+        )
+
+        return BusinessUnitAddressCustomFieldAddedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            BusinessUnitAddressCustomFieldAddedMessagePayloadSchema,
+        )
+
+        return BusinessUnitAddressCustomFieldAddedMessagePayloadSchema().dump(self)
+
+
+class BusinessUnitAddressCustomFieldChangedMessagePayload(MessagePayload):
+    """Generated after changing an existing Custom Field on an address of a Business Unit using the [Set Address CustomField](ctp:api:type:BusinessUnitSetAddressCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:BusinessUnitSetAddressCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:BusinessUnitSetAddressCustomFieldAction) update action.
+    old_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        name: str,
+        value: typing.Any,
+        old_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.old_value = old_value
+
+        super().__init__(type="BusinessUnitAddressCustomFieldChanged")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitAddressCustomFieldChangedMessagePayload":
+        from ._schemas.message import (
+            BusinessUnitAddressCustomFieldChangedMessagePayloadSchema,
+        )
+
+        return BusinessUnitAddressCustomFieldChangedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            BusinessUnitAddressCustomFieldChangedMessagePayloadSchema,
+        )
+
+        return BusinessUnitAddressCustomFieldChangedMessagePayloadSchema().dump(self)
+
+
+class BusinessUnitAddressCustomFieldRemovedMessagePayload(MessagePayload):
+    """Generated after removing a Custom Field from an address of a Business Unit using the [Set Address CustomField](ctp:api:type:BusinessUnitSetAddressCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(self, *, name: str):
+        self.name = name
+
+        super().__init__(type="BusinessUnitAddressCustomFieldRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitAddressCustomFieldRemovedMessagePayload":
+        from ._schemas.message import (
+            BusinessUnitAddressCustomFieldRemovedMessagePayloadSchema,
+        )
+
+        return BusinessUnitAddressCustomFieldRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            BusinessUnitAddressCustomFieldRemovedMessagePayloadSchema,
+        )
+
+        return BusinessUnitAddressCustomFieldRemovedMessagePayloadSchema().dump(self)
+
+
+class BusinessUnitAddressCustomTypeRemovedMessagePayload(MessagePayload):
+    """Generated after removing a Custom Type from an address of a Business Unit using the [Set Custom Type in Address](ctp:api:type:BusinessUnitSetAddressCustomTypeAction) update action."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(self, *, old_type_id: typing.Optional[str] = None):
+        self.old_type_id = old_type_id
+
+        super().__init__(type="BusinessUnitAddressCustomTypeRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitAddressCustomTypeRemovedMessagePayload":
+        from ._schemas.message import (
+            BusinessUnitAddressCustomTypeRemovedMessagePayloadSchema,
+        )
+
+        return BusinessUnitAddressCustomTypeRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            BusinessUnitAddressCustomTypeRemovedMessagePayloadSchema,
+        )
+
+        return BusinessUnitAddressCustomTypeRemovedMessagePayloadSchema().dump(self)
+
+
+class BusinessUnitAddressCustomTypeSetMessagePayload(MessagePayload):
+    """Generated after adding a Custom Type to an address of a Business Unit using the [Set Custom Type in Address](ctp:api:type:BusinessUnitSetAddressCustomTypeAction) update action."""
+
+    #: The Custom Fields that were set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(
+        self, *, custom_fields: "CustomFields", old_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.old_type_id = old_type_id
+
+        super().__init__(type="BusinessUnitAddressCustomTypeSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitAddressCustomTypeSetMessagePayload":
+        from ._schemas.message import (
+            BusinessUnitAddressCustomTypeSetMessagePayloadSchema,
+        )
+
+        return BusinessUnitAddressCustomTypeSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            BusinessUnitAddressCustomTypeSetMessagePayloadSchema,
+        )
+
+        return BusinessUnitAddressCustomTypeSetMessagePayloadSchema().dump(self)
 
 
 class BusinessUnitAddressRemovedMessagePayload(MessagePayload):
@@ -11988,7 +15644,7 @@ class BusinessUnitContactEmailSetMessagePayload(MessagePayload):
 
 
 class BusinessUnitCreatedMessagePayload(MessagePayload):
-    """Generated after a successful [Create Business Unit](/projects/business-units#create-businessunit) request."""
+    """Generated after a successful [Create BusinessUnit](/projects/business-units#create-businessunit) request."""
 
     #: The [Business Unit](ctp:api:type:BusinessUnit) that was created.
     business_unit: "BusinessUnit"
@@ -12010,6 +15666,151 @@ class BusinessUnitCreatedMessagePayload(MessagePayload):
         from ._schemas.message import BusinessUnitCreatedMessagePayloadSchema
 
         return BusinessUnitCreatedMessagePayloadSchema().dump(self)
+
+
+class BusinessUnitCustomFieldAddedMessagePayload(MessagePayload):
+    """Generated after adding a Custom Field to a Business Unit using the [Set CustomField](ctp:api:type:BusinessUnitSetCustomFieldAction) update action. If a Custom Field already exists with the same name, a [BusinessUnitCustomFieldChanged](ctp:api:type:BusinessUnitCustomFieldChangedMessage) Message is generated instead."""
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(self, *, name: str, value: typing.Any):
+        self.name = name
+        self.value = value
+
+        super().__init__(type="BusinessUnitCustomFieldAdded")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitCustomFieldAddedMessagePayload":
+        from ._schemas.message import BusinessUnitCustomFieldAddedMessagePayloadSchema
+
+        return BusinessUnitCustomFieldAddedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitCustomFieldAddedMessagePayloadSchema
+
+        return BusinessUnitCustomFieldAddedMessagePayloadSchema().dump(self)
+
+
+class BusinessUnitCustomFieldChangedMessagePayload(MessagePayload):
+    """Generated after changing an existing Custom Field on a Business Unit using the [Set CustomField](ctp:api:type:BusinessUnitSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:BusinessUnitSetCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:BusinessUnitSetCustomFieldAction) update action.
+    old_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        name: str,
+        value: typing.Any,
+        old_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.old_value = old_value
+
+        super().__init__(type="BusinessUnitCustomFieldChanged")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitCustomFieldChangedMessagePayload":
+        from ._schemas.message import BusinessUnitCustomFieldChangedMessagePayloadSchema
+
+        return BusinessUnitCustomFieldChangedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitCustomFieldChangedMessagePayloadSchema
+
+        return BusinessUnitCustomFieldChangedMessagePayloadSchema().dump(self)
+
+
+class BusinessUnitCustomFieldRemovedMessagePayload(MessagePayload):
+    """Generated after removing a Custom Field from a Business Unit using the [Set CustomField](ctp:api:type:BusinessUnitSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(self, *, name: str):
+        self.name = name
+
+        super().__init__(type="BusinessUnitCustomFieldRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitCustomFieldRemovedMessagePayload":
+        from ._schemas.message import BusinessUnitCustomFieldRemovedMessagePayloadSchema
+
+        return BusinessUnitCustomFieldRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitCustomFieldRemovedMessagePayloadSchema
+
+        return BusinessUnitCustomFieldRemovedMessagePayloadSchema().dump(self)
+
+
+class BusinessUnitCustomTypeRemovedMessagePayload(MessagePayload):
+    """Generated after removing a Custom Type from a Business Unit using the [Set Custom Type](ctp:api:type:BusinessUnitSetCustomTypeAction) update action."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(self, *, old_type_id: typing.Optional[str] = None):
+        self.old_type_id = old_type_id
+
+        super().__init__(type="BusinessUnitCustomTypeRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitCustomTypeRemovedMessagePayload":
+        from ._schemas.message import BusinessUnitCustomTypeRemovedMessagePayloadSchema
+
+        return BusinessUnitCustomTypeRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitCustomTypeRemovedMessagePayloadSchema
+
+        return BusinessUnitCustomTypeRemovedMessagePayloadSchema().dump(self)
+
+
+class BusinessUnitCustomTypeSetMessagePayload(MessagePayload):
+    """Generated after adding a Custom Type to a Business Unit using the [Set Custom Type](ctp:api:type:BusinessUnitSetCustomTypeAction) update action."""
+
+    #: The Custom Fields that were set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(
+        self, *, custom_fields: "CustomFields", old_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.old_type_id = old_type_id
+
+        super().__init__(type="BusinessUnitCustomTypeSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitCustomTypeSetMessagePayload":
+        from ._schemas.message import BusinessUnitCustomTypeSetMessagePayloadSchema
+
+        return BusinessUnitCustomTypeSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import BusinessUnitCustomTypeSetMessagePayloadSchema
+
+        return BusinessUnitCustomTypeSetMessagePayloadSchema().dump(self)
 
 
 class BusinessUnitDefaultBillingAddressSetMessagePayload(MessagePayload):
@@ -12071,7 +15872,7 @@ class BusinessUnitDefaultShippingAddressSetMessagePayload(MessagePayload):
 
 
 class BusinessUnitDeletedMessagePayload(MessagePayload):
-    """Generated after a successful [Delete Business Unit](/projects/business-units#delete-businessunit) request."""
+    """Generated after a successful [Delete BusinessUnit](/projects/business-units#delete-businessunit) request."""
 
     def __init__(self):
         super().__init__(type="BusinessUnitDeleted")
@@ -12115,7 +15916,7 @@ class BusinessUnitNameChangedMessagePayload(MessagePayload):
         return BusinessUnitNameChangedMessagePayloadSchema().dump(self)
 
 
-class BusinessUnitParentUnitChangedMessagePayload(MessagePayload):
+class BusinessUnitParentChangedMessagePayload(MessagePayload):
     """Generated after a successful [Change Parent Unit](ctp:api:type:BusinessUnitChangeParentUnitAction) update action."""
 
     #: Parent unit of the [Business Unit](ctp:api:type:BusinessUnit) before the [Change Parent Unit](ctp:api:type:BusinessUnitChangeParentUnitAction) update action.
@@ -12132,20 +15933,20 @@ class BusinessUnitParentUnitChangedMessagePayload(MessagePayload):
         self.old_parent_unit = old_parent_unit
         self.new_parent_unit = new_parent_unit
 
-        super().__init__(type="BusinessUnitParentUnitChanged")
+        super().__init__(type="BusinessUnitParentChanged")
 
     @classmethod
     def deserialize(
         cls, data: typing.Dict[str, typing.Any]
-    ) -> "BusinessUnitParentUnitChangedMessagePayload":
-        from ._schemas.message import BusinessUnitParentUnitChangedMessagePayloadSchema
+    ) -> "BusinessUnitParentChangedMessagePayload":
+        from ._schemas.message import BusinessUnitParentChangedMessagePayloadSchema
 
-        return BusinessUnitParentUnitChangedMessagePayloadSchema().load(data)
+        return BusinessUnitParentChangedMessagePayloadSchema().load(data)
 
     def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.message import BusinessUnitParentUnitChangedMessagePayloadSchema
+        from ._schemas.message import BusinessUnitParentChangedMessagePayloadSchema
 
-        return BusinessUnitParentUnitChangedMessagePayloadSchema().dump(self)
+        return BusinessUnitParentChangedMessagePayloadSchema().dump(self)
 
 
 class BusinessUnitShippingAddressAddedMessagePayload(MessagePayload):
@@ -12298,6 +16099,8 @@ class BusinessUnitStoreModeChangedMessagePayload(MessagePayload):
 
 
 class BusinessUnitStoreRemovedMessagePayload(MessagePayload):
+    """Generated after a successful [Remove Store](ctp:api:type:BusinessUnitRemoveStoreAction) update action."""
+
     #: The [Store](ctp:api:type:Store) that was removed from the [Business Unit](ctp:api:type:BusinessUnit).
     store: "StoreKeyReference"
 
@@ -12453,6 +16256,174 @@ class CustomerAddressChangedMessagePayload(MessagePayload):
         return CustomerAddressChangedMessagePayloadSchema().dump(self)
 
 
+class CustomerAddressCustomFieldAddedMessagePayload(MessagePayload):
+    """Generated after adding a Custom Field to an Address of a Customer using the [Set CustomField in Address](ctp:api:type:CustomerSetAddressCustomFieldAction) update action.
+    If a Custom Field already exists with the same name, a [CustomerAddressCustomFieldChanged](ctp:api:type:CustomerAddressCustomFieldChangedMessage) Message is generated instead.
+
+    """
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(self, *, name: str, value: typing.Any):
+        self.name = name
+        self.value = value
+
+        super().__init__(type="CustomerAddressCustomFieldAdded")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerAddressCustomFieldAddedMessagePayload":
+        from ._schemas.message import (
+            CustomerAddressCustomFieldAddedMessagePayloadSchema,
+        )
+
+        return CustomerAddressCustomFieldAddedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            CustomerAddressCustomFieldAddedMessagePayloadSchema,
+        )
+
+        return CustomerAddressCustomFieldAddedMessagePayloadSchema().dump(self)
+
+
+class CustomerAddressCustomFieldChangedMessagePayload(MessagePayload):
+    """Generated after changing an existing Custom Field on an Address of a Customer using the [Set CustomField in Address](ctp:api:type:CustomerSetAddressCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:CustomerSetAddressCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:CustomerSetAddressCustomFieldAction) update action.
+    #: When there has not been a Custom Field with the `name` on the Customer Address before, a [Customer Address Custom Field Added](ctp:api:type:CustomerAddressCustomFieldAddedMessage) Message is generated instead.
+    previous_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        name: str,
+        value: typing.Any,
+        previous_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.previous_value = previous_value
+
+        super().__init__(type="CustomerAddressCustomFieldChanged")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerAddressCustomFieldChangedMessagePayload":
+        from ._schemas.message import (
+            CustomerAddressCustomFieldChangedMessagePayloadSchema,
+        )
+
+        return CustomerAddressCustomFieldChangedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            CustomerAddressCustomFieldChangedMessagePayloadSchema,
+        )
+
+        return CustomerAddressCustomFieldChangedMessagePayloadSchema().dump(self)
+
+
+class CustomerAddressCustomFieldRemovedMessagePayload(MessagePayload):
+    """Generated after removing a Custom Field from an Address of a Customer using the [Set CustomField in Address](ctp:api:type:CustomerSetAddressCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(self, *, name: str):
+        self.name = name
+
+        super().__init__(type="CustomerAddressCustomFieldRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerAddressCustomFieldRemovedMessagePayload":
+        from ._schemas.message import (
+            CustomerAddressCustomFieldRemovedMessagePayloadSchema,
+        )
+
+        return CustomerAddressCustomFieldRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            CustomerAddressCustomFieldRemovedMessagePayloadSchema,
+        )
+
+        return CustomerAddressCustomFieldRemovedMessagePayloadSchema().dump(self)
+
+
+class CustomerAddressCustomTypeRemovedMessagePayload(MessagePayload):
+    """Generated after removing a Custom Type from an Address of a Customer using the [Set Custom Type in Address](ctp:api:type:CustomerSetAddressCustomTypeAction) update action."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(self, *, previous_type_id: typing.Optional[str] = None):
+        self.previous_type_id = previous_type_id
+
+        super().__init__(type="CustomerAddressCustomTypeRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerAddressCustomTypeRemovedMessagePayload":
+        from ._schemas.message import (
+            CustomerAddressCustomTypeRemovedMessagePayloadSchema,
+        )
+
+        return CustomerAddressCustomTypeRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            CustomerAddressCustomTypeRemovedMessagePayloadSchema,
+        )
+
+        return CustomerAddressCustomTypeRemovedMessagePayloadSchema().dump(self)
+
+
+class CustomerAddressCustomTypeSetMessagePayload(MessagePayload):
+    """Generated after adding a Custom Type to an Address of a Customer using the [Set Custom Type in Address](ctp:api:type:CustomerSetAddressCustomTypeAction) update action."""
+
+    #: The Custom Fields that have been set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        custom_fields: "CustomFields",
+        previous_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.previous_type_id = previous_type_id
+
+        super().__init__(type="CustomerAddressCustomTypeSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerAddressCustomTypeSetMessagePayload":
+        from ._schemas.message import CustomerAddressCustomTypeSetMessagePayloadSchema
+
+        return CustomerAddressCustomTypeSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerAddressCustomTypeSetMessagePayloadSchema
+
+        return CustomerAddressCustomTypeSetMessagePayloadSchema().dump(self)
+
+
 class CustomerAddressRemovedMessagePayload(MessagePayload):
     """Generated after a successful [Remove Address](ctp:api:type:CustomerRemoveAddressAction) update action."""
 
@@ -12528,6 +16499,158 @@ class CustomerCreatedMessagePayload(MessagePayload):
         return CustomerCreatedMessagePayloadSchema().dump(self)
 
 
+class CustomerCustomFieldAddedMessagePayload(MessagePayload):
+    """Generated after adding a Custom Field to a Customer using the [Set CustomField](ctp:api:type:CustomerSetCustomFieldAction) update action.
+    If a Custom Field already exists with the same name, a [CustomerCustomFieldChanged](ctp:api:type:CustomerCustomFieldChangedMessage) Message is generated instead.
+
+    """
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(self, *, name: str, value: typing.Any):
+        self.name = name
+        self.value = value
+
+        super().__init__(type="CustomerCustomFieldAdded")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerCustomFieldAddedMessagePayload":
+        from ._schemas.message import CustomerCustomFieldAddedMessagePayloadSchema
+
+        return CustomerCustomFieldAddedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerCustomFieldAddedMessagePayloadSchema
+
+        return CustomerCustomFieldAddedMessagePayloadSchema().dump(self)
+
+
+class CustomerCustomFieldChangedMessagePayload(MessagePayload):
+    """Generated after changing an existing Custom Field on a Customer using the [Set CustomField](ctp:api:type:CustomerSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:CustomerSetCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:CustomerSetCustomFieldAction) update action.
+    #: When there has not been a Custom Field with the `name` on the Customer before, a [Customer Custom Field Added](ctp:api:type:CustomerCustomFieldAddedMessage) Message is generated instead.
+    previous_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        name: str,
+        value: typing.Any,
+        previous_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.previous_value = previous_value
+
+        super().__init__(type="CustomerCustomFieldChanged")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerCustomFieldChangedMessagePayload":
+        from ._schemas.message import CustomerCustomFieldChangedMessagePayloadSchema
+
+        return CustomerCustomFieldChangedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerCustomFieldChangedMessagePayloadSchema
+
+        return CustomerCustomFieldChangedMessagePayloadSchema().dump(self)
+
+
+class CustomerCustomFieldRemovedMessagePayload(MessagePayload):
+    """Generated after removing a Custom Field from a Customer using the [Set CustomField](ctp:api:type:CustomerSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(self, *, name: str):
+        self.name = name
+
+        super().__init__(type="CustomerCustomFieldRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerCustomFieldRemovedMessagePayload":
+        from ._schemas.message import CustomerCustomFieldRemovedMessagePayloadSchema
+
+        return CustomerCustomFieldRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerCustomFieldRemovedMessagePayloadSchema
+
+        return CustomerCustomFieldRemovedMessagePayloadSchema().dump(self)
+
+
+class CustomerCustomTypeRemovedMessagePayload(MessagePayload):
+    """Generated after removing a Custom Type from a Customer using the [Set Custom Type](ctp:api:type:CustomerSetCustomTypeAction) update action with empty parameters."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(self, *, previous_type_id: typing.Optional[str] = None):
+        self.previous_type_id = previous_type_id
+
+        super().__init__(type="CustomerCustomTypeRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerCustomTypeRemovedMessagePayload":
+        from ._schemas.message import CustomerCustomTypeRemovedMessagePayloadSchema
+
+        return CustomerCustomTypeRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerCustomTypeRemovedMessagePayloadSchema
+
+        return CustomerCustomTypeRemovedMessagePayloadSchema().dump(self)
+
+
+class CustomerCustomTypeSetMessagePayload(MessagePayload):
+    """Generated after adding a Custom Type to a Customer using the [Set Custom Type](ctp:api:type:CustomerSetCustomTypeAction) update action."""
+
+    #: The Custom Fields that have been set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        custom_fields: "CustomFields",
+        previous_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.previous_type_id = previous_type_id
+
+        super().__init__(type="CustomerCustomTypeSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerCustomTypeSetMessagePayload":
+        from ._schemas.message import CustomerCustomTypeSetMessagePayloadSchema
+
+        return CustomerCustomTypeSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerCustomTypeSetMessagePayloadSchema
+
+        return CustomerCustomTypeSetMessagePayloadSchema().dump(self)
+
+
 class CustomerDateOfBirthSetMessagePayload(MessagePayload):
     """Generated after a successful [Set Date of Birth](ctp:api:type:CustomerSetDateOfBirthAction) update action."""
 
@@ -12598,6 +16721,34 @@ class CustomerEmailChangedMessagePayload(MessagePayload):
         return CustomerEmailChangedMessagePayloadSchema().dump(self)
 
 
+class CustomerEmailTokenCreatedMessagePayload(MessagePayload):
+    """Generated after a successful [Create email token for Customer](/../api/projects/customers#create-email-token-for-customer) request. The `resource` property of the Message is a [CustomerEmailTokenReference](ctp:api:type:CustomerEmailTokenReference)."""
+
+    #: Unique identifier of the Customer.
+    customer_id: str
+    #: Date and time (UTC) the email token expires.
+    expires_at: datetime.datetime
+
+    def __init__(self, *, customer_id: str, expires_at: datetime.datetime):
+        self.customer_id = customer_id
+        self.expires_at = expires_at
+
+        super().__init__(type="CustomerEmailTokenCreated")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerEmailTokenCreatedMessagePayload":
+        from ._schemas.message import CustomerEmailTokenCreatedMessagePayloadSchema
+
+        return CustomerEmailTokenCreatedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerEmailTokenCreatedMessagePayloadSchema
+
+        return CustomerEmailTokenCreatedMessagePayloadSchema().dump(self)
+
+
 class CustomerEmailVerifiedMessagePayload(MessagePayload):
     """Generated after a successful [Verify Customer's Email](/../api/projects/customers#verify-email-of-customer) request."""
 
@@ -12641,6 +16792,162 @@ class CustomerFirstNameSetMessagePayload(MessagePayload):
         from ._schemas.message import CustomerFirstNameSetMessagePayloadSchema
 
         return CustomerFirstNameSetMessagePayloadSchema().dump(self)
+
+
+class CustomerGroupCustomFieldAddedMessagePayload(MessagePayload):
+    """Generated after adding a Custom Field to a Customer Group using the [Set CustomField](ctp:api:type:CustomerGroupSetCustomFieldAction) update action.
+    If a Custom Field already exists with the same name, a [CustomerGroupCustomFieldChanged](ctp:api:type:CustomerGroupCustomFieldChangedMessage) Message is generated instead.
+
+    """
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(self, *, name: str, value: typing.Any):
+        self.name = name
+        self.value = value
+
+        super().__init__(type="CustomerGroupCustomFieldAdded")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerGroupCustomFieldAddedMessagePayload":
+        from ._schemas.message import CustomerGroupCustomFieldAddedMessagePayloadSchema
+
+        return CustomerGroupCustomFieldAddedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerGroupCustomFieldAddedMessagePayloadSchema
+
+        return CustomerGroupCustomFieldAddedMessagePayloadSchema().dump(self)
+
+
+class CustomerGroupCustomFieldChangedMessagePayload(MessagePayload):
+    """Generated after changing an existing Custom Field on a Customer Group using the [Set CustomField](ctp:api:type:CustomerGroupSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:CustomerGroupSetCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:CustomerGroupSetCustomFieldAction) update action.
+    old_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        name: str,
+        value: typing.Any,
+        old_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.old_value = old_value
+
+        super().__init__(type="CustomerGroupCustomFieldChanged")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerGroupCustomFieldChangedMessagePayload":
+        from ._schemas.message import (
+            CustomerGroupCustomFieldChangedMessagePayloadSchema,
+        )
+
+        return CustomerGroupCustomFieldChangedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            CustomerGroupCustomFieldChangedMessagePayloadSchema,
+        )
+
+        return CustomerGroupCustomFieldChangedMessagePayloadSchema().dump(self)
+
+
+class CustomerGroupCustomFieldRemovedMessagePayload(MessagePayload):
+    """Generated after removing a Custom Field from a Customer Group using the [Set CustomField](ctp:api:type:CustomerGroupSetCustomFieldAction) update action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(self, *, name: str):
+        self.name = name
+
+        super().__init__(type="CustomerGroupCustomFieldRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerGroupCustomFieldRemovedMessagePayload":
+        from ._schemas.message import (
+            CustomerGroupCustomFieldRemovedMessagePayloadSchema,
+        )
+
+        return CustomerGroupCustomFieldRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            CustomerGroupCustomFieldRemovedMessagePayloadSchema,
+        )
+
+        return CustomerGroupCustomFieldRemovedMessagePayloadSchema().dump(self)
+
+
+class CustomerGroupCustomTypeRemovedMessagePayload(MessagePayload):
+    """Generated after removing a Custom Type from a Customer Group using the [Set Custom Type](ctp:api:type:CustomerGroupSetCustomTypeAction) update action with empty parameters."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(self, *, old_type_id: typing.Optional[str] = None):
+        self.old_type_id = old_type_id
+
+        super().__init__(type="CustomerGroupCustomTypeRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerGroupCustomTypeRemovedMessagePayload":
+        from ._schemas.message import CustomerGroupCustomTypeRemovedMessagePayloadSchema
+
+        return CustomerGroupCustomTypeRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerGroupCustomTypeRemovedMessagePayloadSchema
+
+        return CustomerGroupCustomTypeRemovedMessagePayloadSchema().dump(self)
+
+
+class CustomerGroupCustomTypeSetMessagePayload(MessagePayload):
+    """Generated after adding a Custom Type to a Customer Group using the [Set Custom Type](ctp:api:type:CustomerGroupSetCustomTypeAction) update action."""
+
+    #: The Custom Fields that have been set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    old_type_id: typing.Optional[str]
+
+    def __init__(
+        self, *, custom_fields: "CustomFields", old_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.old_type_id = old_type_id
+
+        super().__init__(type="CustomerGroupCustomTypeSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerGroupCustomTypeSetMessagePayload":
+        from ._schemas.message import CustomerGroupCustomTypeSetMessagePayloadSchema
+
+        return CustomerGroupCustomTypeSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerGroupCustomTypeSetMessagePayloadSchema
+
+        return CustomerGroupCustomTypeSetMessagePayloadSchema().dump(self)
 
 
 class CustomerGroupSetMessagePayload(MessagePayload):
@@ -12693,6 +17000,34 @@ class CustomerLastNameSetMessagePayload(MessagePayload):
         from ._schemas.message import CustomerLastNameSetMessagePayloadSchema
 
         return CustomerLastNameSetMessagePayloadSchema().dump(self)
+
+
+class CustomerPasswordTokenCreatedMessagePayload(MessagePayload):
+    """Generated after a successful [Create password reset token for Customer](/../api/projects/customers#create-password-reset-token-for-customer) request.  The `resource` property of the Message is a [CustomerPasswordTokenReference](ctp:api:type:CustomerPasswordTokenReference)."""
+
+    #: Unique identifier of the Customer.
+    customer_id: str
+    #: Date and time (UTC) the password token expires.
+    expires_at: datetime.datetime
+
+    def __init__(self, *, customer_id: str, expires_at: datetime.datetime):
+        self.customer_id = customer_id
+        self.expires_at = expires_at
+
+        super().__init__(type="CustomerPasswordTokenCreated")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CustomerPasswordTokenCreatedMessagePayload":
+        from ._schemas.message import CustomerPasswordTokenCreatedMessagePayloadSchema
+
+        return CustomerPasswordTokenCreatedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import CustomerPasswordTokenCreatedMessagePayloadSchema
+
+        return CustomerPasswordTokenCreatedMessagePayloadSchema().dump(self)
 
 
 class CustomerPasswordUpdatedMessagePayload(MessagePayload):
@@ -12888,6 +17223,18 @@ class OrderMessagePayload(MessagePayload):
             from ._schemas.message import OrderCreatedMessagePayloadSchema
 
             return OrderCreatedMessagePayloadSchema().load(data)
+        if data["type"] == "OrderCustomFieldAdded":
+            from ._schemas.message import OrderCustomFieldAddedMessagePayloadSchema
+
+            return OrderCustomFieldAddedMessagePayloadSchema().load(data)
+        if data["type"] == "OrderCustomFieldChanged":
+            from ._schemas.message import OrderCustomFieldChangedMessagePayloadSchema
+
+            return OrderCustomFieldChangedMessagePayloadSchema().load(data)
+        if data["type"] == "OrderCustomFieldRemoved":
+            from ._schemas.message import OrderCustomFieldRemovedMessagePayloadSchema
+
+            return OrderCustomFieldRemovedMessagePayloadSchema().load(data)
         if data["type"] == "OrderCustomLineItemAdded":
             from ._schemas.message import OrderCustomLineItemAddedMessagePayloadSchema
 
@@ -12908,6 +17255,14 @@ class OrderMessagePayload(MessagePayload):
             from ._schemas.message import OrderCustomLineItemRemovedMessagePayloadSchema
 
             return OrderCustomLineItemRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "OrderCustomTypeRemoved":
+            from ._schemas.message import OrderCustomTypeRemovedMessagePayloadSchema
+
+            return OrderCustomTypeRemovedMessagePayloadSchema().load(data)
+        if data["type"] == "OrderCustomTypeSet":
+            from ._schemas.message import OrderCustomTypeSetMessagePayloadSchema
+
+            return OrderCustomTypeSetMessagePayloadSchema().load(data)
         if data["type"] == "OrderCustomerEmailSet":
             from ._schemas.message import OrderCustomerEmailSetMessagePayloadSchema
 
@@ -13042,10 +17397,12 @@ class OrderMessagePayload(MessagePayload):
 
 
 class CustomLineItemStateTransitionMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Transition Custom Line Item State](ctp:api:type:OrderTransitionCustomLineItemStateAction) update action."""
+    """Generated after a successful [Transition CustomLineItem State](ctp:api:type:OrderTransitionCustomLineItemStateAction) update action."""
 
     #: Unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
     custom_line_item_id: str
+    #: User-defined unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
+    custom_line_item_key: typing.Optional[str]
     #: Date and time (UTC) when the transition of the [Custom Line Item](ctp:api:type:CustomLineItem) [State](ctp:api:type:State) was performed.
     transition_date: datetime.datetime
     #: Number of [Custom Line Items](ctp:api:type:CustomLineItem) for which the [State](ctp:api:type:State) was transitioned.
@@ -13059,12 +17416,14 @@ class CustomLineItemStateTransitionMessagePayload(OrderMessagePayload):
         self,
         *,
         custom_line_item_id: str,
+        custom_line_item_key: typing.Optional[str] = None,
         transition_date: datetime.datetime,
         quantity: int,
         from_state: "StateReference",
         to_state: "StateReference"
     ):
         self.custom_line_item_id = custom_line_item_id
+        self.custom_line_item_key = custom_line_item_key
         self.transition_date = transition_date
         self.quantity = quantity
         self.from_state = from_state
@@ -13089,9 +17448,9 @@ class CustomLineItemStateTransitionMessagePayload(OrderMessagePayload):
 class DeliveryAddedMessagePayload(OrderMessagePayload):
     """Generated after a successful [Add Delivery](ctp:api:type:OrderAddDeliveryAction) update action."""
 
-    #: [Delivery](ctp:api:type:Delivery) that was added to the [Order](ctp:api:type:Order). The [Delivery](ctp:api:type:Delivery) in the Message body does not contain [Parcels](ctp:api:type:Parcel) if those were part of the initial [Add Delivery](ctp:api:type:OrderAddDeliveryAction) update action. In that case, the update action produces an additional [ParcelAddedToDelivery](ctp:api:type:ParcelAddedToDeliveryMessage) Message containing information about the [Parcels](ctp:api:type:Parcel).
+    #: [Delivery](ctp:api:type:Delivery) that was added to the [Order](ctp:api:type:Order). The [Delivery](ctp:api:type:Delivery) in the Message body does not contain [Parcels](ctp:api:type:Parcel) if those were part of the initial [Add Delivery](ctp:api:type:OrderAddDeliveryAction) update action. In that case, the update action produces an additional [Parcel Added To Delivery](ctp:api:type:ParcelAddedToDeliveryMessage) Message containing information about the [Parcels](ctp:api:type:Parcel).
     delivery: "Delivery"
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -13125,7 +17484,7 @@ class DeliveryAddressSetMessagePayload(OrderMessagePayload):
     address: typing.Optional["Address"]
     #: [Address](ctp:api:type:Address) before the [Set Delivery Address](ctp:api:type:OrderSetDeliveryAddressAction) update action.
     old_address: typing.Optional["Address"]
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -13166,7 +17525,7 @@ class DeliveryItemsUpdatedMessagePayload(OrderMessagePayload):
     items: typing.List["DeliveryItem"]
     #: [Delivery Items](ctp:api:type:DeliveryItem) before the [Set Delivery Items](ctp:api:type:OrderSetDeliveryItemsAction) update action.
     old_items: typing.List["DeliveryItem"]
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -13203,7 +17562,7 @@ class DeliveryRemovedMessagePayload(OrderMessagePayload):
 
     #: The [Delivery](ctp:api:type:Delivery) that was removed from the [Order](ctp:api:type:Order).
     delivery: "Delivery"
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -13229,10 +17588,12 @@ class DeliveryRemovedMessagePayload(OrderMessagePayload):
 
 
 class LineItemStateTransitionMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Transition Line Item State](ctp:api:type:OrderTransitionLineItemStateAction) update action."""
+    """Generated after a successful [Transition LineItem State](ctp:api:type:OrderTransitionLineItemStateAction) update action."""
 
     #: Unique identifier of the [Line Item](ctp:api:type:LineItem).
     line_item_id: str
+    #: User-defined unique identifier of the LineItem.
+    line_item_key: typing.Optional[str]
     #: Date and time (UTC) when the transition of the [Line Item](ctp:api:type:LineItem) [State](ctp:api:type:State) was performed.
     transition_date: datetime.datetime
     #: Number of [Line Items](ctp:api:type:LineItem) for which the [State](ctp:api:type:State) was transitioned.
@@ -13246,12 +17607,14 @@ class LineItemStateTransitionMessagePayload(OrderMessagePayload):
         self,
         *,
         line_item_id: str,
+        line_item_key: typing.Optional[str] = None,
         transition_date: datetime.datetime,
         quantity: int,
         from_state: "StateReference",
         to_state: "StateReference"
     ):
         self.line_item_id = line_item_id
+        self.line_item_key = line_item_key
         self.transition_date = transition_date
         self.quantity = quantity
         self.from_state = from_state
@@ -13331,8 +17694,99 @@ class OrderCreatedMessagePayload(OrderMessagePayload):
         return OrderCreatedMessagePayloadSchema().dump(self)
 
 
+class OrderCustomFieldAddedMessagePayload(OrderMessagePayload):
+    """Generated after adding a Custom Field using the [Set CustomField](ctp:api:type:OrderSetCustomFieldAction)."""
+
+    #: Name of the Custom Field that was added.
+    name: str
+    #: The added [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType).
+    value: typing.Any
+
+    def __init__(self, *, name: str, value: typing.Any):
+        self.name = name
+        self.value = value
+
+        super().__init__(type="OrderCustomFieldAdded")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "OrderCustomFieldAddedMessagePayload":
+        from ._schemas.message import OrderCustomFieldAddedMessagePayloadSchema
+
+        return OrderCustomFieldAddedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import OrderCustomFieldAddedMessagePayloadSchema
+
+        return OrderCustomFieldAddedMessagePayloadSchema().dump(self)
+
+
+class OrderCustomFieldChangedMessagePayload(OrderMessagePayload):
+    """Generated when an existing Custom Field has been changed using the [Set CustomField](ctp:api:type:OrderSetCustomFieldAction) action."""
+
+    #: Name of the Custom Field that changed.
+    name: str
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) after the [Set CustomField](ctp:api:type:OrderSetCustomFieldAction) update action.
+    value: typing.Any
+    #: [CustomFieldValue](ctp:api:type:CustomFieldValue) based on the [FieldType](ctp:api:type:FieldType) before the [Set CustomField](ctp:api:type:OrderSetCustomFieldAction) update action.
+    #: When there has not been a Custom Field with the `name` on the Order before, an [Order Custom Field Added](ctp:api:type:OrderCustomFieldAddedMessage) Message is generated instead.
+    previous_value: typing.Optional[typing.Any]
+
+    def __init__(
+        self,
+        *,
+        name: str,
+        value: typing.Any,
+        previous_value: typing.Optional[typing.Any] = None
+    ):
+        self.name = name
+        self.value = value
+        self.previous_value = previous_value
+
+        super().__init__(type="OrderCustomFieldChanged")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "OrderCustomFieldChangedMessagePayload":
+        from ._schemas.message import OrderCustomFieldChangedMessagePayloadSchema
+
+        return OrderCustomFieldChangedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import OrderCustomFieldChangedMessagePayloadSchema
+
+        return OrderCustomFieldChangedMessagePayloadSchema().dump(self)
+
+
+class OrderCustomFieldRemovedMessagePayload(OrderMessagePayload):
+    """Generated when a Custom Field has been removed from the Order using the [Set CustomField](ctp:api:type:OrderSetCustomFieldAction) action."""
+
+    #: Name of the Custom Field that was removed.
+    name: str
+
+    def __init__(self, *, name: str):
+        self.name = name
+
+        super().__init__(type="OrderCustomFieldRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "OrderCustomFieldRemovedMessagePayload":
+        from ._schemas.message import OrderCustomFieldRemovedMessagePayloadSchema
+
+        return OrderCustomFieldRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import OrderCustomFieldRemovedMessagePayloadSchema
+
+        return OrderCustomFieldRemovedMessagePayloadSchema().dump(self)
+
+
 class OrderCustomLineItemAddedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Add Custom Line Item](ctp:api:type:StagedOrderAddCustomLineItemAction) update action."""
+    """Generated after a successful [Add CustomLineItem](ctp:api:type:StagedOrderAddCustomLineItemAction) update action."""
 
     #: [Custom Line Item](ctp:api:type:CustomLineItem) that was added to the [Order](ctp:api:type:Order).
     custom_line_item: "CustomLineItem"
@@ -13361,6 +17815,8 @@ class OrderCustomLineItemDiscountSetMessagePayload(OrderMessagePayload):
 
     #: Unique identifier for the [Custom Line Item](ctp:api:type:CustomLineItem).
     custom_line_item_id: str
+    #: User-defined unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
+    custom_line_item_key: typing.Optional[str]
     #: Array of [DiscountedLineItemPriceForQuantity](ctp:api:type:DiscountedLineItemPriceForQuantity) after the Discount recalculation.
     discounted_price_per_quantity: typing.List["DiscountedLineItemPriceForQuantity"]
     #: [TaxedItemPrice](ctp:api:type:TaxedItemPrice) of the [Custom Line Item](ctp:api:type:CustomLineItem) after the Discount recalculation.
@@ -13370,12 +17826,14 @@ class OrderCustomLineItemDiscountSetMessagePayload(OrderMessagePayload):
         self,
         *,
         custom_line_item_id: str,
+        custom_line_item_key: typing.Optional[str] = None,
         discounted_price_per_quantity: typing.List[
             "DiscountedLineItemPriceForQuantity"
         ],
         taxed_price: typing.Optional["TaxedItemPrice"] = None
     ):
         self.custom_line_item_id = custom_line_item_id
+        self.custom_line_item_key = custom_line_item_key
         self.discounted_price_per_quantity = discounted_price_per_quantity
         self.taxed_price = taxed_price
 
@@ -13396,17 +17854,27 @@ class OrderCustomLineItemDiscountSetMessagePayload(OrderMessagePayload):
 
 
 class OrderCustomLineItemQuantityChangedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Change Custom Line Item Quantity](ctp:api:type:StagedOrderChangeCustomLineItemQuantityAction) update action."""
+    """Generated after a successful [Change CustomLineItem Quantity](ctp:api:type:StagedOrderChangeCustomLineItemQuantityAction) update action."""
 
     #: Unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
     custom_line_item_id: str
+    #: User-defined unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
+    custom_line_item_key: typing.Optional[str]
     #: [Custom Line Item](ctp:api:type:CustomLineItem) quantity after the [Change Custom Line Item Quantity](ctp:api:type:StagedOrderChangeCustomLineItemQuantityAction) update action.
     quantity: int
     #: [Custom Line Item](ctp:api:type:CustomLineItem) quantity before the [Change Custom Line Item Quantity](ctp:api:type:StagedOrderChangeCustomLineItemQuantityAction) update action.
     old_quantity: int
 
-    def __init__(self, *, custom_line_item_id: str, quantity: int, old_quantity: int):
+    def __init__(
+        self,
+        *,
+        custom_line_item_id: str,
+        custom_line_item_key: typing.Optional[str] = None,
+        quantity: int,
+        old_quantity: int
+    ):
         self.custom_line_item_id = custom_line_item_id
+        self.custom_line_item_key = custom_line_item_key
         self.quantity = quantity
         self.old_quantity = old_quantity
 
@@ -13431,15 +17899,24 @@ class OrderCustomLineItemQuantityChangedMessagePayload(OrderMessagePayload):
 
 
 class OrderCustomLineItemRemovedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Remove Custom Line Item](ctp:api:type:StagedOrderRemoveCustomLineItemAction) update action."""
+    """Generated after a successful [Remove CustomLineItem](ctp:api:type:StagedOrderRemoveCustomLineItemAction) update action."""
 
     #: Unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
     custom_line_item_id: str
+    #: User-defined unique identifier of the [Custom Line Item](ctp:api:type:CustomLineItem).
+    custom_line_item_key: typing.Optional[str]
     #: [Custom Line Item](ctp:api:type:CustomLineItem) that was removed from the [Order](ctp:api:type:Order).
     custom_line_item: "CustomLineItem"
 
-    def __init__(self, *, custom_line_item_id: str, custom_line_item: "CustomLineItem"):
+    def __init__(
+        self,
+        *,
+        custom_line_item_id: str,
+        custom_line_item_key: typing.Optional[str] = None,
+        custom_line_item: "CustomLineItem"
+    ):
         self.custom_line_item_id = custom_line_item_id
+        self.custom_line_item_key = custom_line_item_key
         self.custom_line_item = custom_line_item
 
         super().__init__(type="OrderCustomLineItemRemoved")
@@ -13456,6 +17933,64 @@ class OrderCustomLineItemRemovedMessagePayload(OrderMessagePayload):
         from ._schemas.message import OrderCustomLineItemRemovedMessagePayloadSchema
 
         return OrderCustomLineItemRemovedMessagePayloadSchema().dump(self)
+
+
+class OrderCustomTypeRemovedMessagePayload(OrderMessagePayload):
+    """Generated after a successful [Set Custom Type](ctp:api:type:OrderSetCustomTypeAction) with empty parameters."""
+
+    #: `id` of the [Custom Type](ctp:api:type:Type) that was removed. Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(self, *, previous_type_id: typing.Optional[str] = None):
+        self.previous_type_id = previous_type_id
+
+        super().__init__(type="OrderCustomTypeRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "OrderCustomTypeRemovedMessagePayload":
+        from ._schemas.message import OrderCustomTypeRemovedMessagePayloadSchema
+
+        return OrderCustomTypeRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import OrderCustomTypeRemovedMessagePayloadSchema
+
+        return OrderCustomTypeRemovedMessagePayloadSchema().dump(self)
+
+
+class OrderCustomTypeSetMessagePayload(OrderMessagePayload):
+    """Generated after a successful [Set Custom Type](ctp:api:type:OrderSetCustomTypeAction)."""
+
+    #: The Custom Fields that have been set.
+    custom_fields: "CustomFields"
+    #: `id` of the previous [Custom Type](ctp:api:type:Type). Absent if there was no previous Custom Type present.
+    previous_type_id: typing.Optional[str]
+
+    def __init__(
+        self,
+        *,
+        custom_fields: "CustomFields",
+        previous_type_id: typing.Optional[str] = None
+    ):
+        self.custom_fields = custom_fields
+        self.previous_type_id = previous_type_id
+
+        super().__init__(type="OrderCustomTypeSet")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "OrderCustomTypeSetMessagePayload":
+        from ._schemas.message import OrderCustomTypeSetMessagePayloadSchema
+
+        return OrderCustomTypeSetMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import OrderCustomTypeSetMessagePayloadSchema
+
+        return OrderCustomTypeSetMessagePayloadSchema().dump(self)
 
 
 class OrderCustomerEmailSetMessagePayload(OrderMessagePayload):
@@ -13525,15 +18060,15 @@ class OrderCustomerGroupSetMessagePayload(OrderMessagePayload):
 
 
 class OrderCustomerSetMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Set Customer Id](ctp:api:type:OrderSetCustomerIdAction) update action."""
+    """Generated after a successful [Set Customer ID](ctp:api:type:OrderSetCustomerIdAction) update action."""
 
-    #: [Customer](ctp:api:type:Customer) on the [Order](ctp:api:type:Order) after the [Set Customer Id](ctp:api:type:OrderSetCustomerIdAction) update action.
+    #: [Customer](ctp:api:type:Customer) on the [Order](ctp:api:type:Order) after the [Set Customer ID](ctp:api:type:OrderSetCustomerIdAction) update action.
     customer: typing.Optional["CustomerReference"]
-    #: [CustomerGroup](ctp:api:type:CustomerGroup) on the [Order](ctp:api:type:Order) after the [Set Customer Id](ctp:api:type:OrderSetCustomerIdAction) update action.
+    #: [CustomerGroup](ctp:api:type:CustomerGroup) on the [Order](ctp:api:type:Order) after the [Set Customer ID](ctp:api:type:OrderSetCustomerIdAction) update action.
     customer_group: typing.Optional["CustomerGroupReference"]
-    #: [Customer](ctp:api:type:Customer) on the [Order](ctp:api:type:Order) before the [Set Customer Id](ctp:api:type:OrderSetCustomerIdAction) update action.
+    #: [Customer](ctp:api:type:Customer) on the [Order](ctp:api:type:Order) before the [Set Customer ID](ctp:api:type:OrderSetCustomerIdAction) update action.
     old_customer: typing.Optional["CustomerReference"]
-    #: [CustomerGroup](ctp:api:type:CustomerGroup) on the [Order](ctp:api:type:Order) before the [Set Customer Id](ctp:api:type:OrderSetCustomerIdAction) update action.
+    #: [CustomerGroup](ctp:api:type:CustomerGroup) on the [Order](ctp:api:type:Order) before the [Set Customer ID](ctp:api:type:OrderSetCustomerIdAction) update action.
     old_customer_group: typing.Optional["CustomerGroupReference"]
 
     def __init__(
@@ -13591,7 +18126,7 @@ class OrderDeletedMessagePayload(OrderMessagePayload):
 
 
 class OrderDiscountCodeAddedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Add Discount Code](ctp:api:type:StagedOrderAddDiscountCodeAction) update action."""
+    """Generated after a successful [Add DiscountCode](ctp:api:type:StagedOrderAddDiscountCodeAction) update action."""
 
     #: [DiscountCode](ctp:api:type:DiscountCode) that was added.
     discount_code: "DiscountCodeReference"
@@ -13616,7 +18151,7 @@ class OrderDiscountCodeAddedMessagePayload(OrderMessagePayload):
 
 
 class OrderDiscountCodeRemovedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Remove Discount Code](ctp:api:type:StagedOrderRemoveDiscountCodeAction) update action."""
+    """Generated after a successful [Remove DiscountCode](ctp:api:type:StagedOrderRemoveDiscountCodeAction) update action."""
 
     #: [DiscountCode](ctp:api:type:DiscountCode) that was removed.
     discount_code: "DiscountCodeReference"
@@ -13678,7 +18213,7 @@ class OrderDiscountCodeStateSetMessagePayload(OrderMessagePayload):
 
 
 class OrderEditAppliedMessagePayload(OrderMessagePayload):
-    """Generated after a successfully applying an [OrderEdit](/../api/projects/order-edits#apply-an-orderedit)."""
+    """Generated after successfully [applying an OrderEdit](ctp:api:endpoint:/{projectKey}/orders/edits/{id}/apply:POST)."""
 
     #: [OrderEdit](ctp:api:type:OrderEdit) that was applied.
     edit: "OrderEdit"
@@ -13706,7 +18241,7 @@ class OrderEditAppliedMessagePayload(OrderMessagePayload):
 
 
 class OrderImportedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Order Import](/../api/projects/orders-import#create-an-order-by-import)."""
+    """Generated after a successful [Order Import](ctp:api:endpoint:/{projectKey}/orders/import:POST)."""
 
     #: [Order](ctp:api:type:Order) that was imported.
     order: "Order"
@@ -13731,7 +18266,7 @@ class OrderImportedMessagePayload(OrderMessagePayload):
 
 
 class OrderLineItemAddedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Add Line Item](ctp:api:type:StagedOrderAddLineItemAction) update action."""
+    """Generated after a successful [Add LineItem](ctp:api:type:StagedOrderAddLineItemAction) update action."""
 
     #: [Line Item](ctp:api:type:LineItem) that was added to the [Order](ctp:api:type:Order).
     line_item: "LineItem"
@@ -13763,19 +18298,22 @@ class OrderLineItemDiscountSetMessagePayload(OrderMessagePayload):
 
     #: Unique identifier for the [Line Item](ctp:api:type:LineItem).
     line_item_id: str
+    #: User-defined unique identifier of the LineItem.
+    line_item_key: typing.Optional[str]
     #: Array of [DiscountedLineItemPriceForQuantity](ctp:api:type:DiscountedLineItemPriceForQuantity) after the Discount recalculation.
     discounted_price_per_quantity: typing.List["DiscountedLineItemPriceForQuantity"]
     #: Total Price of the [Line Item](ctp:api:type:LineItem) after the Discount recalculation.
     total_price: "Money"
     #: [TaxedItemPrice](ctp:api:type:TaxedItemPrice) of the [Line Item](ctp:api:type:LineItem) after the Discount recalculation.
     taxed_price: typing.Optional["TaxedItemPrice"]
-    #: Taxed price of the Shipping Methods in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: Taxed price of the Shipping Methods in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     taxed_price_portions: typing.List["MethodTaxedPrice"]
 
     def __init__(
         self,
         *,
         line_item_id: str,
+        line_item_key: typing.Optional[str] = None,
         discounted_price_per_quantity: typing.List[
             "DiscountedLineItemPriceForQuantity"
         ],
@@ -13784,6 +18322,7 @@ class OrderLineItemDiscountSetMessagePayload(OrderMessagePayload):
         taxed_price_portions: typing.List["MethodTaxedPrice"]
     ):
         self.line_item_id = line_item_id
+        self.line_item_key = line_item_key
         self.discounted_price_per_quantity = discounted_price_per_quantity
         self.total_price = total_price
         self.taxed_price = taxed_price
@@ -13806,10 +18345,12 @@ class OrderLineItemDiscountSetMessagePayload(OrderMessagePayload):
 
 
 class OrderLineItemDistributionChannelSetMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Set Line Item Distribution Channel](/../api/projects/order-edits#set-lineitem-distributionchannel) update action."""
+    """Generated after a successful [Set LineItem DistributionChannel](/../api/projects/order-edits#set-lineitem-distributionchannel) update action."""
 
     #: Unique identifier of the [Line Item](ctp:api:type:LineItem).
     line_item_id: str
+    #: User-defined unique identifier of the LineItem.
+    line_item_key: typing.Optional[str]
     #: [Distribution Channel](ctp:api:type:Channel) that was set.
     distribution_channel: typing.Optional["ChannelReference"]
 
@@ -13817,9 +18358,11 @@ class OrderLineItemDistributionChannelSetMessagePayload(OrderMessagePayload):
         self,
         *,
         line_item_id: str,
+        line_item_key: typing.Optional[str] = None,
         distribution_channel: typing.Optional["ChannelReference"] = None
     ):
         self.line_item_id = line_item_id
+        self.line_item_key = line_item_key
         self.distribution_channel = distribution_channel
 
         super().__init__(type="OrderLineItemDistributionChannelSet")
@@ -13843,10 +18386,12 @@ class OrderLineItemDistributionChannelSetMessagePayload(OrderMessagePayload):
 
 
 class OrderLineItemRemovedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Remove Line Item](ctp:api:type:StagedOrderRemoveLineItemAction) update action."""
+    """Generated after a successful [Remove LineItem](ctp:api:type:StagedOrderRemoveLineItemAction) update action."""
 
     #: Unique identifier of the [Line Item](ctp:api:type:LineItem).
     line_item_id: str
+    #: User-defined unique identifier of the LineItem.
+    line_item_key: typing.Optional[str]
     #: Quantity of [Line Items](ctp:api:type:LineItem) that were removed during the [Remove Line Item](ctp:api:type:StagedOrderRemoveLineItemAction) update action.
     removed_quantity: int
     #: [Line Item](ctp:api:type:LineItem) quantity after the [Remove Line Item](ctp:api:type:StagedOrderRemoveLineItemAction) update action.
@@ -13866,6 +18411,7 @@ class OrderLineItemRemovedMessagePayload(OrderMessagePayload):
         self,
         *,
         line_item_id: str,
+        line_item_key: typing.Optional[str] = None,
         removed_quantity: int,
         new_quantity: int,
         new_state: typing.List["ItemState"],
@@ -13875,6 +18421,7 @@ class OrderLineItemRemovedMessagePayload(OrderMessagePayload):
         new_shipping_detail: typing.Optional["ItemShippingDetails"] = None
     ):
         self.line_item_id = line_item_id
+        self.line_item_key = line_item_key
         self.removed_quantity = removed_quantity
         self.new_quantity = new_quantity
         self.new_state = new_state
@@ -13925,7 +18472,7 @@ class OrderPaymentAddedMessagePayload(MessagePayload):
 
 
 class OrderPaymentStateChangedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Change Payment State](ctp:api:type:OrderChangePaymentStateAction) update action."""
+    """Generated after a successful [Change PaymentState](ctp:api:type:OrderChangePaymentStateAction) update action."""
 
     #: [PaymentState](ctp:api:type:PaymentState) after the [Change Payment State](ctp:api:type:OrderChangePaymentStateAction) update action.
     payment_state: "PaymentState"
@@ -13958,11 +18505,11 @@ class OrderPaymentStateChangedMessagePayload(OrderMessagePayload):
 
 
 class OrderPurchaseOrderNumberSetMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Set PurchaseOrderNumber](/../api/projects/orders#set-purchase-order-number) update action."""
+    """Generated after a successful [Set Purchase Order Number](ctp:api:type:OrderSetPurchaseOrderNumberAction) update action."""
 
-    #: Purchase order number on the [Order](ctp:api:type:Order) after the [Set PurchaseOrderNumber](/../api/projects/orders#set-purchase-order-number) update action.
+    #: Purchase order number on the [Order](ctp:api:type:Order) after the [Set Purchase Order Number](ctp:api:type:OrderSetPurchaseOrderNumberAction) update action.
     purchase_order_number: typing.Optional[str]
-    #: Purchase order number on the [Order](ctp:api:type:Order) before the [Set PurchaseOrderNumber](/../api/projects/orders#set-purchase-order-number) update action.
+    #: Purchase order number on the [Order](ctp:api:type:Order) before the [Set Purchase Order Number](ctp:api:type:OrderSetPurchaseOrderNumberAction) update action.
     old_purchase_order_number: typing.Optional[str]
 
     def __init__(
@@ -13991,7 +18538,7 @@ class OrderPurchaseOrderNumberSetMessagePayload(OrderMessagePayload):
 
 
 class OrderReturnShipmentStateChangedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Set Return Shipment State](ctp:api:type:OrderSetReturnShipmentStateAction) update action."""
+    """Generated after a successful [Set ReturnShipmentState](ctp:api:type:OrderSetReturnShipmentStateAction) update action."""
 
     #: Unique identifier of the [ReturnItem](ctp:api:type:ReturnItem).
     return_item_id: str
@@ -14025,7 +18572,7 @@ class OrderReturnShipmentStateChangedMessagePayload(OrderMessagePayload):
 
 
 class OrderShipmentStateChangedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Change Shipment State](ctp:api:type:OrderChangeShipmentStateAction) update action."""
+    """Generated after a successful [Change ShipmentState](ctp:api:type:OrderChangeShipmentStateAction) update action."""
 
     #: [ShipmentState](ctp:api:type:ShipmentState) after the [Change Shipment State](ctp:api:type:OrderChangeShipmentStateAction) update action.
     shipment_state: "ShipmentState"
@@ -14088,7 +18635,7 @@ class OrderShippingAddressSetMessagePayload(OrderMessagePayload):
 
 
 class OrderShippingInfoSetMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Set Shipping Method](ctp:api:type:StagedOrderSetShippingMethodAction) and [Set Custom Shipping Method](ctp:api:type:StagedOrderSetCustomShippingMethodAction) update actions."""
+    """Generated after a successful [Set ShippingMethod](ctp:api:type:StagedOrderSetShippingMethodAction) and [Set Custom ShippingMethod](ctp:api:type:StagedOrderSetCustomShippingMethodAction) update actions."""
 
     #: [ShippingInfo](ctp:api:type:ShippingInfo) after the [Set Shipping Method](ctp:api:type:StagedOrderSetShippingMethodAction) or [Set Custom Shipping Method](ctp:api:type:StagedOrderSetCustomShippingMethodAction) update action.
     shipping_info: typing.Optional["ShippingInfo"]
@@ -14154,7 +18701,7 @@ class OrderShippingRateInputSetMessagePayload(OrderMessagePayload):
 
 
 class OrderStateChangedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Change Order State](ctp:api:type:OrderChangeOrderStateAction) update action."""
+    """Generated after a successful [Change OrderState](ctp:api:type:OrderChangeOrderStateAction) update action."""
 
     #: [OrderState](ctp:api:type:OrderState) after the [Change Order State](ctp:api:type:OrderChangeOrderStateAction) update action.
     order_state: "OrderState"
@@ -14244,13 +18791,13 @@ class OrderStoreSetMessagePayload(OrderMessagePayload):
 
 
 class ParcelAddedToDeliveryMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Add Parcel To Delivery](ctp:api:type:OrderAddParcelToDeliveryAction) update action."""
+    """Generated after a successful [Add Parcel to Delivery](ctp:api:type:OrderAddParcelToDeliveryAction) update action."""
 
     #: Unique identifier of the [Delivery](ctp:api:type:Delivery).
     delivery: "Delivery"
     #: [Parcel](ctp:api:type:Parcel) that was added to the [Delivery](ctp:api:type:Delivery).
     parcel: "Parcel"
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -14291,7 +18838,7 @@ class ParcelItemsUpdatedMessagePayload(OrderMessagePayload):
     items: typing.List["DeliveryItem"]
     #: [Delivery Items](ctp:api:type:DeliveryItem) before the [Set Parcel Items](ctp:api:type:OrderSetParcelItemsAction) update action.
     old_items: typing.List["DeliveryItem"]
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -14334,7 +18881,7 @@ class ParcelMeasurementsUpdatedMessagePayload(OrderMessagePayload):
     parcel_id: str
     #: The [Parcel Measurements](ctp:api:type:ParcelMeasurements) that were set on the [Parcel](ctp:api:type:Parcel).
     measurements: typing.Optional["ParcelMeasurements"]
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -14367,13 +18914,13 @@ class ParcelMeasurementsUpdatedMessagePayload(OrderMessagePayload):
 
 
 class ParcelRemovedFromDeliveryMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Remove Parcel From Delivery](ctp:api:type:OrderRemoveParcelFromDeliveryAction) update action."""
+    """Generated after a successful [Remove Parcel from Delivery](ctp:api:type:OrderRemoveParcelFromDeliveryAction) update action."""
 
     #: Unique identifier of the [Delivery](ctp:api:type:Delivery).
     delivery_id: str
     #: [Parcel](ctp:api:type:Parcel) that was removed from the [Delivery](ctp:api:type:Delivery).
     parcel: "Parcel"
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -14404,7 +18951,7 @@ class ParcelRemovedFromDeliveryMessagePayload(OrderMessagePayload):
 
 
 class ParcelTrackingDataUpdatedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Set Parcel TrackingData](ctp:api:type:OrderSetParcelTrackingDataAction) update action."""
+    """Generated after a successful [Set Parcel Tracking Data](ctp:api:type:OrderSetParcelTrackingDataAction) update action."""
 
     #: Unique identifier of the [Delivery](ctp:api:type:Delivery).
     delivery_id: str
@@ -14412,7 +18959,7 @@ class ParcelTrackingDataUpdatedMessagePayload(OrderMessagePayload):
     parcel_id: str
     #: The [Tracking Data](ctp:api:type:TrackingData) that was added to the [Parcel](ctp:api:type:Parcel).
     tracking_data: typing.Optional["TrackingData"]
-    #: User-defined unique identifier of the Shipping Method in a Cart with `Multi` [ShippingMode](ctp:api:type:ShippingMode).
+    #: User-defined unique identifier of the Shipping Method in a Cart with `Multiple` [ShippingMode](ctp:api:type:ShippingMode).
     shipping_key: typing.Optional[str]
 
     def __init__(
@@ -14576,7 +19123,7 @@ class PaymentTransactionAddedMessagePayload(MessagePayload):
 
 
 class PaymentTransactionStateChangedMessagePayload(MessagePayload):
-    """Generated after a successful [Change Transaction State](ctp:api:type:PaymentChangeTransactionStateAction) update action."""
+    """Generated after a successful [Change TransactionState](ctp:api:type:PaymentChangeTransactionStateAction) update action."""
 
     #: Unique identifier for the [Transaction](ctp:api:type:Transaction) for which the [Transaction State](ctp:api:type:TransactionState) changed.
     transaction_id: str
@@ -14604,7 +19151,7 @@ class PaymentTransactionStateChangedMessagePayload(MessagePayload):
 
 
 class ProductAddedToCategoryMessagePayload(MessagePayload):
-    """Generated after a successful [Add To Category](ctp:api:type:ProductAddToCategoryAction) update action."""
+    """Generated after a successful [Add to Category](ctp:api:type:ProductAddToCategoryAction) update action."""
 
     #: [Category](ctp:api:type:Category) the [Product](ctp:api:type:Product) was added to.
     category: "CategoryReference"
@@ -14721,7 +19268,7 @@ class ProductImageAddedMessagePayload(MessagePayload):
 
 
 class ProductPriceAddedMessagePayload(MessagePayload):
-    """Generated after a successful [Add Embedded Price](ctp:api:type:ProductAddPriceAction) update action."""
+    """Generated after a successful [Add Price](ctp:api:type:ProductAddPriceAction) update action."""
 
     #: Unique identifier of the [ProductVariant](ctp:api:type:ProductVariant) for which the Price was added.
     variant_id: int
@@ -14752,7 +19299,7 @@ class ProductPriceAddedMessagePayload(MessagePayload):
 
 
 class ProductPriceChangedMessagePayload(MessagePayload):
-    """Generated after a successful [Change Embedded Price](ctp:api:type:ProductChangePriceAction) update action."""
+    """Generated after a successful [Change Price](ctp:api:type:ProductChangePriceAction) update action."""
 
     #: Unique identifier of the [ProductVariant](ctp:api:type:ProductVariant) for which the Price was changed.
     variant_id: int
@@ -14824,7 +19371,7 @@ class ProductPriceDiscountsSetMessagePayload(MessagePayload):
 
 
 class ProductPriceExternalDiscountSetMessagePayload(MessagePayload):
-    """Generated after a successful [Set Discounted Embedded Price](ctp:api:type:ProductSetDiscountedPriceAction) update action."""
+    """Generated after a successful [Set Discounted Price](ctp:api:type:ProductSetDiscountedPriceAction) update action."""
 
     #: Unique identifier of the [Product Variant](ctp:api:type:ProductVariant) for which the Discount was set.
     variant_id: int
@@ -14946,7 +19493,7 @@ class ProductPriceModeSetMessagePayload(MessagePayload):
 
 
 class ProductPriceRemovedMessagePayload(MessagePayload):
-    """Generated after a successful [Remove Embedded Price](ctp:api:type:ProductRemovePriceAction) update action."""
+    """Generated after a successful [Remove Price](ctp:api:type:ProductRemovePriceAction) update action."""
 
     #: Unique identifier of the [ProductVariant](ctp:api:type:ProductVariant) for which the Price was removed.
     variant_id: int
@@ -14977,7 +19524,7 @@ class ProductPriceRemovedMessagePayload(MessagePayload):
 
 
 class ProductPricesSetMessagePayload(MessagePayload):
-    """Generated after a successful [Set Embedded Prices](ctp:api:type:ProductSetPricesAction) update action."""
+    """Generated after a successful [Set Prices](ctp:api:type:ProductSetPricesAction) update action."""
 
     #: Unique identifier of the [ProductVariant](ctp:api:type:ProductVariant) for which the Price was set.
     variant_id: int
@@ -15045,7 +19592,7 @@ class ProductPublishedMessagePayload(MessagePayload):
 
 
 class ProductRemovedFromCategoryMessagePayload(MessagePayload):
-    """Generated after a successful [Remove From Category](ctp:api:type:ProductRemoveFromCategoryAction) update action."""
+    """Generated after a successful [Remove from Category](ctp:api:type:ProductRemoveFromCategoryAction) update action."""
 
     #: [Category](ctp:api:type:Category) the [Product](ctp:api:type:Product) was removed from.
     category: "CategoryReference"
@@ -15098,7 +19645,7 @@ class ProductRevertedStagedChangesMessagePayload(MessagePayload):
 
 
 class ProductSelectionCreatedMessagePayload(MessagePayload):
-    """Generated after a successful [Create Product Selection](/../api/projects/product-selections#create-product-selection) request."""
+    """Generated after a successful [Create Product Selection](/../api/projects/product-selections#create-productselection) request."""
 
     #: [Product Selection](ctp:api:type:ProductSelection) that was created.
     product_selection: "ProductSelection"
@@ -15123,7 +19670,7 @@ class ProductSelectionCreatedMessagePayload(MessagePayload):
 
 
 class ProductSelectionDeletedMessagePayload(MessagePayload):
-    """Generated after a successful [Delete Product Selection](/../api/projects/product-selections#create-product-selection) request."""
+    """Generated after a successful [Delete Product Selection](/../api/projects/product-selections#delete-productselection) request."""
 
     def __init__(self):
         super().__init__(type="ProductSelectionDeleted")
@@ -15401,7 +19948,7 @@ class ProductUnpublishedMessagePayload(MessagePayload):
 
 
 class ProductVariantAddedMessagePayload(MessagePayload):
-    """Generated after a successful [Add Product Variant](ctp:api:type:ProductAddVariantAction) update action."""
+    """Generated after a successful [Add ProductVariant](ctp:api:type:ProductAddVariantAction) update action."""
 
     #: Unique identifier of the [Product Variant](ctp:api:type:ProductVariant) that was added.
     variant: "ProductVariant"
@@ -15429,7 +19976,7 @@ class ProductVariantAddedMessagePayload(MessagePayload):
 
 
 class ProductVariantDeletedMessagePayload(MessagePayload):
-    """Generated after a successful [Remove Product Variant](ctp:api:type:ProductRemoveVariantAction) update action."""
+    """Generated after a successful [Remove ProductVariant](ctp:api:type:ProductRemoveVariantAction) update action."""
 
     #: Unique identifier of the [Product Variant](ctp:api:type:ProductVariant) that was added.
     variant: typing.Optional["ProductVariant"]
@@ -15536,8 +20083,33 @@ class QuoteDeletedMessagePayload(MessagePayload):
         return QuoteDeletedMessagePayloadSchema().dump(self)
 
 
+class QuoteRenegotiationRequestedMessagePayload(MessagePayload):
+    """Generated after a successful [Request Quote Renegotiation](ctp:api:type:QuoteRequestQuoteRenegotiationAction) update action."""
+
+    #: Message from the [Buyer](/api/quotes-overview#buyer) regarding the Quote renegotiation request.
+    buyer_comment: typing.Optional[str]
+
+    def __init__(self, *, buyer_comment: typing.Optional[str] = None):
+        self.buyer_comment = buyer_comment
+
+        super().__init__(type="QuoteRenegotiationRequested")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "QuoteRenegotiationRequestedMessagePayload":
+        from ._schemas.message import QuoteRenegotiationRequestedMessagePayloadSchema
+
+        return QuoteRenegotiationRequestedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import QuoteRenegotiationRequestedMessagePayloadSchema
+
+        return QuoteRenegotiationRequestedMessagePayloadSchema().dump(self)
+
+
 class QuoteRequestCreatedMessagePayload(MessagePayload):
-    """Generated after a successful [Create Quote Request](/../api/projects/quote-requests#create-quoterequest) request."""
+    """Generated after a successful [Create QuoteRequest](/../api/projects/quote-requests#create-quoterequest) request."""
 
     #: [Quote Request](/../api/projects/quote-requests) that was created.
     quote_request: "QuoteRequest"
@@ -15592,7 +20164,7 @@ class QuoteRequestCustomerChangedMessagePayload(MessagePayload):
 
 
 class QuoteRequestDeletedMessagePayload(MessagePayload):
-    """Generated after a successful [Delete Quote Request](/../api/projects/quote-requests#delete-quoterequest) request."""
+    """Generated after a successful [Delete QuoteRequest](/../api/projects/quote-requests#delete-quoterequest) request."""
 
     def __init__(self):
         super().__init__(type="QuoteRequestDeleted")
@@ -15747,7 +20319,7 @@ class QuoteStateTransitionMessagePayload(MessagePayload):
 
 
 class ReturnInfoAddedMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Add Return Info](ctp:api:type:OrderAddReturnInfoAction) update action."""
+    """Generated after a successful [Add ReturnInfo](ctp:api:type:OrderAddReturnInfoAction) update action."""
 
     #: The [ReturnInfo](ctp:api:type:ReturnInfo) that was added to the [Order](ctp:api:type:Order).
     return_info: "ReturnInfo"
@@ -15772,7 +20344,7 @@ class ReturnInfoAddedMessagePayload(OrderMessagePayload):
 
 
 class ReturnInfoSetMessagePayload(OrderMessagePayload):
-    """Generated after a successful [Set Return Info](ctp:api:type:OrderSetReturnInfoAction) update action on [Orders](ctp:api:type:Order) and [Order Edits](ctp:api:type:OrderEdit)."""
+    """Generated after a successful [Set ReturnInfo](ctp:api:type:OrderSetReturnInfoAction) update action on [Orders](ctp:api:type:Order) and [Order Edits](ctp:api:type:OrderEdit)."""
 
     #: The [ReturnInfo](ctp:api:type:ReturnInfo) that was set on the [Order](ctp:api:type:Order) or [Order Edit](ctp:api:type:OrderEdit).
     return_info: typing.Optional[typing.List["ReturnInfo"]]
@@ -15799,7 +20371,7 @@ class ReturnInfoSetMessagePayload(OrderMessagePayload):
 
 
 class ReviewCreatedMessagePayload(MessagePayload):
-    """Generated after a successful [Create Review](/../api/projects/reviews#create-a-review) request."""
+    """Generated after a successful [Create Review](/../api/projects/reviews#create-review) request."""
 
     #: [Review](ctp:api:type:Review) that was created.
     review: "Review"
@@ -15937,7 +20509,7 @@ class ShoppingListStoreSetMessagePayload(MessagePayload):
 
 
 class StagedQuoteCreatedMessagePayload(MessagePayload):
-    """Generated after a successful [Create Staged Quote](/../api/projects/staged-quotes#create-stagedquote) request."""
+    """Generated after a successful [Create StagedQuote](/../api/projects/staged-quotes#create-stagedquote) request."""
 
     #: [Staged Quote](/../api/projects/staged-quotes) that was created.
     staged_quote: "StagedQuote"
@@ -15962,7 +20534,7 @@ class StagedQuoteCreatedMessagePayload(MessagePayload):
 
 
 class StagedQuoteDeletedMessagePayload(MessagePayload):
-    """Generated after a successful [Delete Staged Quote](/../api/projects/staged-quotes#delete-stagedquote) request."""
+    """Generated after a successful [Delete StagedQuote](/../api/projects/staged-quotes#delete-stagedquote) request."""
 
     def __init__(self):
         super().__init__(type="StagedQuoteDeleted")
@@ -16290,6 +20862,35 @@ class StandalonePriceStagedChangesAppliedMessagePayload(MessagePayload):
         )
 
         return StandalonePriceStagedChangesAppliedMessagePayloadSchema().dump(self)
+
+
+class StandalonePriceStagedChangesRemovedMessagePayload(MessagePayload):
+    """Generated after a successful [Remove Staged Changes](ctp:api:type:StandalonePriceRemoveStagedChangesAction) update action."""
+
+    #: Removed changes of the [StandalonePrice](ctp:api:type:StandalonePrice) after the [Remove Staged Changes](ctp:api:type:StandalonePriceRemoveStagedChangesAction) update action.
+    staged_changes: "StagedStandalonePrice"
+
+    def __init__(self, *, staged_changes: "StagedStandalonePrice"):
+        self.staged_changes = staged_changes
+
+        super().__init__(type="StandalonePriceStagedChangesRemoved")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "StandalonePriceStagedChangesRemovedMessagePayload":
+        from ._schemas.message import (
+            StandalonePriceStagedChangesRemovedMessagePayloadSchema,
+        )
+
+        return StandalonePriceStagedChangesRemovedMessagePayloadSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.message import (
+            StandalonePriceStagedChangesRemovedMessagePayloadSchema,
+        )
+
+        return StandalonePriceStagedChangesRemovedMessagePayloadSchema().dump(self)
 
 
 class StandalonePriceTierAddedMessagePayload(MessagePayload):

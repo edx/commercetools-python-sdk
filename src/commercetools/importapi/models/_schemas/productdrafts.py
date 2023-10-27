@@ -311,9 +311,7 @@ class PriceDraftImportSchema(helpers.BaseSchema):
         metadata={"omit_empty": True},
         load_default=None,
     )
-    key = marshmallow.fields.String(
-        allow_none=True, metadata={"omit_empty": True}, load_default=None
-    )
+    key = marshmallow.fields.String(allow_none=True, load_default=None)
 
     class Meta:
         unknown = marshmallow.EXCLUDE

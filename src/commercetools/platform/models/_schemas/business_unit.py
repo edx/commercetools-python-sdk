@@ -48,6 +48,7 @@ class AssociateSchema(helpers.BaseSchema):
             AssociateRoleDeprecated, by_value=True, allow_none=True
         ),
         allow_none=True,
+        metadata={"omit_empty": True},
         load_default=None,
     )
     customer = helpers.LazyNestedField(
@@ -71,7 +72,6 @@ class AssociateDraftSchema(helpers.BaseSchema):
         allow_none=True,
         many=True,
         unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
         load_default=None,
         data_key="associateRoleAssignments",
     )

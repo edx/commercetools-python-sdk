@@ -395,6 +395,13 @@ class ClientLoggingSchema(helpers.BaseSchema):
         load_default=None,
         data_key="anonymousId",
     )
+    associate = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".customer.CustomerReferenceSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
 
     class Meta:
         unknown = marshmallow.EXCLUDE

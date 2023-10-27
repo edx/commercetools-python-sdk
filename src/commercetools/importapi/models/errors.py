@@ -636,9 +636,9 @@ class RequiredFieldError(ErrorObject):
 
 
 class InvalidStateTransitionError(ErrorObject):
-    #: Every [Import Operation](/import-operation) is assigned with one of the following states.
+    #: Every [Import Operation](/import-operation) is assigned one of the following states.
     current_state: "ProcessingState"
-    #: Every [Import Operation](/import-operation) is assigned with one of the following states.
+    #: Every [Import Operation](/import-operation) is assigned one of the following states.
     new_state: "ProcessingState"
 
     def __init__(

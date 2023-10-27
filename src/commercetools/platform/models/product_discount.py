@@ -521,7 +521,10 @@ class ProductDiscountValueDraft(_BaseType):
 class ProductDiscountValueAbsoluteDraft(ProductDiscountValueDraft):
     """Discounts the Product Price by a fixed amount, defined by the `money` field."""
 
-    #: Money values in different currencies. An absolute [ProductDiscount](ctp:api:type:ProductDiscount) will only match a price if this array contains a value with the same currency. For example, if it contains 10€ and 15$, the matching € price will be decreased by 10€ and the matching $ price will be decreased by 15\$.
+    #: Money values in different currencies.
+    #: An absolute Product Discount will match a price only if the array contains a value with the same currency. For example, if it contains 10€ and 15$, the matching € price will be decreased by 10€ and the matching $ price will be decreased by 15$. If the array has multiple values of the same currency, the API returns an [InvalidOperation](ctp:api:type:InvalidOperationError) error.
+    #:
+    #: If the array is empty, the discount does not apply.
     money: typing.List["Money"]
 
     def __init__(self, *, money: typing.List["Money"]):

@@ -46,6 +46,7 @@ class OperationStatesSchema(helpers.BaseSchema):
     )
     imported = marshmallow.fields.Integer(allow_none=True, load_default=None)
     rejected = marshmallow.fields.Integer(allow_none=True, load_default=None)
+    canceled = marshmallow.fields.Integer(allow_none=True, load_default=None)
 
     class Meta:
         unknown = marshmallow.EXCLUDE

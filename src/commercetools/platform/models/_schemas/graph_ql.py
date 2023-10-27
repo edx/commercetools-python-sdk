@@ -58,6 +58,9 @@ class GraphQLErrorSchema(helpers.BaseSchema):
             "ConcurrentModification": helpers.absmod(
                 __name__, ".error.GraphQLConcurrentModificationErrorSchema"
             ),
+            "ContentTooLarge": helpers.absmod(
+                __name__, ".error.GraphQLContentTooLargeErrorSchema"
+            ),
             "CountryNotConfiguredInStore": helpers.absmod(
                 __name__, ".error.GraphQLCountryNotConfiguredInStoreErrorSchema"
             ),
@@ -165,8 +168,14 @@ class GraphQLErrorSchema(helpers.BaseSchema):
             "MatchingPriceNotFound": helpers.absmod(
                 __name__, ".error.GraphQLMatchingPriceNotFoundErrorSchema"
             ),
+            "MaxCartDiscountsReached": helpers.absmod(
+                __name__, ".error.GraphQLMaxCartDiscountsReachedErrorSchema"
+            ),
             "MaxResourceLimitExceeded": helpers.absmod(
                 __name__, ".error.GraphQLMaxResourceLimitExceededErrorSchema"
+            ),
+            "MaxStoreReferencesReached": helpers.absmod(
+                __name__, ".error.GraphQLMaxStoreReferencesReachedErrorSchema"
             ),
             "MissingRoleOnChannel": helpers.absmod(
                 __name__, ".error.GraphQLMissingRoleOnChannelErrorSchema"
@@ -249,6 +258,9 @@ class GraphQLErrorSchema(helpers.BaseSchema):
             ),
             "ShippingMethodDoesNotMatchCart": helpers.absmod(
                 __name__, ".error.GraphQLShippingMethodDoesNotMatchCartErrorSchema"
+            ),
+            "StoreCartDiscountsLimitReached": helpers.absmod(
+                __name__, ".error.GraphQLStoreCartDiscountsLimitReachedErrorSchema"
             ),
             "SyntaxError": helpers.absmod(
                 __name__, ".error.GraphQLSyntaxErrorErrorSchema"

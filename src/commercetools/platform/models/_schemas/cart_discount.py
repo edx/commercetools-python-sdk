@@ -85,6 +85,9 @@ class CartDiscountSchema(BaseResourceSchema):
             "shipping": helpers.absmod(
                 __name__, ".CartDiscountShippingCostTargetSchema"
             ),
+            "totalPrice": helpers.absmod(
+                __name__, ".CartDiscountTotalPriceTargetSchema"
+            ),
             "multiBuyCustomLineItems": helpers.absmod(
                 __name__, ".MultiBuyCustomLineItemsTargetSchema"
             ),
@@ -97,6 +100,13 @@ class CartDiscountSchema(BaseResourceSchema):
     )
     sort_order = marshmallow.fields.String(
         allow_none=True, load_default=None, data_key="sortOrder"
+    )
+    stores = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".store.StoreKeyReferenceSchema"),
+        allow_none=True,
+        many=True,
+        unknown=marshmallow.EXCLUDE,
+        load_default=None,
     )
     is_active = marshmallow.fields.Boolean(
         allow_none=True, load_default=None, data_key="isActive"
@@ -146,6 +156,12 @@ class CartDiscountSchema(BaseResourceSchema):
                 ),
                 "customer-group": helpers.absmod(
                     __name__, ".customer_group.CustomerGroupReferenceSchema"
+                ),
+                "customer-email-token": helpers.absmod(
+                    __name__, ".customer.CustomerEmailTokenReferenceSchema"
+                ),
+                "customer-password-token": helpers.absmod(
+                    __name__, ".customer.CustomerPasswordTokenReferenceSchema"
                 ),
                 "customer": helpers.absmod(
                     __name__, ".customer.CustomerReferenceSchema"
@@ -269,6 +285,9 @@ class CartDiscountDraftSchema(helpers.BaseSchema):
             "shipping": helpers.absmod(
                 __name__, ".CartDiscountShippingCostTargetSchema"
             ),
+            "totalPrice": helpers.absmod(
+                __name__, ".CartDiscountTotalPriceTargetSchema"
+            ),
             "multiBuyCustomLineItems": helpers.absmod(
                 __name__, ".MultiBuyCustomLineItemsTargetSchema"
             ),
@@ -281,6 +300,14 @@ class CartDiscountDraftSchema(helpers.BaseSchema):
     )
     sort_order = marshmallow.fields.String(
         allow_none=True, load_default=None, data_key="sortOrder"
+    )
+    stores = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".store.StoreResourceIdentifierSchema"),
+        allow_none=True,
+        many=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
     )
     is_active = marshmallow.fields.Boolean(
         allow_none=True,
@@ -427,6 +454,16 @@ class CartDiscountShippingCostTargetSchema(CartDiscountTargetSchema):
         return models.CartDiscountShippingCostTarget(**data)
 
 
+class CartDiscountTotalPriceTargetSchema(CartDiscountTargetSchema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["type"]
+        return models.CartDiscountTotalPriceTarget(**data)
+
+
 class CartDiscountUpdateSchema(helpers.BaseSchema):
     version = marshmallow.fields.Integer(allow_none=True, load_default=None)
     actions = marshmallow.fields.List(
@@ -434,6 +471,9 @@ class CartDiscountUpdateSchema(helpers.BaseSchema):
             allow_none=True,
             discriminator_field=("action", "action"),
             discriminator_schemas={
+                "addStore": helpers.absmod(
+                    __name__, ".CartDiscountAddStoreActionSchema"
+                ),
                 "changeCartPredicate": helpers.absmod(
                     __name__, ".CartDiscountChangeCartPredicateActionSchema"
                 ),
@@ -458,6 +498,9 @@ class CartDiscountUpdateSchema(helpers.BaseSchema):
                 "changeValue": helpers.absmod(
                     __name__, ".CartDiscountChangeValueActionSchema"
                 ),
+                "removeStore": helpers.absmod(
+                    __name__, ".CartDiscountRemoveStoreActionSchema"
+                ),
                 "setCustomField": helpers.absmod(
                     __name__, ".CartDiscountSetCustomFieldActionSchema"
                 ),
@@ -468,6 +511,9 @@ class CartDiscountUpdateSchema(helpers.BaseSchema):
                     __name__, ".CartDiscountSetDescriptionActionSchema"
                 ),
                 "setKey": helpers.absmod(__name__, ".CartDiscountSetKeyActionSchema"),
+                "setStores": helpers.absmod(
+                    __name__, ".CartDiscountSetStoresActionSchema"
+                ),
                 "setValidFrom": helpers.absmod(
                     __name__, ".CartDiscountSetValidFromActionSchema"
                 ),
@@ -564,11 +610,20 @@ class CartDiscountValueAbsoluteDraftSchema(CartDiscountValueDraftSchema):
 
 
 class CartDiscountValueFixedSchema(CartDiscountValueSchema):
-    money = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".common.CentPrecisionMoneySchema"),
+    money = marshmallow.fields.List(
+        helpers.Discriminator(
+            allow_none=True,
+            discriminator_field=("type", "type"),
+            discriminator_schemas={
+                "centPrecision": helpers.absmod(
+                    __name__, ".common.CentPrecisionMoneySchema"
+                ),
+                "highPrecision": helpers.absmod(
+                    __name__, ".common.HighPrecisionMoneySchema"
+                ),
+            },
+        ),
         allow_none=True,
-        many=True,
-        unknown=marshmallow.EXCLUDE,
         load_default=None,
     )
 
@@ -582,11 +637,20 @@ class CartDiscountValueFixedSchema(CartDiscountValueSchema):
 
 
 class CartDiscountValueFixedDraftSchema(CartDiscountValueDraftSchema):
-    money = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".common.MoneySchema"),
+    money = marshmallow.fields.List(
+        helpers.Discriminator(
+            allow_none=True,
+            discriminator_field=("type", "type"),
+            discriminator_schemas={
+                "centPrecision": helpers.absmod(
+                    __name__, ".common.CentPrecisionMoneyDraftSchema"
+                ),
+                "highPrecision": helpers.absmod(
+                    __name__, ".common.HighPrecisionMoneyDraftSchema"
+                ),
+            },
+        ),
         allow_none=True,
-        many=True,
-        unknown=marshmallow.EXCLUDE,
         load_default=None,
     )
 
@@ -757,6 +821,23 @@ class MultiBuyLineItemsTargetSchema(CartDiscountTargetSchema):
         return models.MultiBuyLineItemsTarget(**data)
 
 
+class CartDiscountAddStoreActionSchema(CartDiscountUpdateActionSchema):
+    store = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".store.StoreResourceIdentifierSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.CartDiscountAddStoreAction(**data)
+
+
 class CartDiscountChangeCartPredicateActionSchema(CartDiscountUpdateActionSchema):
     cart_predicate = marshmallow.fields.String(
         allow_none=True, load_default=None, data_key="cartPredicate"
@@ -861,6 +942,9 @@ class CartDiscountChangeTargetActionSchema(CartDiscountUpdateActionSchema):
             "shipping": helpers.absmod(
                 __name__, ".CartDiscountShippingCostTargetSchema"
             ),
+            "totalPrice": helpers.absmod(
+                __name__, ".CartDiscountTotalPriceTargetSchema"
+            ),
             "multiBuyCustomLineItems": helpers.absmod(
                 __name__, ".MultiBuyCustomLineItemsTargetSchema"
             ),
@@ -906,6 +990,23 @@ class CartDiscountChangeValueActionSchema(CartDiscountUpdateActionSchema):
     def post_load(self, data, **kwargs):
         del data["action"]
         return models.CartDiscountChangeValueAction(**data)
+
+
+class CartDiscountRemoveStoreActionSchema(CartDiscountUpdateActionSchema):
+    store = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".store.StoreResourceIdentifierSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.CartDiscountRemoveStoreAction(**data)
 
 
 class CartDiscountSetCustomFieldActionSchema(CartDiscountUpdateActionSchema):
@@ -976,6 +1077,25 @@ class CartDiscountSetKeyActionSchema(CartDiscountUpdateActionSchema):
     def post_load(self, data, **kwargs):
         del data["action"]
         return models.CartDiscountSetKeyAction(**data)
+
+
+class CartDiscountSetStoresActionSchema(CartDiscountUpdateActionSchema):
+    stores = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".store.StoreResourceIdentifierSchema"),
+        allow_none=True,
+        many=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.CartDiscountSetStoresAction(**data)
 
 
 class CartDiscountSetValidFromActionSchema(CartDiscountUpdateActionSchema):

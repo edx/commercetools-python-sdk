@@ -341,7 +341,7 @@ class AssociateRoleUpdateAction(_BaseType):
 
 
 class Permission(enum.Enum):
-    """Permissions grant granular access to [Business Units](ctp:api:type:BusinessUnit), [Carts](ctp:api:type:Cart), [Orders](ctp:api:type:Order), [Quotes](ctp:api:type:Quote), and [QuoteRequests](ctp:api:type:QuoteRequest)."""
+    """Permissions grant granular access to [Approval Rules](ctp:api:type:ApprovalRule), [Approval Flows](ctp:api:type:ApprovalFlow), [Business Units](ctp:api:type:BusinessUnit), [Carts](ctp:api:type:Cart), [Orders](ctp:api:type:Order), [Quotes](ctp:api:type:Quote), and [Quote Requests](ctp:api:type:QuoteRequest)."""
 
     ADD_CHILD_UNITS = "AddChildUnits"
     UPDATE_ASSOCIATES = "UpdateAssociates"
@@ -379,6 +379,9 @@ class Permission(enum.Enum):
     UPDATE_OTHERS_QUOTE_REQUESTS = "UpdateOthersQuoteRequests"
     CREATE_MY_QUOTE_REQUESTS_FROM_MY_CARTS = "CreateMyQuoteRequestsFromMyCarts"
     CREATE_QUOTE_REQUESTS_FROM_OTHERS_CARTS = "CreateQuoteRequestsFromOthersCarts"
+    CREATE_APPROVAL_RULES = "CreateApprovalRules"
+    UPDATE_APPROVAL_RULES = "UpdateApprovalRules"
+    UPDATE_APPROVAL_FLOWS = "UpdateApprovalFlows"
 
 
 class AssociateRoleAddPermissionAction(AssociateRoleUpdateAction):

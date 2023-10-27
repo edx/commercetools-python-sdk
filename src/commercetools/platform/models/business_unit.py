@@ -91,7 +91,7 @@ class Associate(_BaseType):
     #: Roles assigned to the Associate within a Business Unit.
     associate_role_assignments: typing.List["AssociateRoleAssignment"]
     #: Deprecated type. Use `associateRoleAssignment` instead.
-    roles: typing.List["AssociateRoleDeprecated"]
+    roles: typing.Optional[typing.List["AssociateRoleDeprecated"]]
     #: The [Customer](ctp:api:type:Customer) that acts as an Associate in the Business Unit.
     customer: "CustomerReference"
 
@@ -99,7 +99,7 @@ class Associate(_BaseType):
         self,
         *,
         associate_role_assignments: typing.List["AssociateRoleAssignment"],
-        roles: typing.List["AssociateRoleDeprecated"],
+        roles: typing.Optional[typing.List["AssociateRoleDeprecated"]] = None,
         customer: "CustomerReference"
     ):
         self.associate_role_assignments = associate_role_assignments
@@ -122,9 +122,7 @@ class Associate(_BaseType):
 
 class AssociateDraft(_BaseType):
     #: Roles assigned to the Associate within a Business Unit.
-    associate_role_assignments: typing.Optional[
-        typing.List["AssociateRoleAssignmentDraft"]
-    ]
+    associate_role_assignments: typing.List["AssociateRoleAssignmentDraft"]
     #: Deprecated type. Use `associateRoleAssignment` instead.
     roles: typing.Optional[typing.List["AssociateRoleDeprecated"]]
     #: The [Customer](ctp:api:type:Customer) to be part of the Business Unit.
@@ -133,9 +131,7 @@ class AssociateDraft(_BaseType):
     def __init__(
         self,
         *,
-        associate_role_assignments: typing.Optional[
-            typing.List["AssociateRoleAssignmentDraft"]
-        ] = None,
+        associate_role_assignments: typing.List["AssociateRoleAssignmentDraft"],
         roles: typing.Optional[typing.List["AssociateRoleDeprecated"]] = None,
         customer: "CustomerResourceIdentifier"
     ):
@@ -1336,7 +1332,7 @@ class BusinessUnitChangeNameAction(BusinessUnitUpdateAction):
 
 
 class BusinessUnitChangeParentUnitAction(BusinessUnitUpdateAction):
-    """Changing the parent of a [Business Unit](ctp:api:type:BusinessUnit) generates a [BusinessUnitParentUnitChanged](ctp:api:type:BusinessUnitParentUnitChangedMessage) Message."""
+    """Changing the parent of a [Business Unit](ctp:api:type:BusinessUnit) generates a [BusinessUnitParentChanged](ctp:api:type:BusinessUnitParentChangedMessage) Message."""
 
     #: New parent unit of the [Business Unit](ctp:api:type:BusinessUnit). The new parent unit must have the same top-level unit as the old parent unit.
     parent_unit: "BusinessUnitResourceIdentifier"
@@ -1550,6 +1546,8 @@ class BusinessUnitRemoveStoreAction(BusinessUnitUpdateAction):
 
 
 class BusinessUnitSetAddressCustomFieldAction(BusinessUnitUpdateAction):
+    """Adding a Custom Field to an Address of a Business Unit generates the [BusinessUnitAddressCustomFieldAdded](ctp:api:type:BusinessUnitAddressCustomFieldAddedMessage) Message, removing one generates the [BusinessUnitAddressCustomFieldRemoved](ctp:api:type:BusinessUnitAddressCustomFieldRemovedMessage) Message, and updating an existing one generates the [BusinessUnitAddressCustomFieldChanged](ctp:api:type:BusinessUnitAddressCustomFieldChangedMessage) Message."""
+
     #: ID of the address to be extended.
     address_id: str
     #: Name of the [Custom Field](/../api/projects/custom-fields).
@@ -1587,6 +1585,8 @@ class BusinessUnitSetAddressCustomFieldAction(BusinessUnitUpdateAction):
 
 
 class BusinessUnitSetAddressCustomTypeAction(BusinessUnitUpdateAction):
+    """Adding or updating a Custom Type on an Address of a Business Unit generates the [BusinessUnitAddressCustomTypeSet](ctp:api:type:BusinessUnitAddressCustomTypeSetMessage) Message, and removing one generates the [BusinessUnitAddressCustomTypeRemoved](ctp:api:type:BusinessUnitAddressCustomTypeRemovedMessage) Message."""
+
     #: Defines the [Type](ctp:api:type:Type) that extends the `address` with [Custom Fields](/../api/projects/custom-fields).
     #: If absent, any existing Type and Custom Fields are removed from the `address`.
     type: typing.Optional["TypeResourceIdentifier"]
@@ -1674,7 +1674,9 @@ class BusinessUnitSetContactEmailAction(BusinessUnitUpdateAction):
 
 
 class BusinessUnitSetCustomFieldAction(BusinessUnitUpdateAction):
-    #: Name of the [Custom Field](/../api/projects/custom-fields).
+    """Adding a Custom Field to a Business Unit generates the [BusinessUnitCustomFieldAdded](ctp:api:type:BusinessUnitCustomFieldAddedMessage) Message, removing one generates the [BusinessUnitCustomFieldRemoved](ctp:api:type:BusinessUnitCustomFieldRemovedMessage) Message, and updating an existing one generates the [BusinessUnitCustomFieldChanged](ctp:api:type:BusinessUnitCustomFieldChangedMessage) Message."""
+
+    #: Name of the [Custom Field](/../api/projects/custom-fields) to add, update, or remove.
     name: str
     #: If `value` is absent or `null`, this field will be removed if it exists.
     #: Trying to remove a field that does not exist will fail with an [InvalidOperation](ctp:api:type:InvalidOperationError) error.
@@ -1702,6 +1704,8 @@ class BusinessUnitSetCustomFieldAction(BusinessUnitUpdateAction):
 
 
 class BusinessUnitSetCustomTypeAction(BusinessUnitUpdateAction):
+    """Adding or updating a Custom Type on a Business Unit generates the [BusinessUnitCustomTypeSet](ctp:api:type:BusinessUnitCustomTypeSetMessage) Message, removing one generates the [BusinessUnitCustomTypeRemoved](ctp:api:type:BusinessUnitCustomTypeRemovedMessage) Message."""
+
     #: Defines the [Type](ctp:api:type:Type) that extends the BusinessUnit with [Custom Fields](/../api/projects/custom-fields).
     #: If absent, any existing Type and Custom Fields are removed from the BusinessUnit.
     type: typing.Optional["TypeResourceIdentifier"]

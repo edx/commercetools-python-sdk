@@ -266,7 +266,7 @@ class ProductSelectionAssignment(_BaseType):
     Given the mode of Product Selection, this assignment refers to, it may contain:
 
     - `variantSelection` field for a Product Selection with `Individual` [ProductSelectionMode](ctp:api:type:ProductSelectionMode).
-    - `variantExclusion` field for a Product Selection with `IndividualExclusion` [ProductSelectionMode](ctp:api:type:ProductSelectionMode) ([BETA](/../offering/api-contract#public-beta)).
+    - `variantExclusion` field for a Product Selection with `IndividualExclusion` [ProductSelectionMode](ctp:api:type:ProductSelectionMode).
     """
 
     #: Reference to a Product that is assigned to the ProductSelection.

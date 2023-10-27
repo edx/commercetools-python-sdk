@@ -274,6 +274,27 @@ class ConcurrentModificationErrorSchema(ErrorObjectSchema):
         return field.post_dump(data, original_data)
 
 
+class ContentTooLargeErrorSchema(ErrorObjectSchema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.pre_load
+    def pre_load(self, data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.pre_load(self, data)
+
+    @marshmallow.post_load(pass_original=True)
+    def post_load(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        data = field.post_load(data, original_data)
+        return models.ContentTooLargeError(**data)
+
+    @marshmallow.post_dump(pass_original=True)
+    def post_dump(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.post_dump(data, original_data)
+
+
 class CountryNotConfiguredInStoreErrorSchema(ErrorObjectSchema):
     store_countries = marshmallow.fields.List(
         marshmallow.fields.String(allow_none=True),
@@ -498,6 +519,12 @@ class DuplicateFieldWithConflictingResourceErrorSchema(ErrorObjectSchema):
             ),
             "customer-group": helpers.absmod(
                 __name__, ".customer_group.CustomerGroupReferenceSchema"
+            ),
+            "customer-email-token": helpers.absmod(
+                __name__, ".customer.CustomerEmailTokenReferenceSchema"
+            ),
+            "customer-password-token": helpers.absmod(
+                __name__, ".customer.CustomerPasswordTokenReferenceSchema"
             ),
             "customer": helpers.absmod(__name__, ".customer.CustomerReferenceSchema"),
             "discount-code": helpers.absmod(
@@ -877,6 +904,9 @@ class ErrorResponseSchema(helpers.BaseSchema):
                 "ConcurrentModification": helpers.absmod(
                     __name__, ".ConcurrentModificationErrorSchema"
                 ),
+                "ContentTooLarge": helpers.absmod(
+                    __name__, ".ContentTooLargeErrorSchema"
+                ),
                 "CountryNotConfiguredInStore": helpers.absmod(
                     __name__, ".CountryNotConfiguredInStoreErrorSchema"
                 ),
@@ -977,8 +1007,14 @@ class ErrorResponseSchema(helpers.BaseSchema):
                 "MatchingPriceNotFound": helpers.absmod(
                     __name__, ".MatchingPriceNotFoundErrorSchema"
                 ),
+                "MaxCartDiscountsReached": helpers.absmod(
+                    __name__, ".MaxCartDiscountsReachedErrorSchema"
+                ),
                 "MaxResourceLimitExceeded": helpers.absmod(
                     __name__, ".MaxResourceLimitExceededErrorSchema"
+                ),
+                "MaxStoreReferencesReached": helpers.absmod(
+                    __name__, ".MaxStoreReferencesReachedErrorSchema"
                 ),
                 "MissingRoleOnChannel": helpers.absmod(
                     __name__, ".MissingRoleOnChannelErrorSchema"
@@ -1044,6 +1080,9 @@ class ErrorResponseSchema(helpers.BaseSchema):
                 "SemanticError": helpers.absmod(__name__, ".SemanticErrorErrorSchema"),
                 "ShippingMethodDoesNotMatchCart": helpers.absmod(
                     __name__, ".ShippingMethodDoesNotMatchCartErrorSchema"
+                ),
+                "StoreCartDiscountsLimitReached": helpers.absmod(
+                    __name__, ".StoreCartDiscountsLimitReachedErrorSchema"
                 ),
                 "SyntaxError": helpers.absmod(__name__, ".SyntaxErrorErrorSchema"),
             },
@@ -1667,6 +1706,27 @@ class MatchingPriceNotFoundErrorSchema(ErrorObjectSchema):
         return field.post_dump(data, original_data)
 
 
+class MaxCartDiscountsReachedErrorSchema(ErrorObjectSchema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.pre_load
+    def pre_load(self, data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.pre_load(self, data)
+
+    @marshmallow.post_load(pass_original=True)
+    def post_load(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        data = field.post_load(data, original_data)
+        return models.MaxCartDiscountsReachedError(**data)
+
+    @marshmallow.post_dump(pass_original=True)
+    def post_dump(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.post_dump(data, original_data)
+
+
 class MaxResourceLimitExceededErrorSchema(ErrorObjectSchema):
     exceeded_resource = marshmallow_enum.EnumField(
         ReferenceTypeId,
@@ -1689,6 +1749,27 @@ class MaxResourceLimitExceededErrorSchema(ErrorObjectSchema):
         field = typing.cast(helpers.RegexField, self.fields["_regex"])
         data = field.post_load(data, original_data)
         return models.MaxResourceLimitExceededError(**data)
+
+    @marshmallow.post_dump(pass_original=True)
+    def post_dump(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.post_dump(data, original_data)
+
+
+class MaxStoreReferencesReachedErrorSchema(ErrorObjectSchema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.pre_load
+    def pre_load(self, data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.pre_load(self, data)
+
+    @marshmallow.post_load(pass_original=True)
+    def post_load(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        data = field.post_load(data, original_data)
+        return models.MaxStoreReferencesReachedError(**data)
 
     @marshmallow.post_dump(pass_original=True)
     def post_dump(self, data, original_data, **kwargs):
@@ -2429,6 +2510,35 @@ class ShippingMethodDoesNotMatchCartErrorSchema(ErrorObjectSchema):
         return field.post_dump(data, original_data)
 
 
+class StoreCartDiscountsLimitReachedErrorSchema(ErrorObjectSchema):
+    stores = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".store.StoreKeyReferenceSchema"),
+        allow_none=True,
+        many=True,
+        unknown=marshmallow.EXCLUDE,
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.pre_load
+    def pre_load(self, data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.pre_load(self, data)
+
+    @marshmallow.post_load(pass_original=True)
+    def post_load(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        data = field.post_load(data, original_data)
+        return models.StoreCartDiscountsLimitReachedError(**data)
+
+    @marshmallow.post_dump(pass_original=True)
+    def post_dump(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.post_dump(data, original_data)
+
+
 class SyntaxErrorErrorSchema(ErrorObjectSchema):
     class Meta:
         unknown = marshmallow.EXCLUDE
@@ -2714,6 +2824,27 @@ class GraphQLConcurrentModificationErrorSchema(GraphQLErrorObjectSchema):
         return field.post_dump(data, original_data)
 
 
+class GraphQLContentTooLargeErrorSchema(GraphQLErrorObjectSchema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.pre_load
+    def pre_load(self, data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.pre_load(self, data)
+
+    @marshmallow.post_load(pass_original=True)
+    def post_load(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        data = field.post_load(data, original_data)
+        return models.GraphQLContentTooLargeError(**data)
+
+    @marshmallow.post_dump(pass_original=True)
+    def post_dump(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.post_dump(data, original_data)
+
+
 class GraphQLCountryNotConfiguredInStoreErrorSchema(GraphQLErrorObjectSchema):
     store_countries = marshmallow.fields.List(
         marshmallow.fields.String(allow_none=True),
@@ -2938,6 +3069,12 @@ class GraphQLDuplicateFieldWithConflictingResourceErrorSchema(GraphQLErrorObject
             ),
             "customer-group": helpers.absmod(
                 __name__, ".customer_group.CustomerGroupReferenceSchema"
+            ),
+            "customer-email-token": helpers.absmod(
+                __name__, ".customer.CustomerEmailTokenReferenceSchema"
+            ),
+            "customer-password-token": helpers.absmod(
+                __name__, ".customer.CustomerPasswordTokenReferenceSchema"
             ),
             "customer": helpers.absmod(__name__, ".customer.CustomerReferenceSchema"),
             "discount-code": helpers.absmod(
@@ -3840,6 +3977,27 @@ class GraphQLMatchingPriceNotFoundErrorSchema(GraphQLErrorObjectSchema):
         return field.post_dump(data, original_data)
 
 
+class GraphQLMaxCartDiscountsReachedErrorSchema(GraphQLErrorObjectSchema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.pre_load
+    def pre_load(self, data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.pre_load(self, data)
+
+    @marshmallow.post_load(pass_original=True)
+    def post_load(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        data = field.post_load(data, original_data)
+        return models.GraphQLMaxCartDiscountsReachedError(**data)
+
+    @marshmallow.post_dump(pass_original=True)
+    def post_dump(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.post_dump(data, original_data)
+
+
 class GraphQLMaxResourceLimitExceededErrorSchema(GraphQLErrorObjectSchema):
     exceeded_resource = marshmallow_enum.EnumField(
         ReferenceTypeId,
@@ -3862,6 +4020,27 @@ class GraphQLMaxResourceLimitExceededErrorSchema(GraphQLErrorObjectSchema):
         field = typing.cast(helpers.RegexField, self.fields["_regex"])
         data = field.post_load(data, original_data)
         return models.GraphQLMaxResourceLimitExceededError(**data)
+
+    @marshmallow.post_dump(pass_original=True)
+    def post_dump(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.post_dump(data, original_data)
+
+
+class GraphQLMaxStoreReferencesReachedErrorSchema(GraphQLErrorObjectSchema):
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.pre_load
+    def pre_load(self, data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.pre_load(self, data)
+
+    @marshmallow.post_load(pass_original=True)
+    def post_load(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        data = field.post_load(data, original_data)
+        return models.GraphQLMaxStoreReferencesReachedError(**data)
 
     @marshmallow.post_dump(pass_original=True)
     def post_dump(self, data, original_data, **kwargs):
@@ -4597,6 +4776,35 @@ class GraphQLShippingMethodDoesNotMatchCartErrorSchema(GraphQLErrorObjectSchema)
         field = typing.cast(helpers.RegexField, self.fields["_regex"])
         data = field.post_load(data, original_data)
         return models.GraphQLShippingMethodDoesNotMatchCartError(**data)
+
+    @marshmallow.post_dump(pass_original=True)
+    def post_dump(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.post_dump(data, original_data)
+
+
+class GraphQLStoreCartDiscountsLimitReachedErrorSchema(GraphQLErrorObjectSchema):
+    stores = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".store.StoreKeyReferenceSchema"),
+        allow_none=True,
+        many=True,
+        unknown=marshmallow.EXCLUDE,
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.pre_load
+    def pre_load(self, data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        return field.pre_load(self, data)
+
+    @marshmallow.post_load(pass_original=True)
+    def post_load(self, data, original_data, **kwargs):
+        field = typing.cast(helpers.RegexField, self.fields["_regex"])
+        data = field.post_load(data, original_data)
+        return models.GraphQLStoreCartDiscountsLimitReachedError(**data)
 
     @marshmallow.post_dump(pass_original=True)
     def post_dump(self, data, original_data, **kwargs):

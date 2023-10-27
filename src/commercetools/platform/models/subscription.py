@@ -91,6 +91,9 @@ class ChangeSubscription(_BaseType):
 class ChangeSubscriptionResourceTypeId(enum.Enum):
     """Resource types supported by [ChangeSubscriptions](ctp:api:type:ChangeSubscription):"""
 
+    APPROVAL_FLOW = "approval-flow"
+    APPROVAL_RULE = "approval-rule"
+    ASSOCIATE_ROLE = "associate-role"
     BUSINESS_UNIT = "business-unit"
     CART = "cart"
     CART_DISCOUNT = "cart-discount"
@@ -643,10 +646,15 @@ class MessageSubscription(_BaseType):
 class MessageSubscriptionResourceTypeId(enum.Enum):
     """Resource types supported by [MessageSubscriptions](ctp:api:type:MessageSubscription):"""
 
+    APPROVAL_FLOW = "approval-flow"
+    APPROVAL_RULE = "approval-rule"
     ASSOCIATE_ROLE = "associate-role"
     BUSINESS_UNIT = "business-unit"
     CATEGORY = "category"
     CUSTOMER = "customer"
+    CUSTOMER_EMAIL_TOKEN = "customer-email-token"
+    CUSTOMER_GROUP = "customer-group"
+    CUSTOMER_PASSWORD_TOKEN = "customer-password-token"
     INVENTORY_ENTRY = "inventory-entry"
     ORDER = "order"
     PAYMENT = "payment"

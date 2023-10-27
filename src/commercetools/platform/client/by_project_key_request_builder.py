@@ -468,6 +468,24 @@ class ByProjectKeyRequestBuilder:
             return None
         warnings.warn("Unhandled status code %d" % response.status_code)
 
+    def head(
+        self,
+        *,
+        headers: typing.Dict[str, str] = None,
+        options: typing.Dict[str, typing.Any] = None,
+    ) -> typing.Optional[None]:
+        """Checks if a Project exists for a given `projectKey`. Returns a `200 OK` status if the Project exists or a `404 Not Found` otherwise."""
+        headers = {} if headers is None else headers
+        response = self._client._head(
+            endpoint=f"/{self._project_key}",
+            params={},
+            headers=headers,
+            options=options,
+        )
+        if response.status_code == 200:
+            return None
+        warnings.warn("Unhandled status code %d" % response.status_code)
+
     def post(
         self,
         body: "ProjectUpdate",

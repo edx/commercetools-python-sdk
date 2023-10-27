@@ -958,7 +958,9 @@ class MyQuoteRequestDraftSchema(helpers.BaseSchema):
     cart_version = marshmallow.fields.Integer(
         allow_none=True, load_default=None, data_key="cartVersion"
     )
-    comment = marshmallow.fields.String(allow_none=True, load_default=None)
+    comment = marshmallow.fields.String(
+        allow_none=True, metadata={"omit_empty": True}, load_default=None
+    )
 
     class Meta:
         unknown = marshmallow.EXCLUDE
@@ -1255,6 +1257,12 @@ class ReplicaMyCartDraftSchema(helpers.BaseSchema):
             ),
             "customer-group": helpers.absmod(
                 __name__, ".customer_group.CustomerGroupReferenceSchema"
+            ),
+            "customer-email-token": helpers.absmod(
+                __name__, ".customer.CustomerEmailTokenReferenceSchema"
+            ),
+            "customer-password-token": helpers.absmod(
+                __name__, ".customer.CustomerPasswordTokenReferenceSchema"
             ),
             "customer": helpers.absmod(__name__, ".customer.CustomerReferenceSchema"),
             "discount-code": helpers.absmod(
@@ -2908,6 +2916,9 @@ class MyQuoteRequestCancelActionSchema(MyQuoteRequestUpdateActionSchema):
 
 
 class MyShoppingListAddLineItemActionSchema(MyShoppingListUpdateActionSchema):
+    key = marshmallow.fields.String(
+        allow_none=True, metadata={"omit_empty": True}, load_default=None
+    )
     sku = marshmallow.fields.String(
         allow_none=True, metadata={"omit_empty": True}, load_default=None
     )
@@ -2954,6 +2965,9 @@ class MyShoppingListAddTextLineItemActionSchema(MyShoppingListUpdateActionSchema
         allow_none=True,
         values=marshmallow.fields.String(allow_none=True),
         load_default=None,
+    )
+    key = marshmallow.fields.String(
+        allow_none=True, metadata={"omit_empty": True}, load_default=None
     )
     description = LocalizedStringField(
         allow_none=True,
@@ -3050,7 +3064,16 @@ class MyShoppingListChangeTextLineItemNameActionSchema(
     MyShoppingListUpdateActionSchema
 ):
     text_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="textLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemId",
+    )
+    text_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemKey",
     )
     name = LocalizedStringField(
         allow_none=True,
@@ -3071,7 +3094,16 @@ class MyShoppingListChangeTextLineItemQuantityActionSchema(
     MyShoppingListUpdateActionSchema
 ):
     text_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="textLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemId",
+    )
+    text_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemKey",
     )
     quantity = marshmallow.fields.Integer(allow_none=True, load_default=None)
 
@@ -3105,7 +3137,16 @@ class MyShoppingListChangeTextLineItemsOrderActionSchema(
 
 class MyShoppingListRemoveLineItemActionSchema(MyShoppingListUpdateActionSchema):
     line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="lineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="lineItemId",
+    )
+    line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="lineItemKey",
     )
     quantity = marshmallow.fields.Integer(
         allow_none=True, metadata={"omit_empty": True}, load_default=None
@@ -3122,7 +3163,16 @@ class MyShoppingListRemoveLineItemActionSchema(MyShoppingListUpdateActionSchema)
 
 class MyShoppingListRemoveTextLineItemActionSchema(MyShoppingListUpdateActionSchema):
     text_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="textLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemId",
+    )
+    text_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemKey",
     )
     quantity = marshmallow.fields.Integer(
         allow_none=True, metadata={"omit_empty": True}, load_default=None
@@ -3216,7 +3266,16 @@ class MyShoppingListSetLineItemCustomFieldActionSchema(
     MyShoppingListUpdateActionSchema
 ):
     line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="lineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="lineItemId",
+    )
+    line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="lineItemKey",
     )
     name = marshmallow.fields.String(allow_none=True, load_default=None)
     value = marshmallow.fields.Raw(
@@ -3263,7 +3322,16 @@ class MyShoppingListSetTextLineItemCustomFieldActionSchema(
     MyShoppingListUpdateActionSchema
 ):
     text_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="textLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemId",
+    )
+    text_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemKey",
     )
     name = marshmallow.fields.String(allow_none=True, load_default=None)
     value = marshmallow.fields.Raw(
@@ -3283,7 +3351,16 @@ class MyShoppingListSetTextLineItemCustomTypeActionSchema(
     MyShoppingListUpdateActionSchema
 ):
     text_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="textLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemId",
+    )
+    text_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemKey",
     )
     type = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".type.TypeResourceIdentifierSchema"),
@@ -3312,7 +3389,16 @@ class MyShoppingListSetTextLineItemDescriptionActionSchema(
     MyShoppingListUpdateActionSchema
 ):
     text_line_item_id = marshmallow.fields.String(
-        allow_none=True, load_default=None, data_key="textLineItemId"
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemId",
+    )
+    text_line_item_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="textLineItemKey",
     )
     description = LocalizedStringField(
         allow_none=True,

@@ -220,6 +220,7 @@ class CustomerImportSchema(ImportResourceSchema):
         allow_none=True,
         many=True,
         unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
         load_default=None,
     )
     default_billing_address = marshmallow.fields.Integer(

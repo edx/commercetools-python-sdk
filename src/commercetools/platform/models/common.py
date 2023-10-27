@@ -162,7 +162,7 @@ class Asset(_BaseType):
     tags: typing.Optional[typing.List["str"]]
     #: Custom Fields defined for the Asset.
     custom: typing.Optional["CustomFields"]
-    #: User-defined unique identifier of the Asset.
+    #: User-defined identifier of the Asset. It is unique per [Category](ctp:api:type:Category) or [ProductVariant](ctp:api:type:ProductVariant).
     key: typing.Optional[str]
 
     def __init__(
@@ -234,7 +234,7 @@ class AssetDraft(_BaseType):
     tags: typing.Optional[typing.List["str"]]
     #: Custom Fields defined for the Asset.
     custom: typing.Optional["CustomFieldsDraft"]
-    #: User-defined unique identifier for the Asset.
+    #: User-defined identifier for the Asset. Must be unique per [Category](ctp:api:type:Category) or [ProductVariant](ctp:api:type:ProductVariant).
     key: typing.Optional[str]
 
     def __init__(
@@ -273,7 +273,7 @@ class AssetSource(_BaseType):
 
     #: URI of the AssetSource.
     uri: str
-    #: User-defined unique identifier of the AssetSource.
+    #: User-defined identifier of the AssetSource. Must be unique per [Asset](ctp:api:type:Asset).
     key: typing.Optional[str]
     #: Width and height of the AssetSource.
     dimensions: typing.Optional["AssetDimensions"]
@@ -635,7 +635,7 @@ class BaseResource(_BaseType):
 class ClientLogging(_BaseType):
     """These objects represent information about which [API Client](/../api/projects/api-clients) created or modified a resource. For more information, see [Client Logging](/client-logging)."""
 
-    #: `id` of the [APIClient](ctp:api:type:ApiClient) which created the resource.
+    #: `id` of the [API Client](ctp:api:type:ApiClient) which created the resource.
     client_id: typing.Optional[str]
     #: [External user ID](/../api/client-logging#external-user-ids) provided by `X-External-User-ID` HTTP Header.
     external_user_id: typing.Optional[str]
@@ -643,6 +643,8 @@ class ClientLogging(_BaseType):
     customer: typing.Optional["CustomerReference"]
     #: Indicates that the resource was modified during an [anonymous session](ctp:api:type:AnonymousSession) with the logged ID.
     anonymous_id: typing.Optional[str]
+    #: Indicates the [Customer](ctp:api:type:Customer) who created or modified the resource in the context of a [Business Unit](ctp:api:type:BusinessUnit). Only present when an Associate acts on behalf of a company using the [associate endpoints](/associates-overview#on-the-associate-endpoints).
+    associate: typing.Optional["CustomerReference"]
 
     def __init__(
         self,
@@ -650,12 +652,14 @@ class ClientLogging(_BaseType):
         client_id: typing.Optional[str] = None,
         external_user_id: typing.Optional[str] = None,
         customer: typing.Optional["CustomerReference"] = None,
-        anonymous_id: typing.Optional[str] = None
+        anonymous_id: typing.Optional[str] = None,
+        associate: typing.Optional["CustomerReference"] = None
     ):
         self.client_id = client_id
         self.external_user_id = external_user_id
         self.customer = customer
         self.anonymous_id = anonymous_id
+        self.associate = associate
 
         super().__init__()
 
@@ -680,13 +684,15 @@ class CreatedBy(ClientLogging):
         client_id: typing.Optional[str] = None,
         external_user_id: typing.Optional[str] = None,
         customer: typing.Optional["CustomerReference"] = None,
-        anonymous_id: typing.Optional[str] = None
+        anonymous_id: typing.Optional[str] = None,
+        associate: typing.Optional["CustomerReference"] = None
     ):
         super().__init__(
             client_id=client_id,
             external_user_id=external_user_id,
             customer=customer,
             anonymous_id=anonymous_id,
+            associate=associate,
         )
 
     @classmethod
@@ -894,13 +900,15 @@ class LastModifiedBy(ClientLogging):
         client_id: typing.Optional[str] = None,
         external_user_id: typing.Optional[str] = None,
         customer: typing.Optional["CustomerReference"] = None,
-        anonymous_id: typing.Optional[str] = None
+        anonymous_id: typing.Optional[str] = None,
+        associate: typing.Optional["CustomerReference"] = None
     ):
         super().__init__(
             client_id=client_id,
             external_user_id=external_user_id,
             customer=customer,
             anonymous_id=anonymous_id,
+            associate=associate,
         )
 
     @classmethod
@@ -949,7 +957,7 @@ class Money(_BaseType):
 
 
 class MoneyType(enum.Enum):
-    """MoneyType supports two different values, one for amounts in cent precision and another one for sub-cent amounts up to 20 fraction digits."""
+    """Determines the type of money used."""
 
     CENT_PRECISION = "centPrecision"
     HIGH_PRECISION = "highPrecision"
@@ -1282,6 +1290,14 @@ class Reference(_BaseType):
             from ._schemas.customer_group import CustomerGroupReferenceSchema
 
             return CustomerGroupReferenceSchema().load(data)
+        if data["typeId"] == "customer-email-token":
+            from ._schemas.customer import CustomerEmailTokenReferenceSchema
+
+            return CustomerEmailTokenReferenceSchema().load(data)
+        if data["typeId"] == "customer-password-token":
+            from ._schemas.customer import CustomerPasswordTokenReferenceSchema
+
+            return CustomerPasswordTokenReferenceSchema().load(data)
         if data["typeId"] == "customer":
             from ._schemas.customer import CustomerReferenceSchema
 
@@ -1380,6 +1396,8 @@ class Reference(_BaseType):
 class ReferenceTypeId(enum.Enum):
     """Type of resource the value should reference. Supported resource type identifiers are:"""
 
+    APPROVAL_FLOW = "approval-flow"
+    APPROVAL_RULE = "approval-rule"
     ASSOCIATE_ROLE = "associate-role"
     ATTRIBUTE_GROUP = "attribute-group"
     BUSINESS_UNIT = "business-unit"
@@ -1388,7 +1406,9 @@ class ReferenceTypeId(enum.Enum):
     CATEGORY = "category"
     CHANNEL = "channel"
     CUSTOMER = "customer"
+    CUSTOMER_EMAIL_TOKEN = "customer-email-token"
     CUSTOMER_GROUP = "customer-group"
+    CUSTOMER_PASSWORD_TOKEN = "customer-password-token"
     DIRECT_DISCOUNT = "direct-discount"
     DISCOUNT_CODE = "discount-code"
     EXTENSION = "extension"
@@ -1494,10 +1514,6 @@ class ResourceIdentifier(_BaseType):
             from ._schemas.order_edit import OrderEditResourceIdentifierSchema
 
             return OrderEditResourceIdentifierSchema().load(data)
-        if data["typeId"] == "order":
-            from ._schemas.order import OrderResourceIdentifierSchema
-
-            return OrderResourceIdentifierSchema().load(data)
         if data["typeId"] == "payment":
             from ._schemas.payment import PaymentResourceIdentifierSchema
 
@@ -1648,14 +1664,14 @@ class ScopedPrice(_BaseType):
 
 
 class TypedMoney(Money):
-    """Base polymorphic read-only Money type which is stored in cent precision or high precision. The actual type is determined by the `type` field."""
+    """Base polymorphic read-only money type that stores currency in cent precision or high precision, that is in sub-cents."""
 
-    #: MoneyType supports two different values, one for amounts in cent precision and another one for sub-cent amounts up to 20 fraction digits.
+    #: Type of money used.
     type: "MoneyType"
-    #: Number of digits after the decimal separator:
+    #: Number of digits after the decimal separator.
     #:
-    #: * Equal to the default number of fraction digits for a currency in [CentPrecisionMoney](ctp:api:type:CentPrecisionMoney).
-    #: * Greater than the default number of fraction digits for a currency in [HighPrecisionMoney](ctp:api:type:HighPrecisionMoney).
+    #: * For [CentPrecisionMoney](ctp:api:type:CentPrecisionMoney), it is equal to the default number of fraction digits for a currency.
+    #: * For [HighPrecisionMoney](ctp:api:type:HighPrecisionMoney), it is greater than the default number of fraction digits for a currency.
     fraction_digits: int
 
     def __init__(
@@ -1747,14 +1763,22 @@ class HighPrecisionMoney(TypedMoney):
 
 
 class TypedMoneyDraft(Money):
+    """Base polymorphic money type containing common fields for [Money](ctp:api:type:Money) and [HighPrecisionMoneyDraft](ctp:api:type:HighPrecisionMoneyDraft).
+
+    - To set money in cent precision, use [Money](ctp:api:type:Money).
+    - To set money in high precision, use [HighPrecisionMoneyDraft](ctp:api:type:HighPrecisionMoneyDraft).
+
+    """
+
+    #: Determines the type of money used.
     type: typing.Optional["MoneyType"]
-    #: Must be equal to the default number of fraction digits for the specified currency.
+    #: Number of fraction digits for a specified money.
     fraction_digits: typing.Optional[int]
 
     def __init__(
         self,
         *,
-        cent_amount: int,
+        cent_amount: typing.Optional[int] = None,
         currency_code: str,
         type: typing.Optional["MoneyType"] = None,
         fraction_digits: typing.Optional[int] = None
@@ -1787,7 +1811,7 @@ class CentPrecisionMoneyDraft(TypedMoneyDraft):
     def __init__(
         self,
         *,
-        cent_amount: int,
+        cent_amount: typing.Optional[int] = None,
         currency_code: str,
         fraction_digits: typing.Optional[int] = None
     ):

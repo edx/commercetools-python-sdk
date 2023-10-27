@@ -54,7 +54,7 @@ class ByProjectKeyProductProjectionsSearchRequestBuilder:
         self,
         *,
         fuzzy: bool = None,
-        fuzzy_level: float = None,
+        fuzzy_level: int = None,
         mark_matching_variants: bool = None,
         filter: typing.List["str"] = None,
         filter_facets: typing.List["str"] = None,

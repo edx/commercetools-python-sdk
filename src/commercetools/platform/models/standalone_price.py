@@ -24,6 +24,7 @@ if typing.TYPE_CHECKING:
         PriceTierDraft,
         ReferenceTypeId,
         TypedMoney,
+        TypedMoneyDraft,
     )
     from .customer_group import CustomerGroupReference, CustomerGroupResourceIdentifier
     from .type import (
@@ -34,6 +35,7 @@ if typing.TYPE_CHECKING:
     )
 
 __all__ = [
+    "StagedPriceDraft",
     "StagedStandalonePrice",
     "StandalonePrice",
     "StandalonePriceAddPriceTierAction",
@@ -44,6 +46,7 @@ __all__ = [
     "StandalonePricePagedQueryResponse",
     "StandalonePriceReference",
     "StandalonePriceRemovePriceTierAction",
+    "StandalonePriceRemoveStagedChangesAction",
     "StandalonePriceResourceIdentifier",
     "StandalonePriceSetCustomFieldAction",
     "StandalonePriceSetCustomTypeAction",
@@ -58,8 +61,33 @@ __all__ = [
 ]
 
 
+class StagedPriceDraft(_BaseType):
+    #: Money value for the StagedPriceDraft.
+    value: "TypedMoneyDraft"
+
+    def __init__(self, *, value: "TypedMoneyDraft"):
+        self.value = value
+
+        super().__init__()
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "StagedPriceDraft":
+        from ._schemas.standalone_price import StagedPriceDraftSchema
+
+        return StagedPriceDraftSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.standalone_price import StagedPriceDraftSchema
+
+        return StagedPriceDraftSchema().dump(self)
+
+
 class StagedStandalonePrice(_BaseType):
-    """Staged changes on a Standalone Price. To update the `value` property of a Staged Standalone Price, use the corresponding [update action](ctp:api:type:StandalonePriceChangeValueAction). To apply all staged changes to the Standalone Price, use the [Apply Staged Changes](ctp:api:type:StandalonePriceApplyStagedChangesAction) update action."""
+    """Staged changes on a Standalone Price.
+    To update the `value` property of a Staged Standalone Price, use the [Change Value](ctp:api:type:StandalonePriceChangeValueAction) update action.
+    To apply all staged changes to the Standalone Price, use the [Apply Staged Changes](ctp:api:type:StandalonePriceApplyStagedChangesAction) update action.
+
+    """
 
     #: Money value of the StagedStandalonePrice.
     value: "TypedMoney"
@@ -210,6 +238,8 @@ class StandalonePriceDraft(_BaseType):
     discounted: typing.Optional["DiscountedPriceDraft"]
     #: Custom Fields for the StandalonePrice.
     custom: typing.Optional["CustomFieldsDraft"]
+    #: Staged changes for the StandalonePrice.
+    staged: typing.Optional["StagedPriceDraft"]
     #: Set to `false`, if the StandalonePrice should not be considered during [price selection](ctp:api:type:ProductPriceSelection).
     active: typing.Optional[bool]
 
@@ -227,6 +257,7 @@ class StandalonePriceDraft(_BaseType):
         tiers: typing.Optional[typing.List["PriceTierDraft"]] = None,
         discounted: typing.Optional["DiscountedPriceDraft"] = None,
         custom: typing.Optional["CustomFieldsDraft"] = None,
+        staged: typing.Optional["StagedPriceDraft"] = None,
         active: typing.Optional[bool] = None
     ):
         self.key = key
@@ -240,6 +271,7 @@ class StandalonePriceDraft(_BaseType):
         self.tiers = tiers
         self.discounted = discounted
         self.custom = custom
+        self.staged = staged
         self.active = active
 
         super().__init__()
@@ -418,6 +450,12 @@ class StandalonePriceUpdateAction(_BaseType):
             )
 
             return StandalonePriceRemovePriceTierActionSchema().load(data)
+        if data["action"] == "removeStagedChanges":
+            from ._schemas.standalone_price import (
+                StandalonePriceRemoveStagedChangesActionSchema,
+            )
+
+            return StandalonePriceRemoveStagedChangesActionSchema().load(data)
         if data["action"] == "setCustomField":
             from ._schemas.standalone_price import (
                 StandalonePriceSetCustomFieldActionSchema,
@@ -440,7 +478,7 @@ class StandalonePriceUpdateAction(_BaseType):
             from ._schemas.standalone_price import StandalonePriceSetKeyActionSchema
 
             return StandalonePriceSetKeyActionSchema().load(data)
-        if data["action"] == "setPriceTier":
+        if data["action"] == "setPriceTiers":
             from ._schemas.standalone_price import (
                 StandalonePriceSetPriceTiersActionSchema,
             )
@@ -606,6 +644,33 @@ class StandalonePriceRemovePriceTierAction(StandalonePriceUpdateAction):
         return StandalonePriceRemovePriceTierActionSchema().dump(self)
 
 
+class StandalonePriceRemoveStagedChangesAction(StandalonePriceUpdateAction):
+    """Removes all staged changes from the StandalonePrice.
+    Removing staged changes successfully produces the [StandalonePriceStagedChangesRemoved](ctp:api:type:StandalonePriceStagedChangesRemovedMessage) Message.
+
+    """
+
+    def __init__(self):
+        super().__init__(action="removeStagedChanges")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "StandalonePriceRemoveStagedChangesAction":
+        from ._schemas.standalone_price import (
+            StandalonePriceRemoveStagedChangesActionSchema,
+        )
+
+        return StandalonePriceRemoveStagedChangesActionSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.standalone_price import (
+            StandalonePriceRemoveStagedChangesActionSchema,
+        )
+
+        return StandalonePriceRemoveStagedChangesActionSchema().dump(self)
+
+
 class StandalonePriceSetCustomFieldAction(StandalonePriceUpdateAction):
     #: Name of the [Custom Field](/../api/projects/custom-fields).
     name: str
@@ -730,7 +795,7 @@ class StandalonePriceSetPriceTiersAction(StandalonePriceUpdateAction):
     def __init__(self, *, tiers: typing.List["PriceTierDraft"]):
         self.tiers = tiers
 
-        super().__init__(action="setPriceTier")
+        super().__init__(action="setPriceTiers")
 
     @classmethod
     def deserialize(

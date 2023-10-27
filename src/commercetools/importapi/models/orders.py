@@ -518,7 +518,7 @@ class Parcel(_BaseType):
     measurements: typing.Optional["ParcelMeasurements"]
     tracking_data: typing.Optional["TrackingData"]
     items: typing.Optional[typing.List["DeliveryItem"]]
-    #: The representation to be sent to the server when creating a resource with custom fields.
+    #: The representation to be sent to the server when creating a resource with Custom Fields.
     custom: typing.Optional["Custom"]
 
     def __init__(
@@ -1126,7 +1126,7 @@ class OrderImport(_BaseType):
     """The data representation for an Order to be imported that is persisted as an [Order](/../api/projects/orders#top) in the Project.
 
     In commercetools, you can import an Order using the
-    [Create Order by Import](/../api/projects/orders-import#create-an-order-by-import)
+    [Create Order by Import](/../api/projects/orders-import#create-order-by-import)
     endpoint method instead of creating it from a Cart.
 
     An OrderImport is a snapshot of an order at the time it was imported.

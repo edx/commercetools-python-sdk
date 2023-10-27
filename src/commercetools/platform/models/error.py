@@ -25,6 +25,7 @@ if typing.TYPE_CHECKING:
     from .product import Attribute, ProductReference
     from .product_selection import ProductVariantSelection
     from .standalone_price import StandalonePriceReference
+    from .store import StoreKeyReference
 
 __all__ = [
     "AnonymousIdAlreadyInUseError",
@@ -35,6 +36,7 @@ __all__ = [
     "AuthErrorResponse",
     "BadGatewayError",
     "ConcurrentModificationError",
+    "ContentTooLargeError",
     "CountryNotConfiguredInStoreError",
     "DiscountCodeNonApplicableError",
     "DuplicateAttributeValueError",
@@ -69,6 +71,7 @@ __all__ = [
     "GraphQLAttributeNameDoesNotExistError",
     "GraphQLBadGatewayError",
     "GraphQLConcurrentModificationError",
+    "GraphQLContentTooLargeError",
     "GraphQLCountryNotConfiguredInStoreError",
     "GraphQLDiscountCodeNonApplicableError",
     "GraphQLDuplicateAttributeValueError",
@@ -106,7 +109,9 @@ __all__ = [
     "GraphQLInvalidTokenError",
     "GraphQLLanguageUsedInStoresError",
     "GraphQLMatchingPriceNotFoundError",
+    "GraphQLMaxCartDiscountsReachedError",
     "GraphQLMaxResourceLimitExceededError",
+    "GraphQLMaxStoreReferencesReachedError",
     "GraphQLMissingRoleOnChannelError",
     "GraphQLMissingTaxRateForCountryError",
     "GraphQLMoneyOverflowError",
@@ -134,6 +139,7 @@ __all__ = [
     "GraphQLSearchIndexingInProgressError",
     "GraphQLSemanticErrorError",
     "GraphQLShippingMethodDoesNotMatchCartError",
+    "GraphQLStoreCartDiscountsLimitReachedError",
     "GraphQLSyntaxErrorError",
     "InsufficientScopeError",
     "InternalConstraintViolatedError",
@@ -148,7 +154,9 @@ __all__ = [
     "InvalidTokenError",
     "LanguageUsedInStoresError",
     "MatchingPriceNotFoundError",
+    "MaxCartDiscountsReachedError",
     "MaxResourceLimitExceededError",
+    "MaxStoreReferencesReachedError",
     "MissingRoleOnChannelError",
     "MissingTaxRateForCountryError",
     "MoneyOverflowError",
@@ -176,6 +184,7 @@ __all__ = [
     "SearchIndexingInProgressError",
     "SemanticErrorError",
     "ShippingMethodDoesNotMatchCartError",
+    "StoreCartDiscountsLimitReachedError",
     "SyntaxErrorError",
     "VariantValues",
 ]
@@ -250,6 +259,10 @@ class ErrorObject(_BaseType):
             from ._schemas.error import ConcurrentModificationErrorSchema
 
             return ConcurrentModificationErrorSchema().load(data)
+        if data["code"] == "ContentTooLarge":
+            from ._schemas.error import ContentTooLargeErrorSchema
+
+            return ContentTooLargeErrorSchema().load(data)
         if data["code"] == "CountryNotConfiguredInStore":
             from ._schemas.error import CountryNotConfiguredInStoreErrorSchema
 
@@ -394,10 +407,18 @@ class ErrorObject(_BaseType):
             from ._schemas.error import MatchingPriceNotFoundErrorSchema
 
             return MatchingPriceNotFoundErrorSchema().load(data)
+        if data["code"] == "MaxCartDiscountsReached":
+            from ._schemas.error import MaxCartDiscountsReachedErrorSchema
+
+            return MaxCartDiscountsReachedErrorSchema().load(data)
         if data["code"] == "MaxResourceLimitExceeded":
             from ._schemas.error import MaxResourceLimitExceededErrorSchema
 
             return MaxResourceLimitExceededErrorSchema().load(data)
+        if data["code"] == "MaxStoreReferencesReached":
+            from ._schemas.error import MaxStoreReferencesReachedErrorSchema
+
+            return MaxStoreReferencesReachedErrorSchema().load(data)
         if data["code"] == "MissingRoleOnChannel":
             from ._schemas.error import MissingRoleOnChannelErrorSchema
 
@@ -508,6 +529,10 @@ class ErrorObject(_BaseType):
             from ._schemas.error import ShippingMethodDoesNotMatchCartErrorSchema
 
             return ShippingMethodDoesNotMatchCartErrorSchema().load(data)
+        if data["code"] == "StoreCartDiscountsLimitReached":
+            from ._schemas.error import StoreCartDiscountsLimitReachedErrorSchema
+
+            return StoreCartDiscountsLimitReachedErrorSchema().load(data)
         if data["code"] == "SyntaxError":
             from ._schemas.error import SyntaxErrorErrorSchema
 
@@ -759,6 +784,25 @@ class ConcurrentModificationError(ErrorObject):
         return ConcurrentModificationErrorSchema().dump(self)
 
 
+class ContentTooLargeError(ErrorObject):
+    """Returned when the request results in too much data being returned from the API. Adjust the request query to reduce the size of the data returned."""
+
+    def __init__(self, *, message: str, **kwargs):
+        kwargs.pop("code", None)
+        super().__init__(message=message, code="ContentTooLarge", **kwargs)
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "ContentTooLargeError":
+        from ._schemas.error import ContentTooLargeErrorSchema
+
+        return ContentTooLargeErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.error import ContentTooLargeErrorSchema
+
+        return ContentTooLargeErrorSchema().dump(self)
+
+
 class CountryNotConfiguredInStoreError(ErrorObject):
     """Returned when a [Cart](ctp:api:type:Cart) or an [Order](ctp:api:type:Order) in a [Store](ctp:api:type:Store) references a country that is not included in the countries configured for the Store.
 
@@ -767,7 +811,7 @@ class CountryNotConfiguredInStoreError(ErrorObject):
     - [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/carts:POST) request and [Set Country](ctp:api:type:CartSetCountryAction) update action on Carts.
     - [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/me/carts:POST) request and [Set Country](ctp:api:type:MyCartSetCountryAction) update action on My Carts.
     - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
-    - [Create Order from Cart in a Store](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
     - [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST) requests on Orders.
     - [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
     - [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) request on Order Import.
@@ -1997,6 +2041,34 @@ class MatchingPriceNotFoundError(ErrorObject):
         return MatchingPriceNotFoundErrorSchema().dump(self)
 
 
+class MaxCartDiscountsReachedError(ErrorObject):
+    """Returned when a Cart Discount cannot be created or activated as the [limit](/../api/limits#cart-discounts) for active Cart Discounts has been reached.
+
+    The error is returned as a failed response to:
+
+    - [Create CartDiscount](ctp:api:endpoint:/{projectKey}/cart-discounts:POST) and [Create CartDiscount in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/cart-discounts:POST) requests
+    - [Change IsActive](ctp:api:type:CartDiscountChangeIsActiveAction) update action
+
+    """
+
+    def __init__(self, *, message: str, **kwargs):
+        kwargs.pop("code", None)
+        super().__init__(message=message, code="MaxCartDiscountsReached", **kwargs)
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "MaxCartDiscountsReachedError":
+        from ._schemas.error import MaxCartDiscountsReachedErrorSchema
+
+        return MaxCartDiscountsReachedErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.error import MaxCartDiscountsReachedErrorSchema
+
+        return MaxCartDiscountsReachedErrorSchema().dump(self)
+
+
 class MaxResourceLimitExceededError(ErrorObject):
     """Returned when a resource type cannot be created as it has reached its [limits](/../api/limits).
 
@@ -2024,6 +2096,34 @@ class MaxResourceLimitExceededError(ErrorObject):
         from ._schemas.error import MaxResourceLimitExceededErrorSchema
 
         return MaxResourceLimitExceededErrorSchema().dump(self)
+
+
+class MaxStoreReferencesReachedError(ErrorObject):
+    """Returned when a Store cannot be added to a Cart Discount as the [limit](/../api/limits#cart-discounts-stores) for Stores configured for a Cart Discount has been reached.
+
+    The error is returned as a failed response to:
+
+    - [Create CartDiscount](ctp:api:endpoint:/{projectKey}/cart-discounts:POST) and [Create CartDiscount in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/cart-discounts:POST) requests
+    - [Add Store](ctp:api:type:CartDiscountAddStoreAction) and [Set Store](ctp:api:type:CartDiscountSetStoresAction) update actions
+
+    """
+
+    def __init__(self, *, message: str, **kwargs):
+        kwargs.pop("code", None)
+        super().__init__(message=message, code="MaxStoreReferencesReached", **kwargs)
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "MaxStoreReferencesReachedError":
+        from ._schemas.error import MaxStoreReferencesReachedErrorSchema
+
+        return MaxStoreReferencesReachedErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.error import MaxStoreReferencesReachedErrorSchema
+
+        return MaxStoreReferencesReachedErrorSchema().dump(self)
 
 
 class MissingRoleOnChannelError(ErrorObject):
@@ -2210,7 +2310,7 @@ class OutOfStockError(ErrorObject):
 
     The error is returned as a failed response to:
 
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), and [Create Order by Import](/../api/projects/me-orders) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), and [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) requests on Orders.
     - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
 
     """
@@ -2820,6 +2920,42 @@ class ShippingMethodDoesNotMatchCartError(ErrorObject):
         return ShippingMethodDoesNotMatchCartErrorSchema().dump(self)
 
 
+class StoreCartDiscountsLimitReachedError(ErrorObject):
+    """Returned when a Cart Discount cannot be created or assigned to a Store as the [limit](/../api/limits#cart-discounts) for active Cart Discounts in a Store has been reached for one or more Stores in the request.
+
+    The error is returned as a failed response to:
+
+    - [Create CartDiscount](ctp:api:endpoint:/{projectKey}/cart-discounts:POST) and [Create CartDiscount in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/cart-discounts:POST) requests
+    - [Add Store](ctp:api:type:CartDiscountAddStoreAction) and [Set Store](ctp:api:type:CartDiscountSetStoresAction) update actions
+
+    """
+
+    #: Stores for which the limit for active Cart Discounts that can exist has been reached.
+    stores: typing.List["StoreKeyReference"]
+
+    def __init__(
+        self, *, message: str, stores: typing.List["StoreKeyReference"], **kwargs
+    ):
+        self.stores = stores
+        kwargs.pop("code", None)
+        super().__init__(
+            message=message, code="StoreCartDiscountsLimitReached", **kwargs
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "StoreCartDiscountsLimitReachedError":
+        from ._schemas.error import StoreCartDiscountsLimitReachedErrorSchema
+
+        return StoreCartDiscountsLimitReachedErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.error import StoreCartDiscountsLimitReachedErrorSchema
+
+        return StoreCartDiscountsLimitReachedErrorSchema().dump(self)
+
+
 class SyntaxErrorError(ErrorObject):
     """Returned when a [Discount predicate](/../api/predicates/predicate-operators), [API Extension predicate](/../api/predicates/query#using-predicates-in-conditional-api-extensions), or [search query](/../api/projects/products-search) does not have the correct syntax."""
 
@@ -2918,6 +3054,10 @@ class GraphQLErrorObject(_BaseType):
             from ._schemas.error import GraphQLConcurrentModificationErrorSchema
 
             return GraphQLConcurrentModificationErrorSchema().load(data)
+        if data["code"] == "ContentTooLarge":
+            from ._schemas.error import GraphQLContentTooLargeErrorSchema
+
+            return GraphQLContentTooLargeErrorSchema().load(data)
         if data["code"] == "CountryNotConfiguredInStore":
             from ._schemas.error import GraphQLCountryNotConfiguredInStoreErrorSchema
 
@@ -3066,10 +3206,18 @@ class GraphQLErrorObject(_BaseType):
             from ._schemas.error import GraphQLMatchingPriceNotFoundErrorSchema
 
             return GraphQLMatchingPriceNotFoundErrorSchema().load(data)
+        if data["code"] == "MaxCartDiscountsReached":
+            from ._schemas.error import GraphQLMaxCartDiscountsReachedErrorSchema
+
+            return GraphQLMaxCartDiscountsReachedErrorSchema().load(data)
         if data["code"] == "MaxResourceLimitExceeded":
             from ._schemas.error import GraphQLMaxResourceLimitExceededErrorSchema
 
             return GraphQLMaxResourceLimitExceededErrorSchema().load(data)
+        if data["code"] == "MaxStoreReferencesReached":
+            from ._schemas.error import GraphQLMaxStoreReferencesReachedErrorSchema
+
+            return GraphQLMaxStoreReferencesReachedErrorSchema().load(data)
         if data["code"] == "MissingRoleOnChannel":
             from ._schemas.error import GraphQLMissingRoleOnChannelErrorSchema
 
@@ -3186,6 +3334,10 @@ class GraphQLErrorObject(_BaseType):
             from ._schemas.error import GraphQLShippingMethodDoesNotMatchCartErrorSchema
 
             return GraphQLShippingMethodDoesNotMatchCartErrorSchema().load(data)
+        if data["code"] == "StoreCartDiscountsLimitReached":
+            from ._schemas.error import GraphQLStoreCartDiscountsLimitReachedErrorSchema
+
+            return GraphQLStoreCartDiscountsLimitReachedErrorSchema().load(data)
         if data["code"] == "SyntaxError":
             from ._schemas.error import GraphQLSyntaxErrorErrorSchema
 
@@ -3430,6 +3582,27 @@ class GraphQLConcurrentModificationError(GraphQLErrorObject):
         return GraphQLConcurrentModificationErrorSchema().dump(self)
 
 
+class GraphQLContentTooLargeError(GraphQLErrorObject):
+    """Returned when the request results in too much data being returned from the API. Adjust the request query to reduce the size of the data returned."""
+
+    def __init__(self, **kwargs):
+        kwargs.pop("code", None)
+        super().__init__(code="ContentTooLarge", **kwargs)
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "GraphQLContentTooLargeError":
+        from ._schemas.error import GraphQLContentTooLargeErrorSchema
+
+        return GraphQLContentTooLargeErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.error import GraphQLContentTooLargeErrorSchema
+
+        return GraphQLContentTooLargeErrorSchema().dump(self)
+
+
 class GraphQLCountryNotConfiguredInStoreError(GraphQLErrorObject):
     """Returned when a [Cart](ctp:api:type:Cart) or an [Order](ctp:api:type:Order) in a [Store](ctp:api:type:Store) references a country that is not included in the countries configured for the Store.
 
@@ -3438,7 +3611,7 @@ class GraphQLCountryNotConfiguredInStoreError(GraphQLErrorObject):
     - [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/carts:POST) request and [Set Country](ctp:api:type:CartSetCountryAction) update action on Carts.
     - [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/me/carts:POST) request and [Set Country](ctp:api:type:MyCartSetCountryAction) update action on My Carts.
     - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
-    - [Create Order from Cart in a Store](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
     - [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST) requests on Orders.
     - [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
     - [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) request on Order Import.
@@ -4541,6 +4714,34 @@ class GraphQLMatchingPriceNotFoundError(GraphQLErrorObject):
         return GraphQLMatchingPriceNotFoundErrorSchema().dump(self)
 
 
+class GraphQLMaxCartDiscountsReachedError(GraphQLErrorObject):
+    """Returned when a Cart Discount cannot be created or activated as the [limit](/../api/limits#cart-discounts) for active Cart Discounts has been reached.
+
+    The error is returned as a failed response to:
+
+    - [Create CartDiscount](ctp:api:endpoint:/{projectKey}/cart-discounts:POST) and [Create CartDiscount in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/cart-discounts:POST) requests
+    - [Change IsActive](ctp:api:type:CartDiscountChangeIsActiveAction) update action
+
+    """
+
+    def __init__(self, **kwargs):
+        kwargs.pop("code", None)
+        super().__init__(code="MaxCartDiscountsReached", **kwargs)
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "GraphQLMaxCartDiscountsReachedError":
+        from ._schemas.error import GraphQLMaxCartDiscountsReachedErrorSchema
+
+        return GraphQLMaxCartDiscountsReachedErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.error import GraphQLMaxCartDiscountsReachedErrorSchema
+
+        return GraphQLMaxCartDiscountsReachedErrorSchema().dump(self)
+
+
 class GraphQLMaxResourceLimitExceededError(GraphQLErrorObject):
     """Returned when a resource type cannot be created as it has reached its [limits](/../api/limits).
 
@@ -4568,6 +4769,34 @@ class GraphQLMaxResourceLimitExceededError(GraphQLErrorObject):
         from ._schemas.error import GraphQLMaxResourceLimitExceededErrorSchema
 
         return GraphQLMaxResourceLimitExceededErrorSchema().dump(self)
+
+
+class GraphQLMaxStoreReferencesReachedError(GraphQLErrorObject):
+    """Returned when a Store cannot be added to a Cart Discount as the [limit](/../api/limits#cart-discounts-stores) for Stores configured for a Cart Discount has been reached.
+
+    The error is returned as a failed response to:
+
+    - [Create CartDiscount](ctp:api:endpoint:/{projectKey}/cart-discounts:POST) and [Create CartDiscount in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/cart-discounts:POST) requests
+    - [Add Store](ctp:api:type:CartDiscountAddStoreAction) and [Set Store](ctp:api:type:CartDiscountSetStoresAction) update actions
+
+    """
+
+    def __init__(self, **kwargs):
+        kwargs.pop("code", None)
+        super().__init__(code="MaxStoreReferencesReached", **kwargs)
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "GraphQLMaxStoreReferencesReachedError":
+        from ._schemas.error import GraphQLMaxStoreReferencesReachedErrorSchema
+
+        return GraphQLMaxStoreReferencesReachedErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.error import GraphQLMaxStoreReferencesReachedErrorSchema
+
+        return GraphQLMaxStoreReferencesReachedErrorSchema().dump(self)
 
 
 class GraphQLMissingRoleOnChannelError(GraphQLErrorObject):
@@ -4756,7 +4985,7 @@ class GraphQLOutOfStockError(GraphQLErrorObject):
 
     The error is returned as a failed response to:
 
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), and [Create Order by Import](/../api/projects/me-orders) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), and [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) requests on Orders.
     - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
 
     """
@@ -5358,6 +5587,38 @@ class GraphQLShippingMethodDoesNotMatchCartError(GraphQLErrorObject):
         from ._schemas.error import GraphQLShippingMethodDoesNotMatchCartErrorSchema
 
         return GraphQLShippingMethodDoesNotMatchCartErrorSchema().dump(self)
+
+
+class GraphQLStoreCartDiscountsLimitReachedError(GraphQLErrorObject):
+    """Returned when a Cart Discount cannot be created or assigned to a Store as the [limit](/../api/limits#cart-discounts) for active Cart Discounts in a Store has been reached for one or more Stores in the request.
+
+    The error is returned as a failed response to:
+
+    - [Create CartDiscount](ctp:api:endpoint:/{projectKey}/cart-discounts:POST) and [Create CartDiscount in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/cart-discounts:POST) requests
+    - [Add Store](ctp:api:type:CartDiscountAddStoreAction) and [Set Store](ctp:api:type:CartDiscountSetStoresAction) update actions
+
+    """
+
+    #: Stores for which the limit for active Cart Discounts that can exist has been reached.
+    stores: typing.List["StoreKeyReference"]
+
+    def __init__(self, *, stores: typing.List["StoreKeyReference"], **kwargs):
+        self.stores = stores
+        kwargs.pop("code", None)
+        super().__init__(code="StoreCartDiscountsLimitReached", **kwargs)
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "GraphQLStoreCartDiscountsLimitReachedError":
+        from ._schemas.error import GraphQLStoreCartDiscountsLimitReachedErrorSchema
+
+        return GraphQLStoreCartDiscountsLimitReachedErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.error import GraphQLStoreCartDiscountsLimitReachedErrorSchema
+
+        return GraphQLStoreCartDiscountsLimitReachedErrorSchema().dump(self)
 
 
 class GraphQLSyntaxErrorError(GraphQLErrorObject):

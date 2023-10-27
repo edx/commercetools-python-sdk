@@ -381,7 +381,6 @@ class QuoteState(enum.Enum):
     DECLINED_FOR_RENEGOTIATION = "DeclinedForRenegotiation"
     RENEGOTIATION_ADDRESSED = "RenegotiationAddressed"
     ACCEPTED = "Accepted"
-    FAILED = "Failed"
     WITHDRAWN = "Withdrawn"
 
 
@@ -504,7 +503,7 @@ class QuoteChangeQuoteStateAction(QuoteUpdateAction):
 
 
 class QuoteRequestQuoteRenegotiationAction(QuoteUpdateAction):
-    """Represents the Buyer requesting renegotiation for a Quote. Valid for Quotes in a `Pending` or `Failed` [state](ctp:api:type:QuoteState)."""
+    """Represents the Buyer requesting renegotiation for a Quote. Valid for Quotes in a `Pending` [state](ctp:api:type:QuoteState)."""
 
     #: Message from the [Buyer](/api/quotes-overview#buyer) regarding the Quote renegotiation request.
     buyer_comment: typing.Optional[str]
