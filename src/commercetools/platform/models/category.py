@@ -301,7 +301,7 @@ class CategoryReference(Reference):
 
 
 class CategoryResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [Category](ctp:api:type:Category)."""
+    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [Category](ctp:api:type:Category). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None

@@ -239,7 +239,7 @@ class Cart(BaseResource):
     cart_state: "CartState"
     #: Billing address associated with the Cart.
     billing_address: typing.Optional["Address"]
-    #: Shipping address associated with the Cart. Determines eligible [ShippingMethod](ctp:api:type:ShippingMethod) rates and Tax Rates of Line Items.
+    #: Shipping address for a Cart with `Single` [ShippingMode](ctp:api:type:ShippingMode). Determines eligible [ShippingMethod](ctp:api:type:ShippingMethod) rates and Tax Rates of Line Items.
     shipping_address: typing.Optional["Address"]
     #: Indicates whether the Cart has one or multiple Shipping Methods.
     shipping_mode: "ShippingMode"
@@ -260,7 +260,7 @@ class Cart(BaseResource):
     shipping: typing.List["Shipping"]
     #: Additional shipping addresses of the Cart as specified by [LineItems](ctp:api:type:LineItem) using the `shippingDetails` field.
     #:
-    #: Eligible Shipping Methods or applicable Tax Rates are determined by the address in `shippingAddress`, and not `itemShippingAddresses`.
+    #: For Carts with `Single` [ShippingMode](ctp:api:type:ShippingMode): eligible Shipping Methods or applicable Tax Rates are determined by the address in `shippingAddress`, and not `itemShippingAddresses`.
     item_shipping_addresses: typing.List["Address"]
     #: Discount Codes applied to the Cart. A Cart that has `directDiscounts` cannot have `discountCodes`.
     discount_codes: typing.List["DiscountCodeInfo"]
@@ -427,7 +427,7 @@ class CartDraft(_BaseType):
     inventory_mode: typing.Optional["InventoryMode"]
     #: Billing address associated with the Cart.
     billing_address: typing.Optional["BaseAddress"]
-    #: Shipping address associated with the Cart. Determines eligible [ShippingMethod](ctp:api:type:ShippingMethod) rates and Tax Rates of Line Items.
+    #: Shipping address for a Cart with `Single` [ShippingMode](ctp:api:type:ShippingMode). Determines eligible [ShippingMethod](ctp:api:type:ShippingMethod) rates and Tax Rates of Line Items.
     shipping_address: typing.Optional["BaseAddress"]
     #: Shipping Method for a Cart with `Single` [ShippingMode](ctp:api:type:ShippingMode). If the referenced [ShippingMethod](ctp:api:type:ShippingMethod) has a `predicate` that does not match the Cart, an [InvalidOperation](ctp:api:type:InvalidOperationError) error is returned when [creating a Cart](ctp:api:endpoint:/{projectKey}/carts:POST).
     shipping_method: typing.Optional["ShippingMethodResourceIdentifier"]
@@ -448,7 +448,7 @@ class CartDraft(_BaseType):
     #: Multiple shipping addresses of the Cart. Each address must contain a `key` that is unique in this Cart.
     #: The keys are used by [LineItems](ctp:api:type:LineItem) to reference these addresses under their `shippingDetails`.
     #:
-    #: Eligible Shipping Methods or applicable Tax Rates are determined by the address `shippingAddress`, and not `itemShippingAddresses`.
+    #: For Carts with `Single` [ShippingMode](ctp:api:type:ShippingMode): eligible Shipping Methods or applicable Tax Rates are determined by the address `shippingAddress`, and not `itemShippingAddresses`.
     item_shipping_addresses: typing.Optional[typing.List["BaseAddress"]]
     #: `code` of the existing [DiscountCodes](ctp:api:type:DiscountCode) to add to the Cart.
     discount_codes: typing.Optional[typing.List["str"]]
@@ -629,7 +629,7 @@ class CartReference(Reference):
 
 
 class CartResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [Cart](ctp:api:type:Cart)."""
+    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [Cart](ctp:api:type:Cart). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None

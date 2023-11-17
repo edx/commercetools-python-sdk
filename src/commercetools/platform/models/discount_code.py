@@ -293,7 +293,7 @@ class DiscountCodeReference(Reference):
 
 
 class DiscountCodeResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [DiscountCode](ctp:api:type:DiscountCode)."""
+    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [DiscountCode](ctp:api:type:DiscountCode). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None

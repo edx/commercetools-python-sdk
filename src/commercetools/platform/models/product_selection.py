@@ -489,7 +489,7 @@ class ProductSelectionReference(Reference):
 
 
 class ProductSelectionResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [ProductSelection](ctp:api:type:ProductSelection)."""
+    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [ProductSelection](ctp:api:type:ProductSelection). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None

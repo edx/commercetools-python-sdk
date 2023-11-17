@@ -90,7 +90,7 @@ __all__ = [
 class Associate(_BaseType):
     #: Roles assigned to the Associate within a Business Unit.
     associate_role_assignments: typing.List["AssociateRoleAssignment"]
-    #: Deprecated type. Use `associateRoleAssignment` instead.
+    #: Deprecated type. Use `associateRoleAssignments` instead.
     roles: typing.Optional[typing.List["AssociateRoleDeprecated"]]
     #: The [Customer](ctp:api:type:Customer) that acts as an Associate in the Business Unit.
     customer: "CustomerReference"
@@ -123,7 +123,7 @@ class Associate(_BaseType):
 class AssociateDraft(_BaseType):
     #: Roles assigned to the Associate within a Business Unit.
     associate_role_assignments: typing.List["AssociateRoleAssignmentDraft"]
-    #: Deprecated type. Use `associateRoleAssignment` instead.
+    #: Deprecated type. Use `associateRoleAssignments` instead.
     roles: typing.Optional[typing.List["AssociateRoleDeprecated"]]
     #: The [Customer](ctp:api:type:Customer) to be part of the Business Unit.
     customer: "CustomerResourceIdentifier"
@@ -547,7 +547,7 @@ class BusinessUnitReference(Reference):
 
 
 class BusinessUnitResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](/../api/types#resourceidentifier) to a [BusinessUnit](ctp:api:type:BusinessUnit)."""
+    """[ResourceIdentifier](/../api/types#resourceidentifier) to a [BusinessUnit](ctp:api:type:BusinessUnit). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None

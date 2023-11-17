@@ -367,7 +367,7 @@ class PaymentReference(Reference):
 
 
 class PaymentResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) of a [Payment](ctp:api:type:Payment)."""
+    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) of a [Payment](ctp:api:type:Payment). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None

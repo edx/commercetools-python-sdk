@@ -187,7 +187,7 @@ class InventoryEntryReference(Reference):
 
 
 class InventoryEntryResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to an [InventoryEntry](ctp:api:type:InventoryEntry)."""
+    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to an [InventoryEntry](ctp:api:type:InventoryEntry). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None

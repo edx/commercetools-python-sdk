@@ -7,7 +7,12 @@
 import typing
 import warnings
 
-from ...models.cart_discount import CartDiscount, CartDiscountDraft
+from ...models.cart_discount import (
+    CartDiscount,
+    CartDiscountDraft,
+    CartDiscountPagedQueryResponse,
+)
+from ...models.error import ErrorResponse
 from .by_project_key_in_store_key_by_store_key_cart_discounts_by_id_request_builder import (
     ByProjectKeyInStoreKeyByStoreKeyCartDiscountsByIDRequestBuilder,
 )
@@ -57,18 +62,41 @@ class ByProjectKeyInStoreKeyByStoreKeyCartDiscountsRequestBuilder:
     def get(
         self,
         *,
+        expand: typing.List["str"] = None,
+        sort: typing.List["str"] = None,
+        limit: int = None,
+        offset: int = None,
+        with_total: bool = None,
+        where: typing.List["str"] = None,
+        predicate_var: typing.Dict[str, typing.List["str"]] = None,
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
-    ) -> "CartDiscount":
+    ) -> typing.Optional["CartDiscountPagedQueryResponse"]:
+        params = {
+            "expand": expand,
+            "sort": sort,
+            "limit": limit,
+            "offset": offset,
+            "withTotal": with_total,
+            "where": where,
+        }
+        predicate_var and params.update(
+            {f"var.{k}": v for k, v in predicate_var.items()}
+        )
         headers = {} if headers is None else headers
         response = self._client._get(
             endpoint=f"/{self._project_key}/in-store/key={self._store_key}/cart-discounts",
-            params={},
+            params=params,
             headers=headers,
             options=options,
         )
         if response.status_code == 200:
-            return CartDiscount.deserialize(response.json())
+            return CartDiscountPagedQueryResponse.deserialize(response.json())
+        elif response.status_code in (400, 401, 403, 500, 502, 503):
+            obj = ErrorResponse.deserialize(response.json())
+            raise self._client._create_exception(obj, response)
+        elif response.status_code == 404:
+            return None
         warnings.warn("Unhandled status code %d" % response.status_code)
 
     def head(
@@ -77,7 +105,7 @@ class ByProjectKeyInStoreKeyByStoreKeyCartDiscountsRequestBuilder:
         where: typing.List["str"] = None,
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
-    ) -> None:
+    ) -> typing.Optional[None]:
         """Checks if a CartDiscount exists for a given Query Predicate. Returns a `200 OK` status if any CartDiscounts match the Query Predicate or a `404 Not Found` otherwise."""
         headers = {} if headers is None else headers
         response = self._client._head(
@@ -86,24 +114,37 @@ class ByProjectKeyInStoreKeyByStoreKeyCartDiscountsRequestBuilder:
             headers=headers,
             options=options,
         )
+        if response.status_code == 200:
+            return None
+        elif response.status_code == 404:
+            return None
+        elif response.status_code in (400, 401, 403, 500, 502, 503):
+            obj = ErrorResponse.deserialize(response.json())
+            raise self._client._create_exception(obj, response)
         warnings.warn("Unhandled status code %d" % response.status_code)
 
     def post(
         self,
         body: "CartDiscountDraft",
         *,
+        expand: typing.List["str"] = None,
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
-    ) -> "CartDiscount":
+    ) -> typing.Optional["CartDiscount"]:
         """When using the endpoint, the Store specified in the path and the Stores specified in the payload's `stores` field are added to the CartDiscount."""
         headers = {} if headers is None else headers
         response = self._client._post(
             endpoint=f"/{self._project_key}/in-store/key={self._store_key}/cart-discounts",
-            params={},
+            params={"expand": expand},
             json=body.serialize(),
             headers={"Content-Type": "application/json", **headers},
             options=options,
         )
         if response.status_code in (201, 200):
             return CartDiscount.deserialize(response.json())
+        elif response.status_code in (400, 401, 403, 500, 502, 503):
+            obj = ErrorResponse.deserialize(response.json())
+            raise self._client._create_exception(obj, response)
+        elif response.status_code == 404:
+            return None
         warnings.warn("Unhandled status code %d" % response.status_code)

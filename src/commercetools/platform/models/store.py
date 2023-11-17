@@ -352,7 +352,7 @@ class StoreReference(Reference):
 
 
 class StoreResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](/../api/types#resourceidentifier) to a [Store](ctp:api:type:Store)."""
+    """[ResourceIdentifier](/../api/types#resourceidentifier) to a [Store](ctp:api:type:Store). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None

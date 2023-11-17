@@ -431,7 +431,7 @@ class OrderEditReference(Reference):
 
 
 class OrderEditResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to an [OrderEdit](ctp:api:type:OrderEdit). Either `id` or `key` is required."""
+    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to an [OrderEdit](ctp:api:type:OrderEdit). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None

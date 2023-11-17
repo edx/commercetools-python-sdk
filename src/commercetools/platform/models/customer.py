@@ -642,7 +642,7 @@ class CustomerResetPassword(_BaseType):
 
 
 class CustomerResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [Customer](ctp:api:type:Customer). Either `id` or `key` is required."""
+    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [Customer](ctp:api:type:Customer). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
@@ -1226,7 +1226,7 @@ class CustomerChangeAddressAction(CustomerUpdateAction):
 
 
 class CustomerChangeEmailAction(CustomerUpdateAction):
-    """Changing the email of the Customer produces the [CustomerEmailChanged](ctp:api:type:CustomerEmailChangedMessage) Message."""
+    """Changes the `email` of the Customer and sets the `isEmailVerified` property to `false`. This update action generates a [CustomerEmailChanged](ctp:api:type:CustomerEmailChangedMessage) Message."""
 
     #: Value to set.
     email: str

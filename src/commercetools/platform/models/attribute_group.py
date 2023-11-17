@@ -200,7 +200,7 @@ class AttributeGroupReference(Reference):
 
 
 class AttributeGroupResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](/../api/types#resourceidentifier) to an [AttributeGroup](ctp:api:type:AttributeGroup)."""
+    """[ResourceIdentifier](/../api/types#resourceidentifier) to an [AttributeGroup](ctp:api:type:AttributeGroup). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
