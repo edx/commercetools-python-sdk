@@ -41,6 +41,7 @@ class CartDiscountsModel(BaseModel):
             references=[],
             stacking_mode=draft.stacking_mode or models.StackingMode.STACKING,
             sort_order=draft.sort_order,
+            stores=draft.stores,
             valid_from=draft.valid_from,
             valid_until=draft.valid_until,
             requires_discount_code=draft.requires_discount_code,
