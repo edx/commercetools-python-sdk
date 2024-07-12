@@ -29,14 +29,19 @@ __all__ = [
     "CartScoreType",
     "CartValueType",
     "CartsConfiguration",
+    "CustomerIndexingStatus",
+    "CustomerSearchStatus",
     "ExternalOAuth",
     "OrderSearchStatus",
+    "ProductSearchIndexingMode",
+    "ProductSearchStatus",
     "Project",
     "ProjectChangeBusinessUnitStatusOnCreationAction",
     "ProjectChangeCartsConfigurationAction",
     "ProjectChangeCountriesAction",
     "ProjectChangeCountryTaxRateFallbackEnabledAction",
     "ProjectChangeCurrenciesAction",
+    "ProjectChangeCustomerSearchStatusAction",
     "ProjectChangeLanguagesAction",
     "ProjectChangeMessagesConfigurationAction",
     "ProjectChangeMessagesEnabledAction",
@@ -55,6 +60,15 @@ __all__ = [
     "ShippingRateInputType",
     "ShoppingListsConfiguration",
 ]
+
+
+class CustomerIndexingStatus(enum.Enum):
+    """The current indexing status of Customer Search."""
+
+    SCHEDULED = "Scheduled"
+    INDEXING = "Indexing"
+    READY = "Ready"
+    FAILED = "Failed"
 
 
 class BusinessUnitConfiguration(_BaseType):
@@ -133,6 +147,16 @@ class CartsConfiguration(_BaseType):
         return CartsConfigurationSchema().dump(self)
 
 
+class CustomerSearchStatus(enum.Enum):
+    """Specifies the status of the [Customer Search](/../api/projects/customer-search) index.
+    You can change the status using the [Change Customer Search Status](ctp:api:type:ProjectChangeCustomerSearchStatusAction) update action.
+
+    """
+
+    ACTIVATED = "Activated"
+    DEACTIVATED = "Deactivated"
+
+
 class ExternalOAuth(_BaseType):
     """Represents a RFC 7662 compliant [OAuth 2.0 Token Introspection](https://datatracker.ietf.org/doc/html/rfc7662) endpoint. For more information, see [Requesting an access token using an external OAuth 2.0 server](/../api/authorization#requesting-an-access-token-using-an-external-oauth-server).
 
@@ -165,6 +189,18 @@ class ExternalOAuth(_BaseType):
 
 class OrderSearchStatus(enum.Enum):
     """Specifies the status of the [Order Search](/../api/projects/order-search) index."""
+
+    ACTIVATED = "Activated"
+    DEACTIVATED = "Deactivated"
+
+
+class ProductSearchIndexingMode(enum.Enum):
+    PRODUCT_PROJECTIONS_SEARCH = "ProductProjectionsSearch"
+    PRODUCTS_SEARCH = "ProductsSearch"
+
+
+class ProductSearchStatus(enum.Enum):
+    """Specifies the status of the [Product Search](/../api/projects/product-search) index."""
 
     ACTIVATED = "Activated"
     DEACTIVATED = "Deactivated"
@@ -252,7 +288,8 @@ class Project(_BaseType):
 
 
 class ProjectUpdate(_BaseType):
-    #: Expected version of the Project on which the changes should be applied. If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error is returned.
+    #: Expected version of the Project on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the Project.
     actions: typing.List["ProjectUpdateAction"]
@@ -309,6 +346,10 @@ class ProjectUpdateAction(_BaseType):
             from ._schemas.project import ProjectChangeCurrenciesActionSchema
 
             return ProjectChangeCurrenciesActionSchema().load(data)
+        if data["action"] == "changeCustomerSearchStatus":
+            from ._schemas.project import ProjectChangeCustomerSearchStatusActionSchema
+
+            return ProjectChangeCustomerSearchStatusActionSchema().load(data)
         if data["action"] == "changeLanguages":
             from ._schemas.project import ProjectChangeLanguagesActionSchema
 
@@ -369,6 +410,8 @@ class SearchIndexingConfiguration(_BaseType):
 
     #: Configuration for the [Product Projection Search](/../api/projects/products-search) and [Product Suggestions](/../api/projects/products-suggestions) endpoints.
     products: typing.Optional["SearchIndexingConfigurationValues"]
+    #: Configuration for the [Product Search](/../api/projects/product-search) feature.
+    products_search: typing.Optional["SearchIndexingConfigurationValues"]
     #: Configuration for the [Order Search](/../api/projects/order-search) feature.
     orders: typing.Optional["SearchIndexingConfigurationValues"]
 
@@ -376,9 +419,11 @@ class SearchIndexingConfiguration(_BaseType):
         self,
         *,
         products: typing.Optional["SearchIndexingConfigurationValues"] = None,
+        products_search: typing.Optional["SearchIndexingConfigurationValues"] = None,
         orders: typing.Optional["SearchIndexingConfigurationValues"] = None
     ):
         self.products = products
+        self.products_search = products_search
         self.orders = orders
 
         super().__init__()
@@ -410,7 +455,7 @@ class SearchIndexingConfigurationValues(_BaseType):
     status: typing.Optional["SearchIndexingConfigurationStatus"]
     #: Date and time (UTC) the Project was last updated. Only present on Projects last modified after 1 February 2019.
     last_modified_at: typing.Optional[datetime.datetime]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the SearchIndexingConfigurationValues.
     last_modified_by: typing.Optional["LastModifiedBy"]
 
     def __init__(
@@ -470,7 +515,7 @@ class ShippingRateInputType(_BaseType):
 
 
 class CartClassificationType(ShippingRateInputType):
-    """Used when the ShippingRate maps to an abstract Cart categorization expressed by strings (for example, `Light`, `Medium`, or `Heavy`).
+    """The [ShippingRate](ctp:api:type:ShippingRate) maps to an abstract Cart categorization expressed by strings (for example, `Light`, `Medium`, or `Heavy`).
     Only keys defined in the `values` array can be used to create a tier or to set a value of the `shippingRateInput` on the [Cart](ctp:api:type:Cart).
     Keys must be unique.
 
@@ -499,9 +544,10 @@ class CartClassificationType(ShippingRateInputType):
 
 
 class CartScoreType(ShippingRateInputType):
-    """Used when the ShippingRate maps to an abstract Cart categorization expressed by integers (such as shipping scores or weight ranges)."""
+    """The [ShippingRate](ctp:api:type:ShippingRate) maps to an abstract [Cart](ctp:api:type:Cart) categorization expressed by integers (such as shipping scores or weight ranges)."""
 
     def __init__(self):
+
         super().__init__(type=ShippingRateTierType.CART_SCORE)
 
     @classmethod
@@ -517,13 +563,14 @@ class CartScoreType(ShippingRateInputType):
 
 
 class CartValueType(ShippingRateInputType):
-    """Used when the ShippingRate maps to the sum of [LineItem](ctp:api:type:LineItem) Prices.
-    The value of the Cart is used to select a tier.
+    """The [ShippingRate](ctp:api:type:ShippingRate) maps to the value of the Cart and is used to select a tier.
+    The value of the [Cart](ctp:api:type:Cart) is the sum of all Line Item totals and Custom Line Item totals (via the `totalPrice` field) after any Product Discounts and Cart Discounts have been applied.
     If chosen, it is not possible to set a value for the `shippingRateInput` on the [Cart](ctp:api:type:Cart).
 
     """
 
     def __init__(self):
+
         super().__init__(type=ShippingRateTierType.CART_VALUE)
 
     @classmethod
@@ -687,6 +734,29 @@ class ProjectChangeCurrenciesAction(ProjectUpdateAction):
         return ProjectChangeCurrenciesActionSchema().dump(self)
 
 
+class ProjectChangeCustomerSearchStatusAction(ProjectUpdateAction):
+    #: Activates or deactivates the [Customer Search](/../api/projects/customer-search) feature. Activation will trigger building a search index for the Customers in the Project.
+    status: "CustomerSearchStatus"
+
+    def __init__(self, *, status: "CustomerSearchStatus"):
+        self.status = status
+
+        super().__init__(action="changeCustomerSearchStatus")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ProjectChangeCustomerSearchStatusAction":
+        from ._schemas.project import ProjectChangeCustomerSearchStatusActionSchema
+
+        return ProjectChangeCustomerSearchStatusActionSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.project import ProjectChangeCustomerSearchStatusActionSchema
+
+        return ProjectChangeCustomerSearchStatusActionSchema().dump(self)
+
+
 class ProjectChangeLanguagesAction(ProjectUpdateAction):
     """Removing a language used by a [Store](ctp:api:type:Store) returns a [LanguageUsedInStores](ctp:api:type:LanguageUsedInStoresError) error."""
 
@@ -807,9 +877,17 @@ class ProjectChangeProductSearchIndexingEnabledAction(ProjectUpdateAction):
     #: - If `false`, the indexing of [Product](ctp:api:type:Product) information will stop and the [Product Projection Search](/../api/projects/products-search) as well as the [Product Suggestions](/../api/projects/products-suggestions) endpoint will not be available anymore for this Project. The Project's [SearchIndexingConfiguration](ctp:api:type:SearchIndexingConfiguration) `status` for `products` will be changed to `"Deactivated"`.
     #: - If `true`, the indexing of [Product](ctp:api:type:Product) information will start and the [Product Projection Search](/../api/projects/products-search) as well as the [Product Suggestions](/../api/projects/products-suggestions) endpoint will become available soon after for this Project. Proportional to the amount of information being indexed, the Project's [SearchIndexingConfiguration](ctp:api:type:SearchIndexingConfiguration) `status` for `products` will be shown as `"Indexing"` during this time. As soon as the indexing has finished, the configuration status will be changed to `"Activated"` making the aforementioned endpoints fully available for this Project.
     enabled: bool
+    #: Controls whether the action should apply to [Product Projection Search](/../api/projects/products-search) or to [Product Search](/../api/projects/product-search).
+    mode: typing.Optional["ProductSearchIndexingMode"]
 
-    def __init__(self, *, enabled: bool):
+    def __init__(
+        self,
+        *,
+        enabled: bool,
+        mode: typing.Optional["ProductSearchIndexingMode"] = None
+    ):
         self.enabled = enabled
+        self.mode = mode
 
         super().__init__(action="changeProductSearchIndexingEnabled")
 

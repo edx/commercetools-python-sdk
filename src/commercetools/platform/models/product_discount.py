@@ -55,9 +55,9 @@ __all__ = [
 
 
 class ProductDiscount(BaseResource):
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the ProductDiscount.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the ProductDiscount.
     created_by: typing.Optional["CreatedBy"]
     #: Name of the ProductDiscount.
     name: "LocalizedString"
@@ -310,6 +310,7 @@ class ProductDiscountResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.PRODUCT_DISCOUNT)
 
     @classmethod
@@ -327,7 +328,8 @@ class ProductDiscountResourceIdentifier(ResourceIdentifier):
 
 
 class ProductDiscountUpdate(_BaseType):
-    #: Expected version of the ProductDiscount on which the changes should be applied. If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error is returned.
+    #: Expected version of the ProductDiscount on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the ProductDiscount.
     actions: typing.List["ProductDiscountUpdateAction"]
@@ -553,6 +555,7 @@ class ProductDiscountValueExternal(ProductDiscountValue):
     """
 
     def __init__(self):
+
         super().__init__(type="external")
 
     @classmethod
@@ -576,6 +579,7 @@ class ProductDiscountValueExternalDraft(ProductDiscountValueDraft):
     """
 
     def __init__(self):
+
         super().__init__(type="external")
 
     @classmethod

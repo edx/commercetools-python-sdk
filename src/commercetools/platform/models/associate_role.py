@@ -48,11 +48,11 @@ __all__ = [
 
 
 class AssociateRole(BaseResource):
-    #: Present on resources updated after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the AssociateRole.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the AssociateRole.
     created_by: typing.Optional["CreatedBy"]
-    #: User-defined unique identifier of the AssociateRole.
+    #: User-defined unique and immutable identifier of the AssociateRole.
     key: str
     #: Whether the AssociateRole can be assigned to an Associate by a [buyer](/../api/associates-overview#buyer). If false, the AssociateRole can only be assigned using the [general endpoint](/../api/associates-overview#through-the-general-endpoints).
     buyer_assignable: bool
@@ -106,7 +106,7 @@ class AssociateRole(BaseResource):
 
 
 class AssociateRoleDraft(_BaseType):
-    #: User-defined unique identifier for the AssociateRole.
+    #: User-defined unique and immutable identifier for the AssociateRole.
     key: str
     #: Name of the AssociateRole.
     name: typing.Optional[str]
@@ -147,9 +147,10 @@ class AssociateRoleDraft(_BaseType):
 
 
 class AssociateRoleKeyReference(KeyReference):
-    """[Reference](ctp:api:type:TypeReference) to an [AssociateRole](ctp:api:type:AssociateRole) by its key."""
+    """[KeyReference](ctp:api:type:KeyReference) to an [AssociateRole](ctp:api:type:AssociateRole)."""
 
     def __init__(self, *, key: str):
+
         super().__init__(key=key, type_id=ReferenceTypeId.ASSOCIATE_ROLE)
 
     @classmethod
@@ -216,7 +217,7 @@ class AssociateRolePagedQueryResponse(_BaseType):
 
 
 class AssociateRoleReference(Reference):
-    """[Reference](ctp:api:type:TypeReference) to an [AssociateRole](ctp:api:type:AssociateRole)."""
+    """[Reference](ctp:api:type:Reference) to an [AssociateRole](ctp:api:type:AssociateRole)."""
 
     #: Contains the representation of the expanded AssociateRole. Only present in responses to requests with [Reference Expansion](/../api/general-concepts#reference-expansion) for AssociateRole.
     obj: typing.Optional["AssociateRole"]
@@ -246,6 +247,7 @@ class AssociateRoleResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.ASSOCIATE_ROLE)
 
     @classmethod
@@ -264,7 +266,7 @@ class AssociateRoleResourceIdentifier(ResourceIdentifier):
 
 class AssociateRoleUpdate(_BaseType):
     #: Expected version of the AssociateRole on which the changes should be applied.
-    #: If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the AssociateRole.
     actions: typing.List["AssociateRoleUpdateAction"]

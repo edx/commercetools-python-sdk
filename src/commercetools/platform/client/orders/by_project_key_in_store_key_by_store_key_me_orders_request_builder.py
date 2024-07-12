@@ -19,6 +19,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyInStoreKeyByStoreKeyMeOrdersRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _store_key: str
@@ -121,11 +122,15 @@ class ByProjectKeyInStoreKeyByStoreKeyMeOrdersRequestBuilder:
 
         Specific Error Codes:
 
+        - [AssociateMissingPermission](ctp:api:type:AssociateMissingPermissionError)
+        - [CountryNotConfiguredInStore](ctp:api:type:CountryNotConfiguredInStoreError)
+        - [DiscountCodeNonApplicable](ctp:api:type:DiscountCodeNonApplicableError)
+        - [InvalidItemShippingDetails](ctp:api:type:InvalidItemShippingDetailsError)
+        - [MatchingPriceNotFound](ctp:api:type:MatchingPriceNotFoundError)
+        - [MissingTaxRateForCountry](ctp:api:type:MissingTaxRateForCountryError)
         - [OutOfStock](ctp:api:type:OutOfStockError)
         - [PriceChanged](ctp:api:type:PriceChangedError)
-        - [DiscountCodeNonApplicable](ctp:api:type:DiscountCodeNonApplicableError)
-        - [CountryNotConfiguredInStore](ctp:api:type:CountryNotConfiguredInStoreError)
-        - [AssociateMissingPermission](ctp:api:type:AssociateMissingPermissionError)
+        - [ShippingMethodDoesNotMatchCart](ctp:api:type:ShippingMethodDoesNotMatchCartError)
 
         """
         headers = {} if headers is None else headers

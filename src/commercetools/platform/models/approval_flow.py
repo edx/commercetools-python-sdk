@@ -17,6 +17,7 @@ if typing.TYPE_CHECKING:
     from .business_unit import Associate, BusinessUnitKeyReference
     from .common import CreatedBy, LastModifiedBy
     from .order import OrderReference
+    from .type import CustomFields, FieldContainer, TypeResourceIdentifier
 
 __all__ = [
     "ApprovalFlow",
@@ -25,6 +26,8 @@ __all__ = [
     "ApprovalFlowPagedQueryResponse",
     "ApprovalFlowRejectAction",
     "ApprovalFlowRejection",
+    "ApprovalFlowSetCustomFieldAction",
+    "ApprovalFlowSetCustomTypeAction",
     "ApprovalFlowStatus",
     "ApprovalFlowUpdate",
     "ApprovalFlowUpdateAction",
@@ -32,9 +35,9 @@ __all__ = [
 
 
 class ApprovalFlow(BaseResource):
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that created the ApprovalFlow.
     created_by: typing.Optional["CreatedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that last modified the ApprovalFlow.
     last_modified_by: typing.Optional["LastModifiedBy"]
     #: [Order](ctp:api:type:Order) that needs to be approved.
     order: "OrderReference"
@@ -55,6 +58,8 @@ class ApprovalFlow(BaseResource):
     pending_approvers: typing.List["RuleApprover"]
     #: Associate Roles required for approval based on the approver hierarchy tiers defined in `rules` only for the currently active tier(s).
     current_tier_pending_approvers: typing.List["RuleApprover"]
+    #: Custom Fields on the Approval Flow.
+    custom: typing.Optional["CustomFields"]
 
     def __init__(
         self,
@@ -73,7 +78,8 @@ class ApprovalFlow(BaseResource):
         approvals: typing.List["ApprovalFlowApproval"],
         eligible_approvers: typing.List["RuleApprover"],
         pending_approvers: typing.List["RuleApprover"],
-        current_tier_pending_approvers: typing.List["RuleApprover"]
+        current_tier_pending_approvers: typing.List["RuleApprover"],
+        custom: typing.Optional["CustomFields"] = None
     ):
         self.created_by = created_by
         self.last_modified_by = last_modified_by
@@ -86,6 +92,7 @@ class ApprovalFlow(BaseResource):
         self.eligible_approvers = eligible_approvers
         self.pending_approvers = pending_approvers
         self.current_tier_pending_approvers = current_tier_pending_approvers
+        self.custom = custom
 
         super().__init__(
             id=id,
@@ -109,7 +116,7 @@ class ApprovalFlow(BaseResource):
 class ApprovalFlowApproval(_BaseType):
     #: Associate who approved the [Approval Flow](ctp:api:type:ApprovalFlow).
     approver: "Associate"
-    #: Date and time (UTC) when the [Approval Flow](ctp:api:type:ApprovalFlow) was approved at.
+    #: Date and time (UTC) the [Approval Flow](ctp:api:type:ApprovalFlow) was approved.
     approved_at: datetime.datetime
 
     def __init__(self, *, approver: "Associate", approved_at: datetime.datetime):
@@ -182,7 +189,7 @@ class ApprovalFlowPagedQueryResponse(_BaseType):
 class ApprovalFlowRejection(_BaseType):
     #: Associate who rejected the [Approval Flow](ctp:api:type:ApprovalFlow).
     rejecter: "Associate"
-    #: Date and time (UTC) when the [Approval Flow](ctp:api:type:ApprovalFlow) was rejected at.
+    #: Date and time (UTC) the [Approval Flow](ctp:api:type:ApprovalFlow) was rejected.
     rejected_at: datetime.datetime
     #: The reason for the rejection of the [Approval Flow](ctp:api:type:ApprovalFlow).
     reason: typing.Optional[str]
@@ -222,7 +229,7 @@ class ApprovalFlowStatus(enum.Enum):
 
 class ApprovalFlowUpdate(_BaseType):
     #: Expected version of the [Approval Flow](ctp:api:type:ApprovalFlow) to which the changes should be applied.
-    #: If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the [Approval Flow](ctp:api:type:ApprovalFlow).
     actions: typing.List["ApprovalFlowUpdateAction"]
@@ -267,6 +274,14 @@ class ApprovalFlowUpdateAction(_BaseType):
             from ._schemas.approval_flow import ApprovalFlowRejectActionSchema
 
             return ApprovalFlowRejectActionSchema().load(data)
+        if data["action"] == "setCustomField":
+            from ._schemas.approval_flow import ApprovalFlowSetCustomFieldActionSchema
+
+            return ApprovalFlowSetCustomFieldActionSchema().load(data)
+        if data["action"] == "setCustomType":
+            from ._schemas.approval_flow import ApprovalFlowSetCustomTypeActionSchema
+
+            return ApprovalFlowSetCustomTypeActionSchema().load(data)
 
     def serialize(self) -> typing.Dict[str, typing.Any]:
         from ._schemas.approval_flow import ApprovalFlowUpdateActionSchema
@@ -282,6 +297,7 @@ class ApprovalFlowApproveAction(ApprovalFlowUpdateAction):
     """
 
     def __init__(self):
+
         super().__init__(action="approve")
 
     @classmethod
@@ -327,3 +343,63 @@ class ApprovalFlowRejectAction(ApprovalFlowUpdateAction):
         from ._schemas.approval_flow import ApprovalFlowRejectActionSchema
 
         return ApprovalFlowRejectActionSchema().dump(self)
+
+
+class ApprovalFlowSetCustomFieldAction(ApprovalFlowUpdateAction):
+    #: Name of the [Custom Field](ctp:api:type:CustomFields).
+    name: str
+    #: If `value` is absent or `null`, this field will be removed if it exists.
+    #: Removing a field that does not exist returns an [InvalidOperation](ctp:api:type:InvalidOperationError) error.
+    #: If `value` is provided, it is set for the field defined by `name`.
+    value: typing.Optional[typing.Any]
+
+    def __init__(self, *, name: str, value: typing.Optional[typing.Any] = None):
+        self.name = name
+        self.value = value
+
+        super().__init__(action="setCustomField")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalFlowSetCustomFieldAction":
+        from ._schemas.approval_flow import ApprovalFlowSetCustomFieldActionSchema
+
+        return ApprovalFlowSetCustomFieldActionSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.approval_flow import ApprovalFlowSetCustomFieldActionSchema
+
+        return ApprovalFlowSetCustomFieldActionSchema().dump(self)
+
+
+class ApprovalFlowSetCustomTypeAction(ApprovalFlowUpdateAction):
+    #: Defines the [Type](ctp:api:type:Type) that extends the ApprovalFlow with [Custom Fields](ctp:api:type:CustomFields).
+    #: If absent, any existing Type and Custom Fields are removed from the ApprovalFlow.
+    type: typing.Optional["TypeResourceIdentifier"]
+    #: Sets the [Custom Fields](ctp:api:type:CustomFields) fields for the ApprovalFlow.
+    fields: typing.Optional["FieldContainer"]
+
+    def __init__(
+        self,
+        *,
+        type: typing.Optional["TypeResourceIdentifier"] = None,
+        fields: typing.Optional["FieldContainer"] = None
+    ):
+        self.type = type
+        self.fields = fields
+
+        super().__init__(action="setCustomType")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ApprovalFlowSetCustomTypeAction":
+        from ._schemas.approval_flow import ApprovalFlowSetCustomTypeActionSchema
+
+        return ApprovalFlowSetCustomTypeActionSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.approval_flow import ApprovalFlowSetCustomTypeActionSchema
+
+        return ApprovalFlowSetCustomTypeActionSchema().dump(self)

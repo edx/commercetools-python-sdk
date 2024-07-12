@@ -118,6 +118,7 @@ class ShoppingListSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShoppingList(**data)
 
 
@@ -199,6 +200,7 @@ class ShoppingListDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShoppingListDraft(**data)
 
 
@@ -265,6 +267,7 @@ class ShoppingListLineItemSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShoppingListLineItem(**data)
 
 
@@ -309,6 +312,7 @@ class ShoppingListLineItemDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShoppingListLineItemDraft(**data)
 
 
@@ -332,6 +336,7 @@ class ShoppingListPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShoppingListPagedQueryResponse(**data)
 
 
@@ -354,6 +359,7 @@ class ShoppingListReferenceSchema(ReferenceSchema):
 
 
 class ShoppingListResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -450,6 +456,7 @@ class ShoppingListUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShoppingListUpdate(**data)
 
 
@@ -498,6 +505,7 @@ class TextLineItemSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.TextLineItem(**data)
 
 
@@ -538,6 +546,7 @@ class TextLineItemDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.TextLineItemDraft(**data)
 
 

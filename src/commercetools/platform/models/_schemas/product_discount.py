@@ -130,6 +130,9 @@ class ProductDiscountSchema(BaseResourceSchema):
                 "product-selection": helpers.absmod(
                     __name__, ".product_selection.ProductSelectionReferenceSchema"
                 ),
+                "product-tailoring": helpers.absmod(
+                    __name__, ".product_tailoring.ProductTailoringReferenceSchema"
+                ),
                 "product-type": helpers.absmod(
                     __name__, ".product_type.ProductTypeReferenceSchema"
                 ),
@@ -181,6 +184,7 @@ class ProductDiscountSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ProductDiscount(**data)
 
 
@@ -240,6 +244,7 @@ class ProductDiscountDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ProductDiscountDraft(**data)
 
 
@@ -263,6 +268,7 @@ class ProductDiscountMatchQuerySchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ProductDiscountMatchQuery(**data)
 
 
@@ -286,6 +292,7 @@ class ProductDiscountPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ProductDiscountPagedQueryResponse(**data)
 
 
@@ -308,6 +315,7 @@ class ProductDiscountReferenceSchema(ReferenceSchema):
 
 
 class ProductDiscountResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -365,6 +373,7 @@ class ProductDiscountUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ProductDiscountUpdate(**data)
 
 
@@ -441,6 +450,7 @@ class ProductDiscountValueAbsoluteDraftSchema(ProductDiscountValueDraftSchema):
 
 
 class ProductDiscountValueExternalSchema(ProductDiscountValueSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -451,6 +461,7 @@ class ProductDiscountValueExternalSchema(ProductDiscountValueSchema):
 
 
 class ProductDiscountValueExternalDraftSchema(ProductDiscountValueDraftSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 

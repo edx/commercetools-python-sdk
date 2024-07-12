@@ -62,9 +62,9 @@ __all__ = [
 class QuoteRequest(BaseResource):
     #: User-defined unique identifier of the QuoteRequest.
     key: typing.Optional[str]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that last modified the QuoteRequest.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that created the QuoteRequest.
     created_by: typing.Optional["CreatedBy"]
     #: Indicates the current state of the Quote Request in the negotiation process.
     quote_request_state: "QuoteRequestState"
@@ -347,6 +347,7 @@ class QuoteRequestResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.QUOTE_REQUEST)
 
     @classmethod
@@ -375,7 +376,7 @@ class QuoteRequestState(enum.Enum):
 
 class QuoteRequestUpdate(_BaseType):
     #: Expected version of the [QuoteRequest](ctp:api:type:QuoteRequest) to which the changes should be applied.
-    #: If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the [QuoteRequest](ctp:api:type:QuoteRequest).
     actions: typing.List["QuoteRequestUpdateAction"]

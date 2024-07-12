@@ -18,6 +18,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyMePaymentsRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
 

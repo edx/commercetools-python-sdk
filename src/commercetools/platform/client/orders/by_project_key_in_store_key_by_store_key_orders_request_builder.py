@@ -9,6 +9,9 @@ import warnings
 
 from ...models.error import ErrorResponse
 from ...models.order import Order, OrderFromCartDraft, OrderPagedQueryResponse
+from ..quotes.by_project_key_in_store_key_by_store_key_orders_quotes_request_builder import (
+    ByProjectKeyInStoreKeyByStoreKeyOrdersQuotesRequestBuilder,
+)
 from .by_project_key_in_store_key_by_store_key_orders_by_id_request_builder import (
     ByProjectKeyInStoreKeyByStoreKeyOrdersByIDRequestBuilder,
 )
@@ -21,6 +24,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyInStoreKeyByStoreKeyOrdersRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _store_key: str
@@ -34,6 +38,13 @@ class ByProjectKeyInStoreKeyByStoreKeyOrdersRequestBuilder:
         self._project_key = project_key
         self._store_key = store_key
         self._client = client
+
+    def order_quote(self) -> ByProjectKeyInStoreKeyByStoreKeyOrdersQuotesRequestBuilder:
+        return ByProjectKeyInStoreKeyByStoreKeyOrdersQuotesRequestBuilder(
+            project_key=self._project_key,
+            store_key=self._store_key,
+            client=self._client,
+        )
 
     def with_order_number(
         self, order_number: str
@@ -131,6 +142,8 @@ class ByProjectKeyInStoreKeyByStoreKeyOrdersRequestBuilder:
         The shipping address is used for tax calculation for a Cart with `Platform` [TaxMode](ctp:api:type:TaxMode).
 
         Creating an Order produces the [OrderCreated](ctp:api:type:OrderCreatedMessage) Message.
+        If a server-side problem occurs, indicated by a 500 Internal Server Error HTTP response, the Order creation may still successfully complete after the error is returned.
+        If you receive this error, you should verify the status of the Order by querying a unique identifier supplied during the creation request, such as the Order number.
 
         Specific Error Codes:
 
@@ -139,6 +152,7 @@ class ByProjectKeyInStoreKeyByStoreKeyOrdersRequestBuilder:
         - [DiscountCodeNonApplicable](ctp:api:type:DiscountCodeNonApplicableError)
         - [ShippingMethodDoesNotMatchCart](ctp:api:type:ShippingMethodDoesNotMatchCartError)
         - [InvalidItemShippingDetails](ctp:api:type:InvalidItemShippingDetailsError)
+        - [InvalidOperation](ctp:api:type:InvalidOperationError)
         - [MatchingPriceNotFound](ctp:api:type:MatchingPriceNotFoundError)
         - [MissingTaxRateForCountry](ctp:api:type:MissingTaxRateForCountryError)
         - [CountryNotConfiguredInStore](ctp:api:type:CountryNotConfiguredInStoreError)

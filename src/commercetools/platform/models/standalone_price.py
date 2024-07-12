@@ -118,9 +118,9 @@ class StagedStandalonePrice(_BaseType):
 
 
 class StandalonePrice(BaseResource):
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that last modified the StandalonePrice.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that created the StandalonePrice.
     created_by: typing.Optional["CreatedBy"]
     #: User-defined unique identifier of the StandalonePrice.
     key: typing.Optional[str]
@@ -139,16 +139,18 @@ class StandalonePrice(BaseResource):
     #: Date until the Price is valid. Standalone Prices that are no longer valid are not automatically deleted, but they can be [deleted](/../api/projects/standalone-prices#delete-standaloneprice) if necessary.
     valid_until: typing.Optional[datetime.datetime]
     #: Price tiers if any are defined.
+    #:
+    #: If `discounted` is present, the tiered Price is ignored for a Product Variant.
     tiers: typing.Optional[typing.List["PriceTier"]]
-    #: Set if a matching [ProductDiscount](ctp:api:type:ProductDiscount) exists. If set, the API uses the `discounted` value for the [LineItem Price selection](ctp:api:type:LineItemPriceSelection).
+    #: Set if a matching [ProductDiscount](ctp:api:type:ProductDiscount) exists. If set, the API uses the `discounted` value for the [Line Item price selection](/../api/pricing-and-discounts-overview#line-item-price-selection).
     #: When a [relative discount](/../api/projects/productDiscounts#productdiscountvaluerelative) is applied and the fraction part of the `discounted` price is 0.5, the discounted price is rounded in favor of the customer with the [half down rounding](https://en.wikipedia.org/wiki/Rounding#Round_half_down).
     discounted: typing.Optional["DiscountedPrice"]
     #: Custom Fields for the StandalonePrice.
     custom: typing.Optional["CustomFields"]
     #: Staged changes of the StandalonePrice. Only present if the StandalonePrice has some changes staged.
     staged: typing.Optional["StagedStandalonePrice"]
-    #: If set to `true`, the StandalonePrice is considered during [price selection](ctp:api:type:ProductPriceSelection).
-    #: If set to `false`, the StandalonePrice is not considered during [price selection](ctp:api:type:ProductPriceSelection).
+    #: If set to `true`, the StandalonePrice is considered during [Product price selection](/../api/pricing-and-discounts-overview#product-price-selection).
+    #: If set to `false`, the StandalonePrice is not considered during [Product price selection](/../api/pricing-and-discounts-overview#product-price-selection) and any associated Line Items in a Cart cannot be ordered.
     active: bool
 
     def __init__(
@@ -210,11 +212,6 @@ class StandalonePrice(BaseResource):
 
 
 class StandalonePriceDraft(_BaseType):
-    """Standalone Prices are defined with a scope consisting of `currency` and optionally `country`, `customerGroup`, and `channel` and/or a validity period (`validFrom` and/or `validTo`). For more information see [price selection](/../api/projects/products#price-selection).
-
-    Creating a Standalone Price for an SKU which has a Standalone Price with exactly the same price scope, or with overlapping validity periods within the same price scope returns the [DuplicateStandalonePriceScope](ctp:api:type:DuplicateStandalonePriceScopeError) and [OverlappingStandalonePriceValidity](ctp:api:type:OverlappingStandalonePriceValidityError) errors, respectively. A Price without validity period does not conflict with a Price defined for a time period.
-    """
-
     #: User-defined unique identifier for the StandalonePrice.
     key: typing.Optional[str]
     #: Specifies to which [ProductVariant](ctp:api:type:ProductVariant) the API associates this Price.
@@ -233,6 +230,8 @@ class StandalonePriceDraft(_BaseType):
     #: Sets the date until the Price is valid. Must be at least 1 ms later than `validFrom`. Standalone Prices that are no longer valid are not automatically deleted, but they can be [deleted](/../api/projects/standalone-prices#delete-standaloneprice) if necessary.
     valid_until: typing.Optional[datetime.datetime]
     #: Sets price tiers.
+    #:
+    #: If `discounted` is set, the tiered Price is ignored for a Product Variant.
     tiers: typing.Optional[typing.List["PriceTierDraft"]]
     #: Sets a discounted price for this Price that is different from the base price with `value`.
     discounted: typing.Optional["DiscountedPriceDraft"]
@@ -240,7 +239,7 @@ class StandalonePriceDraft(_BaseType):
     custom: typing.Optional["CustomFieldsDraft"]
     #: Staged changes for the StandalonePrice.
     staged: typing.Optional["StagedPriceDraft"]
-    #: Set to `false`, if the StandalonePrice should not be considered during [price selection](ctp:api:type:ProductPriceSelection).
+    #: Set to `false`, if the StandalonePrice should not be considered during [Product price selection](/../api/pricing-and-discounts-overview#product-price-selection).
     active: typing.Optional[bool]
 
     def __init__(
@@ -289,6 +288,8 @@ class StandalonePriceDraft(_BaseType):
 
 
 class StandalonePricePagedQueryResponse(_BaseType):
+    """[PagedQueryResult](/general-concepts#pagedqueryresult) with `results` containing an array of [StandalonePrice](ctp:api:type:StandalonePrice)."""
+
     #: Number of requested results.
     limit: int
     #: Offset supplied by the client or server default. It is the number of elements skipped, not a page number.
@@ -336,7 +337,7 @@ class StandalonePricePagedQueryResponse(_BaseType):
 
 
 class StandalonePriceReference(Reference):
-    """[Reference](/../api/types#reference) to a [StandalonePrice](ctp:api:type:StandalonePrice)."""
+    """[Reference](ctp:api:type:Reference) to a [StandalonePrice](ctp:api:type:StandalonePrice)."""
 
     #: Contains the representation of the expanded StandalonePrice. Only present in responses to requests with [Reference Expansion](/../api/general-concepts#reference-expansion) for StandalonePrice.
     obj: typing.Optional["StandalonePrice"]
@@ -361,11 +362,12 @@ class StandalonePriceReference(Reference):
 
 
 class StandalonePriceResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](/../api/types#resourceidentifier) to a [StandalonePrice](ctp:api:type:StandalonePrice)."""
+    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [StandalonePrice](ctp:api:type:StandalonePrice)."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.STANDALONE_PRICE)
 
     @classmethod
@@ -383,7 +385,8 @@ class StandalonePriceResourceIdentifier(ResourceIdentifier):
 
 
 class StandalonePriceUpdate(_BaseType):
-    #: Expected version of the StandalonePrice on which the changes should be applied. If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error is returned.
+    #: Expected version of the StandalonePrice on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the StandalonePrice.
     actions: typing.List["StandalonePriceUpdateAction"]
@@ -542,6 +545,7 @@ class StandalonePriceApplyStagedChangesAction(StandalonePriceUpdateAction):
     """Applies all staged changes to the StandalonePrice by overwriting all current values with the values in the [StagedStandalonePrice](ctp:api:type:StagedStandalonePrice). After successfully applied, the [StagedStandalonePrice](ctp:api:type:StagedStandalonePrice) will be removed from the StandalonePrice. An `applyStagedChanges` update action on a StandalonePrice that does not contain any staged changes will return a `400 Bad Request` error. Applying staged changes successfully will produce the [StandalonePriceStagedChangesApplied](ctp:api:type:StandalonePriceStagedChangesAppliedMessage) Message."""
 
     def __init__(self):
+
         super().__init__(action="applyStagedChanges")
 
     @classmethod
@@ -563,7 +567,7 @@ class StandalonePriceApplyStagedChangesAction(StandalonePriceUpdateAction):
 
 
 class StandalonePriceChangeActiveAction(StandalonePriceUpdateAction):
-    """Updating the value of a [StandalonePrice](ctp:api:type:StandalonePrice) produces the [StandalonePriceActiveChangedMessage](ctp:api:type:StandalonePriceActiveChangedMessage)."""
+    """Updating the value of a [StandalonePrice](ctp:api:type:StandalonePrice) produces the [StandalonePriceActiveChanged](ctp:api:type:StandalonePriceActiveChangedMessage) Message."""
 
     #: New value to set for the `active` field of the [StandalonePrice](ctp:api:type:StandalonePrice).
     active: bool
@@ -651,6 +655,7 @@ class StandalonePriceRemoveStagedChangesAction(StandalonePriceUpdateAction):
     """
 
     def __init__(self):
+
         super().__init__(action="removeStagedChanges")
 
     @classmethod

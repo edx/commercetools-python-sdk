@@ -27,6 +27,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyCartsRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
 
@@ -139,9 +140,14 @@ class ByProjectKeyCartsRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["Cart"]:
-        """Creating a Cart fails with an [InvalidOperation](ctp:api:type:InvalidOperationError) error if the
-        [ShippingMethod](ctp:api:type:ShippingMethod) referenced in the CartDraft
-        has a `predicate` that does not match the Cart.
+        """If the referenced [ShippingMethod](ctp:api:type:ShippingMethod) in the [CartDraft](ctp:api:type:CartDraft) has a predicate that does not match, or if the Shipping Method is not active, an [InvalidOperation](ctp:api:type:InvalidOperationError) error is returned.
+
+        Specific Error Codes:
+
+        - [DiscountCodeNonApplicable](ctp:api:type:DiscountCodeNonApplicableError)
+        - [InvalidItemShippingDetails](ctp:api:type:InvalidItemShippingDetailsError)
+        - [MatchingPriceNotFound](ctp:api:type:MatchingPriceNotFoundError)
+        - [MissingTaxRateForCountry](ctp:api:type:MissingTaxRateForCountryError)
 
         """
         headers = {} if headers is None else headers

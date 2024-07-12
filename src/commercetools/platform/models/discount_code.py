@@ -41,6 +41,7 @@ __all__ = [
     "DiscountCodeSetCustomFieldAction",
     "DiscountCodeSetCustomTypeAction",
     "DiscountCodeSetDescriptionAction",
+    "DiscountCodeSetKeyAction",
     "DiscountCodeSetMaxApplicationsAction",
     "DiscountCodeSetMaxApplicationsPerCustomerAction",
     "DiscountCodeSetNameAction",
@@ -53,9 +54,11 @@ __all__ = [
 
 
 class DiscountCode(BaseResource):
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: User-defined unique identifier of the DiscountCode.
+    key: typing.Optional[str]
+    #: IDs and references that last modified the DiscountCode.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the DiscountCode.
     created_by: typing.Optional["CreatedBy"]
     #: Name of the DiscountCode.
     name: typing.Optional["LocalizedString"]
@@ -97,6 +100,7 @@ class DiscountCode(BaseResource):
         version: int,
         created_at: datetime.datetime,
         last_modified_at: datetime.datetime,
+        key: typing.Optional[str] = None,
         last_modified_by: typing.Optional["LastModifiedBy"] = None,
         created_by: typing.Optional["CreatedBy"] = None,
         name: typing.Optional["LocalizedString"] = None,
@@ -114,6 +118,7 @@ class DiscountCode(BaseResource):
         valid_until: typing.Optional[datetime.datetime] = None,
         application_version: typing.Optional[int] = None
     ):
+        self.key = key
         self.last_modified_by = last_modified_by
         self.created_by = created_by
         self.name = name
@@ -151,6 +156,8 @@ class DiscountCode(BaseResource):
 
 
 class DiscountCodeDraft(_BaseType):
+    #: User-defined unique identifier for the DiscountCode.
+    key: typing.Optional[str]
     #: Name of the DiscountCode.
     name: typing.Optional["LocalizedString"]
     #: Description of the DiscountCode.
@@ -165,8 +172,12 @@ class DiscountCodeDraft(_BaseType):
     #: Only active DiscountCodes can be applied to the Cart.
     is_active: typing.Optional[bool]
     #: Number of times the DiscountCode can be applied.
+    #:
+    #: If not set, the DiscountCode can be applied any number of times.
     max_applications: typing.Optional[int]
     #: Number of times the DiscountCode can be applied per Customer.
+    #:
+    #: If not set, the DiscountCode can be applied any number of times.
     max_applications_per_customer: typing.Optional[int]
     #: Custom Fields for the DiscountCode.
     custom: typing.Optional["CustomFieldsDraft"]
@@ -180,6 +191,7 @@ class DiscountCodeDraft(_BaseType):
     def __init__(
         self,
         *,
+        key: typing.Optional[str] = None,
         name: typing.Optional["LocalizedString"] = None,
         description: typing.Optional["LocalizedString"] = None,
         code: str,
@@ -193,6 +205,7 @@ class DiscountCodeDraft(_BaseType):
         valid_from: typing.Optional[datetime.datetime] = None,
         valid_until: typing.Optional[datetime.datetime] = None
     ):
+        self.key = key
         self.name = name
         self.description = description
         self.code = code
@@ -298,6 +311,7 @@ class DiscountCodeResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.DISCOUNT_CODE)
 
     @classmethod
@@ -316,7 +330,7 @@ class DiscountCodeResourceIdentifier(ResourceIdentifier):
 
 class DiscountCodeUpdate(_BaseType):
     #: Expected version of the DiscountCode on which the changes should be applied.
-    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error is returned.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the DiscountCode.
     actions: typing.List["DiscountCodeUpdateAction"]
@@ -383,6 +397,10 @@ class DiscountCodeUpdateAction(_BaseType):
             from ._schemas.discount_code import DiscountCodeSetDescriptionActionSchema
 
             return DiscountCodeSetDescriptionActionSchema().load(data)
+        if data["action"] == "setKey":
+            from ._schemas.discount_code import DiscountCodeSetKeyActionSchema
+
+            return DiscountCodeSetKeyActionSchema().load(data)
         if data["action"] == "setMaxApplications":
             from ._schemas.discount_code import (
                 DiscountCodeSetMaxApplicationsActionSchema,
@@ -597,8 +615,36 @@ class DiscountCodeSetDescriptionAction(DiscountCodeUpdateAction):
         return DiscountCodeSetDescriptionActionSchema().dump(self)
 
 
+class DiscountCodeSetKeyAction(DiscountCodeUpdateAction):
+    """This action generates a [DiscountCodeKeySet](ctp:api:type:DiscountCodeKeySetMessage) Message."""
+
+    #: Unique value to set.
+    #: If empty, any existing value will be removed.
+    key: typing.Optional[str]
+
+    def __init__(self, *, key: typing.Optional[str] = None):
+        self.key = key
+
+        super().__init__(action="setKey")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "DiscountCodeSetKeyAction":
+        from ._schemas.discount_code import DiscountCodeSetKeyActionSchema
+
+        return DiscountCodeSetKeyActionSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.discount_code import DiscountCodeSetKeyActionSchema
+
+        return DiscountCodeSetKeyActionSchema().dump(self)
+
+
 class DiscountCodeSetMaxApplicationsAction(DiscountCodeUpdateAction):
-    #: Value to set. If empty, any existing value will be removed.
+    #: Value to set.
+    #:
+    #: If empty, any existing value will be removed and the DiscountCode can be applied any number of times.
     max_applications: typing.Optional[int]
 
     def __init__(self, *, max_applications: typing.Optional[int] = None):
@@ -621,7 +667,9 @@ class DiscountCodeSetMaxApplicationsAction(DiscountCodeUpdateAction):
 
 
 class DiscountCodeSetMaxApplicationsPerCustomerAction(DiscountCodeUpdateAction):
-    #: Value to set. If empty, any existing value will be removed.
+    #: Value to set.
+    #:
+    #: If empty, any existing value will be removed and the DiscountCode can be applied any number of times.
     max_applications_per_customer: typing.Optional[int]
 
     def __init__(self, *, max_applications_per_customer: typing.Optional[int] = None):

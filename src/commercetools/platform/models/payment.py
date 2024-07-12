@@ -74,15 +74,15 @@ __all__ = [
 
 
 class Payment(BaseResource):
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the Payment.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the Payment.
     created_by: typing.Optional["CreatedBy"]
     #: Reference to a [Customer](ctp:api:type:Customer) associated with the Payment.
     customer: typing.Optional["CustomerReference"]
     #: [Anonymous session](ctp:api:type:AnonymousSession) associated with the Payment.
     anonymous_id: typing.Optional[str]
-    #: Additional identifier for external systems like Customer Relationship Management (CRM) or Enterprise Resource Planning (ERP).
+    #: Additional identifier for external systems like customer relationship management (CRM) or enterprise resource planning (ERP).
     external_id: typing.Optional[str]
     #: Identifier used by the payment service that processes the Payment (for example, a PSP).
     #: The combination of `interfaceId` and the `paymentInterface` field on [PaymentMethodInfo](ctp:api:type:PaymentMethodInfo) must be unique.
@@ -178,7 +178,7 @@ class PaymentDraft(_BaseType):
     customer: typing.Optional["CustomerResourceIdentifier"]
     #: [Anonymous session](ctp:api:type:AnonymousSession) associated with the Payment.
     anonymous_id: typing.Optional[str]
-    #: Additional identifier for external systems like Customer Relationship Management (CRM) or Enterprise Resource Planning (ERP).
+    #: Additional identifier for external systems like customer relationship management (CRM) or enterprise resource planning (ERP).
     external_id: typing.Optional[str]
     #: Identifier used by the payment service that processes the Payment (for example, a PSP).
     #: The combination of `interfaceId` and the `paymentInterface` field on [PaymentMethodInfo](ctp:api:type:PaymentMethodInfo) must be unique.
@@ -372,6 +372,7 @@ class PaymentResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.PAYMENT)
 
     @classmethod
@@ -455,7 +456,8 @@ class PaymentStatusDraft(_BaseType):
 
 
 class PaymentUpdate(_BaseType):
-    #: Expected version of the Payment on which the changes should be applied. If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: Expected version of the Payment on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the Payment.
     actions: typing.List["PaymentUpdateAction"]
@@ -872,7 +874,7 @@ class PaymentChangeTransactionTimestampAction(PaymentUpdateAction):
 
 
 class PaymentSetAmountPaidAction(PaymentUpdateAction):
-    #: Draft type that stores amounts only in cent precision for the specified currency.
+    #: Draft object to store money in cent amounts for a specific currency.
     amount: typing.Optional["Money"]
 
     def __init__(self, *, amount: typing.Optional["Money"] = None):
@@ -895,7 +897,7 @@ class PaymentSetAmountPaidAction(PaymentUpdateAction):
 
 
 class PaymentSetAmountRefundedAction(PaymentUpdateAction):
-    #: Draft type that stores amounts only in cent precision for the specified currency.
+    #: Draft object to store money in cent amounts for a specific currency.
     amount: typing.Optional["Money"]
 
     def __init__(self, *, amount: typing.Optional["Money"] = None):
@@ -918,8 +920,9 @@ class PaymentSetAmountRefundedAction(PaymentUpdateAction):
 
 
 class PaymentSetAnonymousIdAction(PaymentUpdateAction):
-    #: Value to set.
-    #: If empty, any existing value will be removed.
+    """If the Payment is already associated with a Customer, an [InvalidOperation](ctp:api:type:InvalidOperationError) error is returned."""
+
+    #: Value to set. If empty, any existing value will be removed.
     anonymous_id: typing.Optional[str]
 
     def __init__(self, *, anonymous_id: typing.Optional[str] = None):
@@ -942,7 +945,7 @@ class PaymentSetAnonymousIdAction(PaymentUpdateAction):
 
 
 class PaymentSetAuthorizationAction(PaymentUpdateAction):
-    #: Draft type that stores amounts only in cent precision for the specified currency.
+    #: Draft object to store money in cent amounts for a specific currency.
     amount: typing.Optional["Money"]
     until: typing.Optional[datetime.datetime]
 

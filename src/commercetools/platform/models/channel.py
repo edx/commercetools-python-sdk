@@ -55,9 +55,9 @@ __all__ = [
 
 
 class Channel(BaseResource):
-    #: Present on resources updated after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the Channel.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the Channel.
     created_by: typing.Optional["CreatedBy"]
     #: User-defined unique identifier of the Channel.
     key: str
@@ -255,6 +255,7 @@ class ChannelResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.CHANNEL)
 
     @classmethod
@@ -282,7 +283,8 @@ class ChannelRoleEnum(enum.Enum):
 
 
 class ChannelUpdate(_BaseType):
-    #: Expected version of the Channel on which the changes should be applied. If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error is returned.
+    #: Expected version of the Channel on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the Channel.
     actions: typing.List["ChannelUpdateAction"]

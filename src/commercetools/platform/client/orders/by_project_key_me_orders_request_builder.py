@@ -22,6 +22,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyMeOrdersRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
 
@@ -122,12 +123,19 @@ class ByProjectKeyMeOrdersRequestBuilder:
 
         Creating an Order produces the [OrderCreated](ctp:api:type:OrderCreatedMessage) Message.
 
+        If a server-side problem occurs, indicated by a 500 Internal Server Error HTTP response, the Order creation may still successfully complete after the error is returned.
+        If you receive this error, you should verify the status of the Order by querying a unique identifier supplied during the creation request, such as the Order number.
+
         Specific Error Codes:
 
+        - [AssociateMissingPermission](ctp:api:type:AssociateMissingPermissionError)
+        - [DiscountCodeNonApplicable](ctp:api:type:DiscountCodeNonApplicableError)
+        - [InvalidItemShippingDetails](ctp:api:type:InvalidItemShippingDetailsError)
         - [OutOfStock](ctp:api:type:OutOfStockError)
         - [PriceChanged](ctp:api:type:PriceChangedError)
-        - [DiscountCodeNonApplicable](ctp:api:type:DiscountCodeNonApplicableError)
-        - [AssociateMissingPermission](ctp:api:type:AssociateMissingPermissionError)
+        - [ShippingMethodDoesNotMatchCart](ctp:api:type:ShippingMethodDoesNotMatchCartError)
+        - [MatchingPriceNotFound](ctp:api:type:MatchingPriceNotFoundError)
+        - [MissingTaxRateForCountry](ctp:api:type:MissingTaxRateForCountryError)
 
         """
         headers = {} if headers is None else headers

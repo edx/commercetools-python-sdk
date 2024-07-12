@@ -183,6 +183,9 @@ class CartDiscountSchema(BaseResourceSchema):
                 "product-selection": helpers.absmod(
                     __name__, ".product_selection.ProductSelectionReferenceSchema"
                 ),
+                "product-tailoring": helpers.absmod(
+                    __name__, ".product_tailoring.ProductTailoringReferenceSchema"
+                ),
                 "product-type": helpers.absmod(
                     __name__, ".product_type.ProductTypeReferenceSchema"
                 ),
@@ -236,6 +239,7 @@ class CartDiscountSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CartDiscount(**data)
 
 
@@ -354,6 +358,7 @@ class CartDiscountDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CartDiscountDraft(**data)
 
 
@@ -377,6 +382,7 @@ class CartDiscountPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CartDiscountPagedQueryResponse(**data)
 
 
@@ -399,6 +405,7 @@ class CartDiscountReferenceSchema(ReferenceSchema):
 
 
 class CartDiscountResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -445,6 +452,7 @@ class CartDiscountLineItemsTargetSchema(CartDiscountTargetSchema):
 
 
 class CartDiscountShippingCostTargetSchema(CartDiscountTargetSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -455,6 +463,7 @@ class CartDiscountShippingCostTargetSchema(CartDiscountTargetSchema):
 
 
 class CartDiscountTotalPriceTargetSchema(CartDiscountTargetSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -534,6 +543,7 @@ class CartDiscountUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CartDiscountUpdate(**data)
 
 
@@ -1085,7 +1095,6 @@ class CartDiscountSetStoresActionSchema(CartDiscountUpdateActionSchema):
         allow_none=True,
         many=True,
         unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
         load_default=None,
     )
 

@@ -16,12 +16,16 @@ from ...models.error import ErrorResponse
 from .by_project_key_discount_codes_by_id_request_builder import (
     ByProjectKeyDiscountCodesByIDRequestBuilder,
 )
+from .by_project_key_discount_codes_key_by_key_request_builder import (
+    ByProjectKeyDiscountCodesKeyByKeyRequestBuilder,
+)
 
 if typing.TYPE_CHECKING:
     from ...base_client import BaseClient
 
 
 class ByProjectKeyDiscountCodesRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
 
@@ -36,6 +40,13 @@ class ByProjectKeyDiscountCodesRequestBuilder:
     def with_id(self, id: str) -> ByProjectKeyDiscountCodesByIDRequestBuilder:
         return ByProjectKeyDiscountCodesByIDRequestBuilder(
             id=id,
+            project_key=self._project_key,
+            client=self._client,
+        )
+
+    def with_key(self, key: str) -> ByProjectKeyDiscountCodesKeyByKeyRequestBuilder:
+        return ByProjectKeyDiscountCodesKeyByKeyRequestBuilder(
+            key=key,
             project_key=self._project_key,
             client=self._client,
         )
@@ -113,7 +124,11 @@ class ByProjectKeyDiscountCodesRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["DiscountCode"]:
-        """Deprecated scope: `manage_orders:{projectKey}`"""
+        """Creating a Discount Code produces the [DiscountCodeCreated](ctp:api:type:DiscountCodeCreatedMessage) Message.
+
+        Deprecated scope: `manage_orders:{projectKey}`
+
+        """
         headers = {} if headers is None else headers
         response = self._client._post(
             endpoint=f"/{self._project_key}/discount-codes",

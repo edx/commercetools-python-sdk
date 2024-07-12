@@ -12,74 +12,151 @@ import typing
 from ._abstract import _BaseType
 
 __all__ = [
-    "AdyenBadConfig",
-    "AdyenInitError",
-    "AdyenTimeout",
     "ApplicationDeactivated",
     "ApplicationNotFound",
     "BadInputData",
     "CartEmptiedDuringCheckout",
     "CartEmpty",
     "CartNotFound",
+    "CartWithExistingPayment",
     "CheckoutCancelled",
     "CheckoutCompleted",
     "CheckoutLoaded",
     "CheckoutStarted",
+    "DeprecatedFields",
+    "ExternalTermsAndConditionsPending",
+    "InitError",
     "InitTimeout",
+    "InvalidMode",
     "InvalidToken",
-    "NoAllowedOrigins",
+    "Message",
     "NoPaymentMethods",
     "NoShippingMethods",
     "OrderCreated",
+    "OrderCreationError",
+    "PaymentCancelled",
+    "PaymentConnectorError",
+    "PaymentFailed",
+    "PaymentMethodLoaded",
+    "PaymentMethodLoading",
+    "PaymentMethodLoadingError",
+    "PaymentMethodSelected",
+    "PaymentMethodSelectionConfirmation",
+    "PaymentMethodSelectionConfirmationFailed",
+    "PaymentMethodsReceived",
+    "PaymentStarted",
+    "PaymentValidationFailed",
+    "PaymentValidationPassed",
+    "PaymentValidationStarted",
+    "PaymentVerificationStarted",
+    "PaymentVerificationTimeout",
+    "ProjectIsDeactivated",
     "ResponseMessage",
-    "SellerIsDeactivated",
-    "SellerNotFound",
-    "ShippingAddressMissing",
-    "UnallowedOrigin",
+    "SetShippingAddressError",
     "UnavailableLocale",
+    "UnsupportedCountry",
 ]
 
 
-class ResponseMessage(_BaseType):
-    #: The message code for the event.
+class Message(_BaseType):
+    #: The Message code for the event.
     code: str
-    #: A string with the following pattern `{level}:{entity}:{subtype}` where `{level}` can be `info`, `warn`, or `error`.
-    #: This field allows filtering messages from a more generic to a more specific type. Messages for different events can be of the same `type`.
-    type: str
+    #: The severity level of the event. It can be `info`, `warn`, or `error`.
+    severity: str
     #: A human-readable description of the event.
     message: str
-    #: An object containing additional data about the event.
-    payload: typing.Optional[object]
 
-    def __init__(
-        self,
-        *,
-        code: str,
-        type: str,
-        message: str,
-        payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, code: str, severity: str, message: str):
         self.code = code
-        self.type = type
+        self.severity = severity
         self.message = message
-        self.payload = payload
 
         super().__init__()
 
     @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "Message":
+        if data["code"] == "checkout_cancelled":
+            from ._schemas.responses import CheckoutCancelledSchema
+
+            return CheckoutCancelledSchema().load(data)
+        if data["code"] == "checkout_loaded":
+            from ._schemas.responses import CheckoutLoadedSchema
+
+            return CheckoutLoadedSchema().load(data)
+        if data["code"] == "checkout_started":
+            from ._schemas.responses import CheckoutStartedSchema
+
+            return CheckoutStartedSchema().load(data)
+        if data["code"] == "init_timeout":
+            from ._schemas.responses import InitTimeoutSchema
+
+            return InitTimeoutSchema().load(data)
+        if data["code"] == "invalid_mode":
+            from ._schemas.responses import InvalidModeSchema
+
+            return InvalidModeSchema().load(data)
+        if data["code"] == "invalid_token":
+            from ._schemas.responses import InvalidTokenSchema
+
+            return InvalidTokenSchema().load(data)
+        if data["code"] == "no_payment_methods":
+            from ._schemas.responses import NoPaymentMethodsSchema
+
+            return NoPaymentMethodsSchema().load(data)
+        if data["code"] == "payment_failed":
+            from ._schemas.responses import PaymentFailedSchema
+
+            return PaymentFailedSchema().load(data)
+        if data["code"] == "init_error":
+            from ._schemas.responses import InitErrorSchema
+
+            return InitErrorSchema().load(data)
+        if data["code"] == "payment_cancelled":
+            from ._schemas.responses import PaymentCancelledSchema
+
+            return PaymentCancelledSchema().load(data)
+        if data["code"] == "payment_validation_failed":
+            from ._schemas.responses import PaymentValidationFailedSchema
+
+            return PaymentValidationFailedSchema().load(data)
+        if data["code"] == "payment_validation_passed":
+            from ._schemas.responses import PaymentValidationPassedSchema
+
+            return PaymentValidationPassedSchema().load(data)
+        if data["code"] == "payment_validation_started":
+            from ._schemas.responses import PaymentValidationStartedSchema
+
+            return PaymentValidationStartedSchema().load(data)
+        if data["code"] == "payment_verification_started":
+            from ._schemas.responses import PaymentVerificationStartedSchema
+
+            return PaymentVerificationStartedSchema().load(data)
+        if data["code"] == "payment_verification_timeout":
+            from ._schemas.responses import PaymentVerificationTimeoutSchema
+
+            return PaymentVerificationTimeoutSchema().load(data)
+        if data["code"] == "external_terms_and_conditions_pending":
+            from ._schemas.responses import ExternalTermsAndConditionsPendingSchema
+
+            return ExternalTermsAndConditionsPendingSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import MessageSchema
+
+        return MessageSchema().dump(self)
+
+
+class ResponseMessage(Message):
+    #: Additional data about the event.
+    payload: object
+
+    def __init__(self, *, code: str, severity: str, message: str, payload: object):
+        self.payload = payload
+
+        super().__init__(code=code, severity=severity, message=message)
+
+    @classmethod
     def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "ResponseMessage":
-        if data["code"] == "adyen_bad_config":
-            from ._schemas.responses import AdyenBadConfigSchema
-
-            return AdyenBadConfigSchema().load(data)
-        if data["code"] == "adyen_init_error":
-            from ._schemas.responses import AdyenInitErrorSchema
-
-            return AdyenInitErrorSchema().load(data)
-        if data["code"] == "adyen_timeout":
-            from ._schemas.responses import AdyenTimeoutSchema
-
-            return AdyenTimeoutSchema().load(data)
         if data["code"] == "application_disabled":
             from ._schemas.responses import ApplicationDeactivatedSchema
 
@@ -100,42 +177,56 @@ class ResponseMessage(_BaseType):
             from ._schemas.responses import CartNotFoundSchema
 
             return CartNotFoundSchema().load(data)
-        if data["code"] == "checkout_cancelled":
-            from ._schemas.responses import CheckoutCancelledSchema
-
-            return CheckoutCancelledSchema().load(data)
         if data["code"] == "checkout_completed":
             from ._schemas.responses import CheckoutCompletedSchema
 
             return CheckoutCompletedSchema().load(data)
-        if data["code"] == "checkout_loaded":
-            from ._schemas.responses import CheckoutLoadedSchema
-
-            return CheckoutLoadedSchema().load(data)
-        if data["code"] == "checkout_started":
-            from ._schemas.responses import CheckoutStartedSchema
-
-            return CheckoutStartedSchema().load(data)
-        if data["code"] == "init_timeout":
-            from ._schemas.responses import InitTimeoutSchema
-
-            return InitTimeoutSchema().load(data)
         if data["code"] == "invalid_fields":
             from ._schemas.responses import BadInputDataSchema
 
             return BadInputDataSchema().load(data)
-        if data["code"] == "invalid_token":
-            from ._schemas.responses import InvalidTokenSchema
+        if data["code"] == "payment_started":
+            from ._schemas.responses import PaymentStartedSchema
 
-            return InvalidTokenSchema().load(data)
-        if data["code"] == "no_allowed_origins":
-            from ._schemas.responses import NoAllowedOriginsSchema
+            return PaymentStartedSchema().load(data)
+        if data["code"] == "payment_connector_error":
+            from ._schemas.responses import PaymentConnectorErrorSchema
 
-            return NoAllowedOriginsSchema().load(data)
-        if data["code"] == "no_payment_methods":
-            from ._schemas.responses import NoPaymentMethodsSchema
+            return PaymentConnectorErrorSchema().load(data)
+        if data["code"] == "payment_method_loaded":
+            from ._schemas.responses import PaymentMethodLoadedSchema
 
-            return NoPaymentMethodsSchema().load(data)
+            return PaymentMethodLoadedSchema().load(data)
+        if data["code"] == "payment_method_loading":
+            from ._schemas.responses import PaymentMethodLoadingSchema
+
+            return PaymentMethodLoadingSchema().load(data)
+        if data["code"] == "payment_method_loading_error":
+            from ._schemas.responses import PaymentMethodLoadingErrorSchema
+
+            return PaymentMethodLoadingErrorSchema().load(data)
+        if data["code"] == "payment_method_selected":
+            from ._schemas.responses import PaymentMethodSelectedSchema
+
+            return PaymentMethodSelectedSchema().load(data)
+        if data["code"] == "payment_method_selection_confirmation":
+            from ._schemas.responses import PaymentMethodSelectionConfirmationSchema
+
+            return PaymentMethodSelectionConfirmationSchema().load(data)
+        if data["code"] == "payment_method_selection_confirmation_failed":
+            from ._schemas.responses import (
+                PaymentMethodSelectionConfirmationFailedSchema,
+            )
+
+            return PaymentMethodSelectionConfirmationFailedSchema().load(data)
+        if data["code"] == "payment_methods_received":
+            from ._schemas.responses import PaymentMethodsReceivedSchema
+
+            return PaymentMethodsReceivedSchema().load(data)
+        if data["code"] == "set_shipping_address_error":
+            from ._schemas.responses import SetShippingAddressErrorSchema
+
+            return SetShippingAddressErrorSchema().load(data)
         if data["code"] == "no_shipping_methods":
             from ._schemas.responses import NoShippingMethodsSchema
 
@@ -144,26 +235,30 @@ class ResponseMessage(_BaseType):
             from ._schemas.responses import OrderCreatedSchema
 
             return OrderCreatedSchema().load(data)
-        if data["code"] == "seller_deactivated":
-            from ._schemas.responses import SellerIsDeactivatedSchema
+        if data["code"] == "project_deactivated":
+            from ._schemas.responses import ProjectIsDeactivatedSchema
 
-            return SellerIsDeactivatedSchema().load(data)
-        if data["code"] == "seller_not_found":
-            from ._schemas.responses import SellerNotFoundSchema
-
-            return SellerNotFoundSchema().load(data)
-        if data["code"] == "shipping_address_missing":
-            from ._schemas.responses import ShippingAddressMissingSchema
-
-            return ShippingAddressMissingSchema().load(data)
-        if data["code"] == "unallowed_origin":
-            from ._schemas.responses import UnallowedOriginSchema
-
-            return UnallowedOriginSchema().load(data)
+            return ProjectIsDeactivatedSchema().load(data)
         if data["code"] == "unavailable_locale":
             from ._schemas.responses import UnavailableLocaleSchema
 
             return UnavailableLocaleSchema().load(data)
+        if data["code"] == "deprecated_fields":
+            from ._schemas.responses import DeprecatedFieldsSchema
+
+            return DeprecatedFieldsSchema().load(data)
+        if data["code"] == "order_creation_error":
+            from ._schemas.responses import OrderCreationErrorSchema
+
+            return OrderCreationErrorSchema().load(data)
+        if data["code"] == "cart_with_exisiting_payment":
+            from ._schemas.responses import CartWithExistingPaymentSchema
+
+            return CartWithExistingPaymentSchema().load(data)
+        if data["code"] == "unsupported_country":
+            from ._schemas.responses import UnsupportedCountrySchema
+
+            return UnsupportedCountrySchema().load(data)
 
     def serialize(self) -> typing.Dict[str, typing.Any]:
         from ._schemas.responses import ResponseMessageSchema
@@ -171,80 +266,16 @@ class ResponseMessage(_BaseType):
         return ResponseMessageSchema().dump(self)
 
 
-class AdyenBadConfig(ResponseMessage):
-    """Generated when the configuration used to initialize Adyen contains at least one invalid field."""
-
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="adyen_bad_config"
-        )
-
-    @classmethod
-    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "AdyenBadConfig":
-        from ._schemas.responses import AdyenBadConfigSchema
-
-        return AdyenBadConfigSchema().load(data)
-
-    def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.responses import AdyenBadConfigSchema
-
-        return AdyenBadConfigSchema().dump(self)
-
-
-class AdyenInitError(ResponseMessage):
-    """Generated when Adyen cannot be initialized."""
-
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="adyen_init_error"
-        )
-
-    @classmethod
-    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "AdyenInitError":
-        from ._schemas.responses import AdyenInitErrorSchema
-
-        return AdyenInitErrorSchema().load(data)
-
-    def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.responses import AdyenInitErrorSchema
-
-        return AdyenInitErrorSchema().dump(self)
-
-
-class AdyenTimeout(ResponseMessage):
-    """Generated when a timeout error occurs while initializing Adyen."""
-
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="adyen_timeout"
-        )
-
-    @classmethod
-    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "AdyenTimeout":
-        from ._schemas.responses import AdyenTimeoutSchema
-
-        return AdyenTimeoutSchema().load(data)
-
-    def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.responses import AdyenTimeoutSchema
-
-        return AdyenTimeoutSchema().dump(self)
-
-
 class ApplicationDeactivated(ResponseMessage):
-    """Generated when the requested application is deactivated. Activate the application in the Merchant Center to continue."""
+    """Generated when the requested [Application](/payment-connectors-applications#applications) is deactivated. Activate the Application in the Merchant Center to continue."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, severity: str, message: str, payload: object):
+
         super().__init__(
-            type=type, message=message, payload=payload, code="application_disabled"
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="application_disabled",
         )
 
     @classmethod
@@ -262,13 +293,15 @@ class ApplicationDeactivated(ResponseMessage):
 
 
 class ApplicationNotFound(ResponseMessage):
-    """Generated when the requested application is not found. The application may have been deleted or its configuration is incorrect."""
+    """Generated when the requested [Application](/payment-connectors-applications#applications) is not found. The Application may have been deleted or its configuration is incorrect."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, severity: str, message: str, payload: object):
+
         super().__init__(
-            type=type, message=message, payload=payload, code="application_not_found"
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="application_not_found",
         )
 
     @classmethod
@@ -284,13 +317,12 @@ class ApplicationNotFound(ResponseMessage):
 
 
 class CartEmptiedDuringCheckout(ResponseMessage):
-    """Generated when the Cart was emptied during the checkout. It is not possible to recover from this, the customer must restart the checkout process."""
+    """Generated when the [Cart](/../api/projects/carts) was emptied during the checkout process. It is not possible to recover from this, the customer must restart the checkout process."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, severity: str, message: str, payload: object):
+
         super().__init__(
-            type=type,
+            severity=severity,
             message=message,
             payload=payload,
             code="cart_emptied_during_checkout",
@@ -311,12 +343,13 @@ class CartEmptiedDuringCheckout(ResponseMessage):
 
 
 class CartEmpty(ResponseMessage):
-    """Generated when the Cart for the current checkout is empty. The Cart must contain at least one Line Item."""
+    """Generated when the [Cart](/../api/projects/carts) for the current checkout is empty. The Cart must contain at least one [Line Item](/../api/carts-orders-overview#line-items)."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(type=type, message=message, payload=payload, code="cart_empty")
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity, message=message, payload=payload, code="cart_empty"
+        )
 
     @classmethod
     def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "CartEmpty":
@@ -331,13 +364,12 @@ class CartEmpty(ResponseMessage):
 
 
 class CartNotFound(ResponseMessage):
-    """Generated when the Cart is not found. A valid Cart with at least one Line Item is required to start the checkout."""
+    """Generated when the [Cart](/../api/projects/carts) is not found. To start the checkout process, a valid Cart with at least one [Line Item](/../api/carts-orders-overview#line-items) is required."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, severity: str, message: str, payload: object):
+
         super().__init__(
-            type=type, message=message, payload=payload, code="cart_not_found"
+            severity=severity, message=message, payload=payload, code="cart_not_found"
         )
 
     @classmethod
@@ -352,15 +384,12 @@ class CartNotFound(ResponseMessage):
         return CartNotFoundSchema().dump(self)
 
 
-class CheckoutCancelled(ResponseMessage):
-    """Generated when the customer cancels the checkout."""
+class CheckoutCancelled(Message):
+    """Generated when the customer cancels the checkout process."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="checkout_cancelled"
-        )
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(severity=severity, message=message, code="checkout_cancelled")
 
     @classmethod
     def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "CheckoutCancelled":
@@ -375,13 +404,15 @@ class CheckoutCancelled(ResponseMessage):
 
 
 class CheckoutCompleted(ResponseMessage):
-    """Generated when the customer completes the checkout."""
+    """Generated when the customer completes the checkout process."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, severity: str, message: str, payload: object):
+
         super().__init__(
-            type=type, message=message, payload=payload, code="checkout_completed"
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="checkout_completed",
         )
 
     @classmethod
@@ -396,15 +427,12 @@ class CheckoutCompleted(ResponseMessage):
         return CheckoutCompletedSchema().dump(self)
 
 
-class CheckoutLoaded(ResponseMessage):
-    """Generated when the checkout was loaded successfully and it is waiting for the configuration parameters passed through the `checkoutConfig` object."""
+class CheckoutLoaded(Message):
+    """Generated when Checkout is loaded and waiting for the configuration properties to be passed with the `checkoutFlow` or `paymentFlow` [method](/sdk)."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="checkout_loaded"
-        )
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(severity=severity, message=message, code="checkout_loaded")
 
     @classmethod
     def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "CheckoutLoaded":
@@ -418,15 +446,12 @@ class CheckoutLoaded(ResponseMessage):
         return CheckoutLoadedSchema().dump(self)
 
 
-class CheckoutStarted(ResponseMessage):
-    """Generated when the checkout receives the configuration parameters passed through the `checkoutConfig` object and starts successfully."""
+class CheckoutStarted(Message):
+    """Generated when the configuration properties are passed successfully with the `checkoutFlow` or `paymentFlow` [method](/sdk) and the checkout process starts."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="checkout_started"
-        )
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(severity=severity, message=message, code="checkout_started")
 
     @classmethod
     def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "CheckoutStarted":
@@ -440,15 +465,12 @@ class CheckoutStarted(ResponseMessage):
         return CheckoutStartedSchema().dump(self)
 
 
-class InitTimeout(ResponseMessage):
-    """Generated when the checkout has not received the configuration parameters passed through the `checkoutConfig` object on time."""
+class InitTimeout(Message):
+    """Generated when Checkout does not receive the configuration properties with the `checkoutFlow` or `paymentFlow` [method](/sdk) on time."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="init_timeout"
-        )
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(severity=severity, message=message, code="init_timeout")
 
     @classmethod
     def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "InitTimeout":
@@ -462,14 +484,32 @@ class InitTimeout(ResponseMessage):
         return InitTimeoutSchema().dump(self)
 
 
-class BadInputData(ResponseMessage):
-    """Generated when the `checkoutConfig` object contains one or more invalid fields."""
+class InvalidMode(Message):
+    """Generated when the Application does not support the requested Checkout [mode](/../checkout/overview#complete-checkout-and-payment-only-modes)."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(severity=severity, message=message, code="invalid_mode")
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "InvalidMode":
+        from ._schemas.responses import InvalidModeSchema
+
+        return InvalidModeSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import InvalidModeSchema
+
+        return InvalidModeSchema().dump(self)
+
+
+class BadInputData(ResponseMessage):
+    """Generated when the `checkoutConfig` [object](/sdk) contains one or more invalid fields."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
         super().__init__(
-            type=type, message=message, payload=payload, code="invalid_fields"
+            severity=severity, message=message, payload=payload, code="invalid_fields"
         )
 
     @classmethod
@@ -484,15 +524,12 @@ class BadInputData(ResponseMessage):
         return BadInputDataSchema().dump(self)
 
 
-class InvalidToken(ResponseMessage):
+class InvalidToken(Message):
     """Generated when the `accessToken` is invalid."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="invalid_token"
-        )
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(severity=severity, message=message, code="invalid_token")
 
     @classmethod
     def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "InvalidToken":
@@ -506,37 +543,12 @@ class InvalidToken(ResponseMessage):
         return InvalidTokenSchema().dump(self)
 
 
-class NoAllowedOrigins(ResponseMessage):
-    """Generated when there are no allowed origins configured for the current application. Add at least one **Origin URL** in your [application settings in the Merchant Center](/configuring-checkout#applications)."""
+class NoPaymentMethods(Message):
+    """Generated when no payment method is set up for an [Application](/payment-connectors-applications#applications). Add at least one **Payment method** to the Application in the Merchant Center."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="no_allowed_origins"
-        )
+    def __init__(self, *, severity: str, message: str):
 
-    @classmethod
-    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "NoAllowedOrigins":
-        from ._schemas.responses import NoAllowedOriginsSchema
-
-        return NoAllowedOriginsSchema().load(data)
-
-    def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.responses import NoAllowedOriginsSchema
-
-        return NoAllowedOriginsSchema().dump(self)
-
-
-class NoPaymentMethods(ResponseMessage):
-    """Generated when there are no payment methods available. Add at least one **Payment method** in your [application settings in the Merchant Center](/configuring-checkout#payment-connector)."""
-
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="no_payment_methods"
-        )
+        super().__init__(severity=severity, message=message, code="no_payment_methods")
 
     @classmethod
     def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "NoPaymentMethods":
@@ -550,14 +562,460 @@ class NoPaymentMethods(ResponseMessage):
         return NoPaymentMethodsSchema().dump(self)
 
 
-class NoShippingMethods(ResponseMessage):
-    """Generated when no Shipping Method is available for the shipping address of the Cart. This may indicate an incomplete configuration."""
+class PaymentFailed(Message):
+    """Generated when the payment fails."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(severity=severity, message=message, code="payment_failed")
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "PaymentFailed":
+        from ._schemas.responses import PaymentFailedSchema
+
+        return PaymentFailedSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentFailedSchema
+
+        return PaymentFailedSchema().dump(self)
+
+
+class PaymentStarted(ResponseMessage):
+    """Generated when the payment starts."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
         super().__init__(
-            type=type, message=message, payload=payload, code="no_shipping_methods"
+            severity=severity, message=message, payload=payload, code="payment_started"
+        )
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "PaymentStarted":
+        from ._schemas.responses import PaymentStartedSchema
+
+        return PaymentStartedSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentStartedSchema
+
+        return PaymentStartedSchema().dump(self)
+
+
+class InitError(Message):
+    """Generated when an error occurs during Checkout's initialization."""
+
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(severity=severity, message=message, code="init_error")
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "InitError":
+        from ._schemas.responses import InitErrorSchema
+
+        return InitErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import InitErrorSchema
+
+        return InitErrorSchema().dump(self)
+
+
+class PaymentConnectorError(ResponseMessage):
+    """Generated when the [payment Connector](/../checkout/payment-connectors-applications#payment-connectors) triggers an error."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="payment_connector_error",
+        )
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "PaymentConnectorError":
+        from ._schemas.responses import PaymentConnectorErrorSchema
+
+        return PaymentConnectorErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentConnectorErrorSchema
+
+        return PaymentConnectorErrorSchema().dump(self)
+
+
+class PaymentMethodLoaded(ResponseMessage):
+    """Generated when the selected payment method is loaded."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="payment_method_loaded",
+        )
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "PaymentMethodLoaded":
+        from ._schemas.responses import PaymentMethodLoadedSchema
+
+        return PaymentMethodLoadedSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentMethodLoadedSchema
+
+        return PaymentMethodLoadedSchema().dump(self)
+
+
+class PaymentMethodLoading(ResponseMessage):
+    """Generated when the selected payment method is loading."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="payment_method_loading",
+        )
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "PaymentMethodLoading":
+        from ._schemas.responses import PaymentMethodLoadingSchema
+
+        return PaymentMethodLoadingSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentMethodLoadingSchema
+
+        return PaymentMethodLoadingSchema().dump(self)
+
+
+class PaymentMethodLoadingError(ResponseMessage):
+    """Generated when the loading of the selected payment method fails."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="payment_method_loading_error",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "PaymentMethodLoadingError":
+        from ._schemas.responses import PaymentMethodLoadingErrorSchema
+
+        return PaymentMethodLoadingErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentMethodLoadingErrorSchema
+
+        return PaymentMethodLoadingErrorSchema().dump(self)
+
+
+class PaymentMethodSelected(ResponseMessage):
+    """Generated when the customer selects the payment method."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="payment_method_selected",
+        )
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "PaymentMethodSelected":
+        from ._schemas.responses import PaymentMethodSelectedSchema
+
+        return PaymentMethodSelectedSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentMethodSelectedSchema
+
+        return PaymentMethodSelectedSchema().dump(self)
+
+
+class PaymentMethodSelectionConfirmation(ResponseMessage):
+    """Generated when the customer has entered the payment method information and moves to the next step."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="payment_method_selection_confirmation",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "PaymentMethodSelectionConfirmation":
+        from ._schemas.responses import PaymentMethodSelectionConfirmationSchema
+
+        return PaymentMethodSelectionConfirmationSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentMethodSelectionConfirmationSchema
+
+        return PaymentMethodSelectionConfirmationSchema().dump(self)
+
+
+class PaymentMethodSelectionConfirmationFailed(ResponseMessage):
+    """Generated when an error occurs when the customer selects the payment method."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="payment_method_selection_confirmation_failed",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "PaymentMethodSelectionConfirmationFailed":
+        from ._schemas.responses import PaymentMethodSelectionConfirmationFailedSchema
+
+        return PaymentMethodSelectionConfirmationFailedSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentMethodSelectionConfirmationFailedSchema
+
+        return PaymentMethodSelectionConfirmationFailedSchema().dump(self)
+
+
+class PaymentMethodsReceived(ResponseMessage):
+    """Generated when Checkout receives and loads the payment methods configured for the Application."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="payment_methods_received",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "PaymentMethodsReceived":
+        from ._schemas.responses import PaymentMethodsReceivedSchema
+
+        return PaymentMethodsReceivedSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentMethodsReceivedSchema
+
+        return PaymentMethodsReceivedSchema().dump(self)
+
+
+class PaymentCancelled(Message):
+    """Generated when the customer cancels the payment (for example, by closing the browser's window)."""
+
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(severity=severity, message=message, code="payment_cancelled")
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "PaymentCancelled":
+        from ._schemas.responses import PaymentCancelledSchema
+
+        return PaymentCancelledSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentCancelledSchema
+
+        return PaymentCancelledSchema().dump(self)
+
+
+class PaymentValidationFailed(Message):
+    """Generated when Checkout and the payment service provider (PSP) do not validate the payment information entered by the customer."""
+
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(
+            severity=severity, message=message, code="payment_validation_failed"
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "PaymentValidationFailed":
+        from ._schemas.responses import PaymentValidationFailedSchema
+
+        return PaymentValidationFailedSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentValidationFailedSchema
+
+        return PaymentValidationFailedSchema().dump(self)
+
+
+class PaymentValidationPassed(Message):
+    """Generated when Checkout and the payment service provider (PSP) validate the payment information entered by the customer."""
+
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(
+            severity=severity, message=message, code="payment_validation_passed"
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "PaymentValidationPassed":
+        from ._schemas.responses import PaymentValidationPassedSchema
+
+        return PaymentValidationPassedSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentValidationPassedSchema
+
+        return PaymentValidationPassedSchema().dump(self)
+
+
+class PaymentValidationStarted(Message):
+    """Generated when the validation of the payment information entered by the customer starts."""
+
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(
+            severity=severity, message=message, code="payment_validation_started"
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "PaymentValidationStarted":
+        from ._schemas.responses import PaymentValidationStartedSchema
+
+        return PaymentValidationStartedSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentValidationStartedSchema
+
+        return PaymentValidationStartedSchema().dump(self)
+
+
+class PaymentVerificationStarted(Message):
+    """Generated when Checkout starts verifying the payment [authorization](/payments-lifecycle#authorization) given by the payment service provider (PSP)."""
+
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(
+            severity=severity, message=message, code="payment_verification_started"
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "PaymentVerificationStarted":
+        from ._schemas.responses import PaymentVerificationStartedSchema
+
+        return PaymentVerificationStartedSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentVerificationStartedSchema
+
+        return PaymentVerificationStartedSchema().dump(self)
+
+
+class PaymentVerificationTimeout(Message):
+    """Generated when the verification of the payment [authorization](/payments-lifecycle#authorization) times out."""
+
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(
+            severity=severity, message=message, code="payment_verification_timeout"
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "PaymentVerificationTimeout":
+        from ._schemas.responses import PaymentVerificationTimeoutSchema
+
+        return PaymentVerificationTimeoutSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import PaymentVerificationTimeoutSchema
+
+        return PaymentVerificationTimeoutSchema().dump(self)
+
+
+class ExternalTermsAndConditionsPending(Message):
+    """Generated in Payment Only [mode](/../checkout/overview#complete-checkout-and-payment-only-modes) when the customer hasn't accepted the terms and conditions yet."""
+
+    def __init__(self, *, severity: str, message: str):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            code="external_terms_and_conditions_pending",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "ExternalTermsAndConditionsPending":
+        from ._schemas.responses import ExternalTermsAndConditionsPendingSchema
+
+        return ExternalTermsAndConditionsPendingSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import ExternalTermsAndConditionsPendingSchema
+
+        return ExternalTermsAndConditionsPendingSchema().dump(self)
+
+
+class SetShippingAddressError(ResponseMessage):
+    """Generated when the [Cart](/../api/projects/carts) cannot be updated with the shipping address."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="set_shipping_address_error",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "SetShippingAddressError":
+        from ._schemas.responses import SetShippingAddressErrorSchema
+
+        return SetShippingAddressErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import SetShippingAddressErrorSchema
+
+        return SetShippingAddressErrorSchema().dump(self)
+
+
+class NoShippingMethods(ResponseMessage):
+    """Generated when no [Shipping Method](/../api/projects/shippingMethods) is available for the shipping address of the [Cart](/../api/projects/carts). This may indicate an incomplete configuration."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="no_shipping_methods",
         )
 
     @classmethod
@@ -573,13 +1031,12 @@ class NoShippingMethods(ResponseMessage):
 
 
 class OrderCreated(ResponseMessage):
-    """Generated when the checkout successfully creates an Order."""
+    """Generated when an [Order](/../api/projects/orders) is created after a successful checkout process."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, severity: str, message: str, payload: object):
+
         super().__init__(
-            type=type, message=message, payload=payload, code="order_created"
+            severity=severity, message=message, payload=payload, code="order_created"
         )
 
     @classmethod
@@ -594,104 +1051,40 @@ class OrderCreated(ResponseMessage):
         return OrderCreatedSchema().dump(self)
 
 
-class SellerIsDeactivated(ResponseMessage):
-    """Generated when the seller is deactivated and the checkout cannot be initialized. Contact commercetools support."""
+class ProjectIsDeactivated(ResponseMessage):
+    """Generated when the commercetools Checkout [`projectKey`](/sdk) is deactivated and cannot be initialized. To activate it, contact the [Checkout support team](https://support.commercetools.com/)."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, severity: str, message: str, payload: object):
+
         super().__init__(
-            type=type, message=message, payload=payload, code="seller_deactivated"
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="project_deactivated",
         )
 
     @classmethod
-    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "SellerIsDeactivated":
-        from ._schemas.responses import SellerIsDeactivatedSchema
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "ProjectIsDeactivated":
+        from ._schemas.responses import ProjectIsDeactivatedSchema
 
-        return SellerIsDeactivatedSchema().load(data)
-
-    def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.responses import SellerIsDeactivatedSchema
-
-        return SellerIsDeactivatedSchema().dump(self)
-
-
-class SellerNotFound(ResponseMessage):
-    """Generated when the seller is not found. The seller may have been deleted or the configuration may not be correct. Contact commercetools support."""
-
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="seller_not_found"
-        )
-
-    @classmethod
-    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "SellerNotFound":
-        from ._schemas.responses import SellerNotFoundSchema
-
-        return SellerNotFoundSchema().load(data)
+        return ProjectIsDeactivatedSchema().load(data)
 
     def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.responses import SellerNotFoundSchema
+        from ._schemas.responses import ProjectIsDeactivatedSchema
 
-        return SellerNotFoundSchema().dump(self)
-
-
-class ShippingAddressMissing(ResponseMessage):
-    """Generated when the checkout is initialised with [`skipShipping` set to `true`](/installing-checkout#placeholder-values). You must populate the `shippingAddress` field of the Cart with at least the shipping country."""
-
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="shipping_address_missing"
-        )
-
-    @classmethod
-    def deserialize(
-        cls, data: typing.Dict[str, typing.Any]
-    ) -> "ShippingAddressMissing":
-        from ._schemas.responses import ShippingAddressMissingSchema
-
-        return ShippingAddressMissingSchema().load(data)
-
-    def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.responses import ShippingAddressMissingSchema
-
-        return ShippingAddressMissingSchema().dump(self)
-
-
-class UnallowedOrigin(ResponseMessage):
-    """Generated when the currently used origin URL is not in the list of the [**Origin URLs** configured in the Merchant Center](/configuring-checkout#create-an-application) and the checkout cannot be initialized. Add the **Origin URL** in your application settings in the Merchant Center."""
-
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
-        super().__init__(
-            type=type, message=message, payload=payload, code="unallowed_origin"
-        )
-
-    @classmethod
-    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "UnallowedOrigin":
-        from ._schemas.responses import UnallowedOriginSchema
-
-        return UnallowedOriginSchema().load(data)
-
-    def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.responses import UnallowedOriginSchema
-
-        return UnallowedOriginSchema().dump(self)
+        return ProjectIsDeactivatedSchema().dump(self)
 
 
 class UnavailableLocale(ResponseMessage):
-    """Generated when the provided locale is not [available for localization](/installing-checkout#locales). The checkout falls back to English."""
+    """Generated when the provided `locale` is not [available for localization](/installing-checkout#locales). The localization falls back to English."""
 
-    def __init__(
-        self, *, type: str, message: str, payload: typing.Optional[object] = None
-    ):
+    def __init__(self, *, severity: str, message: str, payload: object):
+
         super().__init__(
-            type=type, message=message, payload=payload, code="unavailable_locale"
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="unavailable_locale",
         )
 
     @classmethod
@@ -704,3 +1097,101 @@ class UnavailableLocale(ResponseMessage):
         from ._schemas.responses import UnavailableLocaleSchema
 
         return UnavailableLocaleSchema().dump(self)
+
+
+class DeprecatedFields(ResponseMessage):
+    """Generated when the `checkoutConfig` [object](/sdk) contains one or more deprecated fields."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="deprecated_fields",
+        )
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "DeprecatedFields":
+        from ._schemas.responses import DeprecatedFieldsSchema
+
+        return DeprecatedFieldsSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import DeprecatedFieldsSchema
+
+        return DeprecatedFieldsSchema().dump(self)
+
+
+class OrderCreationError(ResponseMessage):
+    """Generated when an [Order](/../api/projects/orders) that references an approved [Payment](/../api/projects/payments) cannot be created."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="order_creation_error",
+        )
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "OrderCreationError":
+        from ._schemas.responses import OrderCreationErrorSchema
+
+        return OrderCreationErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import OrderCreationErrorSchema
+
+        return OrderCreationErrorSchema().dump(self)
+
+
+class CartWithExistingPayment(ResponseMessage):
+    """Generated when trying to add a [Payment](/../api/projects/payments) to a [Cart](/../api/projects/carts) that already references an approved Payment."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="cart_with_exisiting_payment",
+        )
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "CartWithExistingPayment":
+        from ._schemas.responses import CartWithExistingPaymentSchema
+
+        return CartWithExistingPaymentSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import CartWithExistingPaymentSchema
+
+        return CartWithExistingPaymentSchema().dump(self)
+
+
+class UnsupportedCountry(ResponseMessage):
+    """Generated when the country of the shipping address and/or billing address associated with the [Cart](/../api/projects/carts) does not match the countries set for the [Application](/payment-connectors-applications#applications)."""
+
+    def __init__(self, *, severity: str, message: str, payload: object):
+
+        super().__init__(
+            severity=severity,
+            message=message,
+            payload=payload,
+            code="unsupported_country",
+        )
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "UnsupportedCountry":
+        from ._schemas.responses import UnsupportedCountrySchema
+
+        return UnsupportedCountrySchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.responses import UnsupportedCountrySchema
+
+        return UnsupportedCountrySchema().dump(self)

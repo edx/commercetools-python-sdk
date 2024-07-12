@@ -16,6 +16,7 @@ from ... import models
 from ..business_unit import (
     AssociateRoleDeprecated,
     AssociateRoleInheritanceMode,
+    BusinessUnitApprovalRuleMode,
     BusinessUnitAssociateMode,
     BusinessUnitStatus,
     BusinessUnitStoreMode,
@@ -63,6 +64,7 @@ class AssociateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Associate(**data)
 
 
@@ -95,6 +97,7 @@ class AssociateDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.AssociateDraft(**data)
 
 
@@ -117,6 +120,7 @@ class AssociateRoleAssignmentSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.AssociateRoleAssignment(**data)
 
 
@@ -143,6 +147,7 @@ class AssociateRoleAssignmentDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.AssociateRoleAssignmentDraft(**data)
 
 
@@ -274,6 +279,13 @@ class BusinessUnitSchema(BaseResourceSchema):
         load_default=None,
         data_key="topLevelUnit",
     )
+    approval_rule_mode = marshmallow_enum.EnumField(
+        BusinessUnitApprovalRuleMode,
+        by_value=True,
+        allow_none=True,
+        load_default=None,
+        data_key="approvalRuleMode",
+    )
 
     class Meta:
         unknown = marshmallow.EXCLUDE
@@ -339,6 +351,14 @@ class BusinessUnitDraftSchema(helpers.BaseSchema):
         metadata={"omit_empty": True},
         load_default=None,
     )
+    approval_rule_mode = marshmallow_enum.EnumField(
+        BusinessUnitApprovalRuleMode,
+        by_value=True,
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="approvalRuleMode",
+    )
     addresses = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".common.BaseAddressSchema"),
         allow_none=True,
@@ -391,6 +411,7 @@ class BusinessUnitDraftSchema(helpers.BaseSchema):
 
 
 class BusinessUnitKeyReferenceSchema(KeyReferenceSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -425,6 +446,7 @@ class BusinessUnitPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.BusinessUnitPagedQueryResponse(**data)
 
 
@@ -450,6 +472,7 @@ class BusinessUnitReferenceSchema(ReferenceSchema):
 
 
 class BusinessUnitResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -483,6 +506,9 @@ class BusinessUnitUpdateSchema(helpers.BaseSchema):
                 ),
                 "changeAddress": helpers.absmod(
                     __name__, ".BusinessUnitChangeAddressActionSchema"
+                ),
+                "changeApprovalRuleMode": helpers.absmod(
+                    __name__, ".BusinessUnitChangeApprovalRuleModeActionSchema"
                 ),
                 "changeAssociate": helpers.absmod(
                     __name__, ".BusinessUnitChangeAssociateActionSchema"
@@ -555,6 +581,7 @@ class BusinessUnitUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.BusinessUnitUpdate(**data)
 
 
@@ -571,6 +598,7 @@ class BusinessUnitUpdateActionSchema(helpers.BaseSchema):
 
 
 class CompanySchema(BusinessUnitSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -581,6 +609,7 @@ class CompanySchema(BusinessUnitSchema):
 
 
 class CompanyDraftSchema(BusinessUnitDraftSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -591,6 +620,7 @@ class CompanyDraftSchema(BusinessUnitDraftSchema):
 
 
 class DivisionSchema(BusinessUnitSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -639,6 +669,7 @@ class InheritedAssociateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.InheritedAssociate(**data)
 
 
@@ -664,6 +695,7 @@ class InheritedAssociateRoleAssignmentSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.InheritedAssociateRoleAssignment(**data)
 
 
@@ -791,6 +823,24 @@ class BusinessUnitChangeAddressActionSchema(BusinessUnitUpdateActionSchema):
     def post_load(self, data, **kwargs):
         del data["action"]
         return models.BusinessUnitChangeAddressAction(**data)
+
+
+class BusinessUnitChangeApprovalRuleModeActionSchema(BusinessUnitUpdateActionSchema):
+    approval_rule_mode = marshmallow_enum.EnumField(
+        BusinessUnitApprovalRuleMode,
+        by_value=True,
+        allow_none=True,
+        load_default=None,
+        data_key="approvalRuleMode",
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.BusinessUnitChangeApprovalRuleModeAction(**data)
 
 
 class BusinessUnitChangeAssociateActionSchema(BusinessUnitUpdateActionSchema):
@@ -1170,7 +1220,6 @@ class BusinessUnitSetStoresActionSchema(BusinessUnitUpdateActionSchema):
         allow_none=True,
         many=True,
         unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
         load_default=None,
     )
 

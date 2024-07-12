@@ -89,9 +89,9 @@ class ShoppingList(BaseResource):
     store: typing.Optional["StoreKeyReference"]
     #: Custom Fields defined for the ShoppingList.
     custom: typing.Optional["CustomFields"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that last modified the ShoppingList.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that created the ShoppingList.
     created_by: typing.Optional["CreatedBy"]
 
     def __init__(
@@ -427,6 +427,7 @@ class ShoppingListResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.SHOPPING_LIST)
 
     @classmethod
@@ -444,7 +445,8 @@ class ShoppingListResourceIdentifier(ResourceIdentifier):
 
 
 class ShoppingListUpdate(_BaseType):
-    #: Expected version of the ShoppingList on which the changes should be applied. If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) will be returned.
+    #: Expected version of the ShoppingList on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: List of update actions to be performed on the ShoppingList.
     actions: typing.List["ShoppingListUpdateAction"]
@@ -1071,6 +1073,8 @@ class ShoppingListRemoveTextLineItemAction(ShoppingListUpdateAction):
 
 
 class ShoppingListSetAnonymousIdAction(ShoppingListUpdateAction):
+    """If the Shopping List is already associated with a Customer, an [InvalidOperation](ctp:api:type:InvalidOperationError) error is returned."""
+
     #: Value to set. If empty, any existing value will be removed.
     anonymous_id: typing.Optional[str]
 

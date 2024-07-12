@@ -65,6 +65,7 @@ class HitSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Hit(**data)
 
 
@@ -89,6 +90,7 @@ class OrderPagedSearchResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderPagedSearchResponse(**data)
 
 
@@ -109,6 +111,7 @@ class OrderSearchQueryExpressionValueSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchQueryExpressionValue(**data)
 
 
@@ -129,6 +132,7 @@ class OrderSearchAnyValueSchema(OrderSearchQueryExpressionValueSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchAnyValue(**data)
 
 
@@ -145,6 +149,7 @@ class OrderSearchDateRangeValueSchema(OrderSearchQueryExpressionValueSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchDateRangeValue(**data)
 
 
@@ -167,6 +172,7 @@ class OrderSearchFullTextValueSchema(OrderSearchQueryExpressionValueSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchFullTextValue(**data)
 
 
@@ -183,6 +189,7 @@ class OrderSearchLongRangeValueSchema(OrderSearchQueryExpressionValueSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchLongRangeValue(**data)
 
 
@@ -199,6 +206,7 @@ class OrderSearchNumberRangeValueSchema(OrderSearchQueryExpressionValueSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchNumberRangeValue(**data)
 
 
@@ -219,6 +227,7 @@ class OrderSearchStringValueSchema(OrderSearchQueryExpressionValueSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchStringValue(**data)
 
 
@@ -294,6 +303,7 @@ class CustomLineItemImportDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomLineItemImportDraft(**data)
 
 
@@ -339,6 +349,7 @@ class DeliverySchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Delivery(**data)
 
 
@@ -382,6 +393,7 @@ class DeliveryDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DeliveryDraft(**data)
 
 
@@ -394,6 +406,7 @@ class DeliveryItemSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DeliveryItem(**data)
 
 
@@ -405,7 +418,7 @@ class DiscountedLineItemPriceDraftSchema(helpers.BaseSchema):
         load_default=None,
     )
     included_discounts = helpers.LazyNestedField(
-        nested=helpers.absmod(__name__, ".cart.DiscountedLineItemPortionSchema"),
+        nested=helpers.absmod(__name__, ".cart.DiscountedLineItemPortionDraftSchema"),
         allow_none=True,
         many=True,
         unknown=marshmallow.EXCLUDE,
@@ -418,6 +431,7 @@ class DiscountedLineItemPriceDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DiscountedLineItemPriceDraft(**data)
 
 
@@ -435,6 +449,7 @@ class ItemStateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ItemState(**data)
 
 
@@ -527,6 +542,7 @@ class LineItemImportDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.LineItemImportDraft(**data)
 
 
@@ -891,6 +907,7 @@ class OrderSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Order(**data)
 
 
@@ -962,6 +979,7 @@ class OrderFromCartDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderFromCartDraft(**data)
 
 
@@ -1022,6 +1040,7 @@ class OrderFromQuoteDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderFromQuoteDraft(**data)
 
 
@@ -1235,6 +1254,7 @@ class OrderImportDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderImportDraft(**data)
 
 
@@ -1258,6 +1278,7 @@ class OrderPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderPagedQueryResponse(**data)
 
 
@@ -1280,20 +1301,24 @@ class OrderReferenceSchema(ReferenceSchema):
 
 
 class OrderSearchQuerySchema(helpers.BaseSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchQuery(**data)
 
 
 class OrderSearchCompoundExpressionSchema(OrderSearchQuerySchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchCompoundExpression(**data)
 
 
@@ -1312,6 +1337,7 @@ class OrderSearchAndExpressionSchema(OrderSearchCompoundExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchAndExpression(**data)
 
 
@@ -1329,6 +1355,7 @@ class OrderSearchFilterExpressionSchema(OrderSearchCompoundExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchFilterExpression(**data)
 
 
@@ -1347,6 +1374,7 @@ class OrderSearchNotExpressionSchema(OrderSearchCompoundExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchNotExpression(**data)
 
 
@@ -1365,15 +1393,18 @@ class OrderSearchOrExpressionSchema(OrderSearchCompoundExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchOrExpression(**data)
 
 
 class OrderSearchQueryExpressionSchema(OrderSearchQuerySchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchQueryExpression(**data)
 
 
@@ -1390,6 +1421,7 @@ class OrderSearchDateRangeExpressionSchema(OrderSearchQueryExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchDateRangeExpression(**data)
 
 
@@ -1406,6 +1438,7 @@ class OrderSearchExactExpressionSchema(OrderSearchQueryExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchExactExpression(**data)
 
 
@@ -1422,6 +1455,7 @@ class OrderSearchExistsExpressionSchema(OrderSearchQueryExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchExistsExpression(**data)
 
 
@@ -1439,6 +1473,7 @@ class OrderSearchFullTextExpressionSchema(OrderSearchQueryExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchFullTextExpression(**data)
 
 
@@ -1455,6 +1490,7 @@ class OrderSearchLongRangeExpressionSchema(OrderSearchQueryExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchLongRangeExpression(**data)
 
 
@@ -1471,6 +1507,7 @@ class OrderSearchNumberRangeExpressionSchema(OrderSearchQueryExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchNumberRangeExpression(**data)
 
 
@@ -1487,6 +1524,7 @@ class OrderSearchPrefixExpressionSchema(OrderSearchQueryExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchPrefixExpression(**data)
 
 
@@ -1503,6 +1541,7 @@ class OrderSearchWildCardExpressionSchema(OrderSearchQueryExpressionSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchWildCardExpression(**data)
 
 
@@ -1533,6 +1572,7 @@ class OrderSearchRequestSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchRequest(**data)
 
 
@@ -1568,6 +1608,7 @@ class OrderSearchSortingSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderSearchSorting(**data)
 
 
@@ -1727,6 +1768,12 @@ class OrderUpdateSchema(helpers.BaseSchema):
                 "setShippingAddressCustomType": helpers.absmod(
                     __name__, ".OrderSetShippingAddressCustomTypeActionSchema"
                 ),
+                "setShippingCustomField": helpers.absmod(
+                    __name__, ".OrderSetShippingCustomFieldActionSchema"
+                ),
+                "setShippingCustomType": helpers.absmod(
+                    __name__, ".OrderSetShippingCustomTypeActionSchema"
+                ),
                 "setStore": helpers.absmod(__name__, ".OrderSetStoreActionSchema"),
                 "transitionCustomLineItemState": helpers.absmod(
                     __name__, ".OrderTransitionCustomLineItemStateActionSchema"
@@ -1754,6 +1801,7 @@ class OrderUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderUpdate(**data)
 
 
@@ -1813,6 +1861,7 @@ class ParcelSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Parcel(**data)
 
 
@@ -1856,6 +1905,7 @@ class ParcelDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ParcelDraft(**data)
 
 
@@ -1890,6 +1940,7 @@ class ParcelMeasurementsSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ParcelMeasurements(**data)
 
 
@@ -1907,6 +1958,7 @@ class PaymentInfoSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.PaymentInfo(**data)
 
 
@@ -1947,6 +1999,7 @@ class ProductVariantImportDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ProductVariantImportDraft(**data)
 
 
@@ -1985,6 +2038,7 @@ class ReturnInfoSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ReturnInfo(**data)
 
 
@@ -2014,6 +2068,7 @@ class ReturnInfoDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ReturnInfoDraft(**data)
 
 
@@ -2132,6 +2187,7 @@ class ReturnItemDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ReturnItemDraft(**data)
 
 
@@ -2210,6 +2266,7 @@ class ShippingInfoImportDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShippingInfoImportDraft(**data)
 
 
@@ -2235,6 +2292,7 @@ class SyncInfoSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.SyncInfo(**data)
 
 
@@ -2259,6 +2317,7 @@ class TaxedItemPriceDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.TaxedItemPriceDraft(**data)
 
 
@@ -2293,6 +2352,7 @@ class TrackingDataSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.TrackingData(**data)
 
 
@@ -3608,6 +3668,57 @@ class OrderSetShippingAddressCustomTypeActionSchema(OrderUpdateActionSchema):
     def post_load(self, data, **kwargs):
         del data["action"]
         return models.OrderSetShippingAddressCustomTypeAction(**data)
+
+
+class OrderSetShippingCustomFieldActionSchema(OrderUpdateActionSchema):
+    shipping_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="shippingKey",
+    )
+    name = marshmallow.fields.String(allow_none=True, load_default=None)
+    value = marshmallow.fields.Raw(
+        allow_none=True, metadata={"omit_empty": True}, load_default=None
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.OrderSetShippingCustomFieldAction(**data)
+
+
+class OrderSetShippingCustomTypeActionSchema(OrderUpdateActionSchema):
+    shipping_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="shippingKey",
+    )
+    type = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".type.TypeResourceIdentifierSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
+    fields = FieldContainerField(
+        allow_none=True,
+        values=marshmallow.fields.Raw(allow_none=True),
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.OrderSetShippingCustomTypeAction(**data)
 
 
 class OrderSetStoreActionSchema(OrderUpdateActionSchema):

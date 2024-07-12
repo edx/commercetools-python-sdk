@@ -11,7 +11,7 @@ import typing
 
 from ._abstract import _BaseType
 from .business_unit import BusinessUnitType
-from .cart import InventoryMode, TaxMode
+from .cart import InventoryMode, ShippingMode, TaxMode
 from .payment import TransactionType
 
 if typing.TYPE_CHECKING:
@@ -29,6 +29,7 @@ if typing.TYPE_CHECKING:
         InventoryMode,
         ItemShippingDetailsDraft,
         ItemShippingTarget,
+        ShippingMode,
         TaxMode,
     )
     from .channel import ChannelResourceIdentifier
@@ -184,7 +185,8 @@ __all__ = [
 
 
 class MyBusinessUnitAssociateDraft(_BaseType):
-    #: Expected version of the BusinessUnit on which the changes should be applied. If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: Expected version of the BusinessUnit on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: [Customer](ctp:api:type:Customer) to create and assign to the Business Unit.
     customer: "MyCustomerDraft"
@@ -228,7 +230,7 @@ class MyBusinessUnitDraft(_BaseType):
     #: Email address of the Business Unit.
     contact_email: typing.Optional[str]
     #: Custom Fields for the Business Unit.
-    custom: typing.Optional["CustomFields"]
+    custom: typing.Optional["CustomFieldsDraft"]
     #: Addresses used by the Business Unit.
     addresses: typing.Optional[typing.List["BaseAddress"]]
     #: Indexes of entries in `addresses` to set as shipping addresses.
@@ -249,7 +251,7 @@ class MyBusinessUnitDraft(_BaseType):
         unit_type: "BusinessUnitType",
         name: str,
         contact_email: typing.Optional[str] = None,
-        custom: typing.Optional["CustomFields"] = None,
+        custom: typing.Optional["CustomFieldsDraft"] = None,
         addresses: typing.Optional[typing.List["BaseAddress"]] = None,
         shipping_addresses: typing.Optional[typing.List["int"]] = None,
         default_shipping_address: typing.Optional[int] = None,
@@ -288,7 +290,7 @@ class MyBusinessUnitDraft(_BaseType):
 
 class MyBusinessUnitUpdate(_BaseType):
     #: Expected version of the BusinessUnit on which the changes should be applied.
-    #: If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the BusinessUnit.
     actions: typing.List["BusinessUnitUpdateAction"]
@@ -437,9 +439,12 @@ class MyCartDraft(_BaseType):
     #:
     #: Eligible Shipping Methods or applicable Tax Rates are determined by the [Cart](ctp:api:type:Cart) `shippingAddress`, and not `itemShippingAddresses`.
     item_shipping_addresses: typing.Optional[typing.List["BaseAddress"]]
+    #: - If set to `Single`, only a single Shipping Method can be added to the Cart.
+    #: - If set to `Multiple`, multiple Shipping Methods can be added to the Cart.
+    shipping_mode: typing.Optional["ShippingMode"]
     #: `code` of the existing [DiscountCodes](ctp:api:type:DiscountCode) to add to the Cart.
     discount_codes: typing.Optional[typing.List["str"]]
-    #: Used for [LineItem Price selection](ctp:api:type:LineItemPriceSelection).
+    #: Used for [Line Item price selection](/../api/pricing-and-discounts-overview#line-item-price-selection).
     #: If used for [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/me/carts:POST), the provided country must be one of the [Store's](ctp:api:type:Store) `countries`.
     country: typing.Optional[str]
     #: Languages of the Cart.
@@ -467,6 +472,7 @@ class MyCartDraft(_BaseType):
         shipping_address: typing.Optional["BaseAddress"] = None,
         shipping_method: typing.Optional["ShippingMethodResourceIdentifier"] = None,
         item_shipping_addresses: typing.Optional[typing.List["BaseAddress"]] = None,
+        shipping_mode: typing.Optional["ShippingMode"] = None,
         discount_codes: typing.Optional[typing.List["str"]] = None,
         country: typing.Optional[str] = None,
         locale: typing.Optional[str] = None,
@@ -484,6 +490,7 @@ class MyCartDraft(_BaseType):
         self.shipping_address = shipping_address
         self.shipping_method = shipping_method
         self.item_shipping_addresses = item_shipping_addresses
+        self.shipping_mode = shipping_mode
         self.discount_codes = discount_codes
         self.country = country
         self.locale = locale
@@ -506,7 +513,7 @@ class MyCartDraft(_BaseType):
 
 class MyCartUpdate(_BaseType):
     #: Expected version of the Cart on which the changes apply.
-    #: If it does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error is returned.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the Cart.
     actions: typing.List["MyCartUpdateAction"]
@@ -676,13 +683,14 @@ class MyCompanyDraft(MyBusinessUnitDraft):
         key: str,
         name: str,
         contact_email: typing.Optional[str] = None,
-        custom: typing.Optional["CustomFields"] = None,
+        custom: typing.Optional["CustomFieldsDraft"] = None,
         addresses: typing.Optional[typing.List["BaseAddress"]] = None,
         shipping_addresses: typing.Optional[typing.List["int"]] = None,
         default_shipping_address: typing.Optional[int] = None,
         billing_addresses: typing.Optional[typing.List["int"]] = None,
         default_billing_address: typing.Optional[int] = None
     ):
+
         super().__init__(
             key=key,
             name=name,
@@ -797,7 +805,8 @@ class MyCustomerDraft(_BaseType):
 
 
 class MyCustomerUpdate(_BaseType):
-    #: Expected version of the Customer on which the changes should be applied. If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: Expected version of the Customer on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the Customer.
     actions: typing.List["MyCustomerUpdateAction"]
@@ -938,7 +947,7 @@ class MyDivisionDraft(MyBusinessUnitDraft):
         key: str,
         name: str,
         contact_email: typing.Optional[str] = None,
-        custom: typing.Optional["CustomFields"] = None,
+        custom: typing.Optional["CustomFieldsDraft"] = None,
         addresses: typing.Optional[typing.List["BaseAddress"]] = None,
         shipping_addresses: typing.Optional[typing.List["int"]] = None,
         default_shipping_address: typing.Optional[int] = None,
@@ -995,7 +1004,7 @@ class MyLineItemDraft(_BaseType):
     #: Used to identify [Inventory entries](/../api/projects/inventory) that must be reserved.
     #: The Channel must have the `InventorySupply` [ChannelRoleEnum](ctp:api:type:ChannelRoleEnum).
     supply_channel: typing.Optional["ChannelResourceIdentifier"]
-    #: Used to [select](ctp:api:type:LineItemPriceSelection) a Product Price.
+    #: Used to [select](/../api/pricing-and-discounts-overview#line-item-price-selection) a Product Price.
     #: The Channel must have the `ProductDistribution` [ChannelRoleEnum](ctp:api:type:ChannelRoleEnum).
     #:
     #: If the Cart is bound to a [Store](ctp:api:type:Store) with `distributionChannels` set,
@@ -1244,7 +1253,8 @@ class MyPaymentPagedQueryResponse(_BaseType):
 
 
 class MyPaymentUpdate(_BaseType):
-    #: Expected version of the Payment on which the changes should be applied. If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) will be returned.
+    #: Expected version of the Payment on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the Payment.
     actions: typing.List["MyPaymentUpdateAction"]
@@ -1397,7 +1407,7 @@ class MyQuoteState(enum.Enum):
 
 class MyQuoteUpdate(_BaseType):
     #: Expected version of the [Quote](ctp:api:type:Quote) to which the changes should be applied.
-    #: If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the [Quote](ctp:api:type:Quote).
     actions: typing.List["MyQuoteUpdateAction"]
@@ -1499,7 +1509,8 @@ class MyShoppingListDraft(_BaseType):
 
 
 class MyShoppingListUpdate(_BaseType):
-    #: Expected version of the ShoppingList on which the changes should be applied. If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) will be returned.
+    #: Expected version of the ShoppingList on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: List of update actions to be performed on the ShoppingList.
     actions: typing.List["MyShoppingListUpdateAction"]
@@ -2312,8 +2323,7 @@ class MyCartAddItemShippingAddressAction(MyCartUpdateAction):
 class MyCartAddLineItemAction(MyCartUpdateAction):
     """If the Cart contains a [LineItem](ctp:api:type:LineItem) for a Product Variant with the same [LineItemMode](ctp:api:type:LineItemMode), [Custom Fields](/../api/projects/custom-fields), supply and distribution channel, then only the quantity of the existing Line Item is increased.
     If [LineItem](ctp:api:type:LineItem) `shippingDetails` is set, it is merged. All addresses will be present afterwards and, for address keys present in both shipping details, the quantity will be summed up.
-    A new Line Item is added when the `externalPrice` or `externalTotalPrice` is set in this update action.
-    The [LineItem](ctp:api:type:LineItem) price is set as described in [LineItem Price selection](ctp:api:type:LineItemPriceSelection).
+    The [LineItem](ctp:api:type:LineItem) price is set as described in [Line Item price selection](/../api/pricing-and-discounts-overview#line-item-price-selection).
 
     If the Tax Rate is not set, a [MissingTaxRateForCountry](ctp:api:type:MissingTaxRateForCountryError) error is returned.
 
@@ -2344,7 +2354,7 @@ class MyCartAddLineItemAction(MyCartUpdateAction):
     #:
     #: Optional for backwards compatibility reasons.
     added_at: typing.Optional[datetime.datetime]
-    #: Used to [select](ctp:api:type:LineItemPriceSelection) a Product Price.
+    #: Used to [select](/../api/pricing-and-discounts-overview#line-item-price-selection) a Product Price.
     #: The Channel must have the `ProductDistribution` [ChannelRoleEnum](ctp:api:type:ChannelRoleEnum).
     #: If the Cart is bound to a [Store](ctp:api:type:Store) with `distributionChannels` set, the Channel must match one of the Store's distribution channels.
     distribution_channel: typing.Optional["ChannelResourceIdentifier"]
@@ -2633,7 +2643,7 @@ class MyCartRemoveItemShippingAddressAction(MyCartUpdateAction):
 
 
 class MyCartRemoveLineItemAction(MyCartUpdateAction):
-    """The [LineItem](ctp:api:type:LineItem) price is updated as described in [LineItem Price selection](ctp:api:type:LineItemPriceSelection)."""
+    """The [LineItem](ctp:api:type:LineItem) price is updated as described in [Line Item price selection](/../api/pricing-and-discounts-overview#line-item-price-selection)."""
 
     #: `id` of the [LineItem](ctp:api:type:LineItem) to update. Either `lineItemId` or `lineItemKey` is required.
     line_item_id: typing.Optional[str]
@@ -2982,7 +2992,7 @@ class MyCartSetLineItemCustomTypeAction(MyCartUpdateAction):
 
 
 class MyCartSetLineItemDistributionChannelAction(MyCartUpdateAction):
-    """Setting a distribution channel for a [LineItem](ctp:api:type:LineItem) can lead to an updated `price` as described in [LineItem Price selection](ctp:api:type:LineItemPriceSelection)."""
+    """Setting a distribution channel for a [LineItem](ctp:api:type:LineItem) can lead to an updated `price` as described in [Line Item price selection](/../api/pricing-and-discounts-overview#line-item-price-selection)."""
 
     #: `id` of the [LineItem](ctp:api:type:LineItem) to update. Either `lineItemId` or `lineItemKey` is required.
     line_item_id: typing.Optional[str]
@@ -3121,7 +3131,7 @@ class MyCartSetLocaleAction(MyCartUpdateAction):
 class MyCartSetShippingAddressAction(MyCartUpdateAction):
     """Setting the shipping address also sets the [TaxRate](ctp:api:type:TaxRate) of Line Items and calculates the [TaxedPrice](ctp:api:type:TaxedPrice).
 
-    If a matching price cannot be found for the given shipping address during [Line Item Price selection](ctp:api:type:LineItemPriceSelection),
+    If a matching price cannot be found for the given shipping address during [Line Item price selection](/../api/pricing-and-discounts-overview#line-item-price-selection),
     a [MissingTaxRateForCountry](ctp:api:type:MissingTaxRateForCountryError) error is returned.
 
     If you want to allow shipping to states inside a country that are not explicitly covered by a TaxRate,
@@ -3669,7 +3679,7 @@ class MyCustomerSetDefaultShippingAddressAction(MyCustomerUpdateAction):
 
 
 class MyCustomerSetFirstNameAction(MyCustomerUpdateAction):
-    """Setting the first name of the Customer produces the [CustomerFirstNameSetMessage](ctp:api:type:CustomerFirstNameSetMessage)."""
+    """Setting the first name of the Customer produces the [CustomerFirstNameSet](ctp:api:type:CustomerFirstNameSetMessage) Message."""
 
     #: Value to set.
     #: If empty, any existing value is removed.
@@ -3695,7 +3705,7 @@ class MyCustomerSetFirstNameAction(MyCustomerUpdateAction):
 
 
 class MyCustomerSetLastNameAction(MyCustomerUpdateAction):
-    """Setting the last name of the Customer produces the [CustomerLastNameSetMessage](ctp:api:type:CustomerLastNameSetMessage)."""
+    """Setting the last name of the Customer produces the [CustomerLastNameSet](ctp:api:type:CustomerLastNameSetMessage) Message."""
 
     #: Value to set.
     #: If empty, any existing value is removed.
@@ -4052,6 +4062,7 @@ class MyQuoteRequestCancelAction(MyQuoteRequestUpdateAction):
     """Transitions the `quoteRequestState` of the Quote Request to `Cancelled`. Can only be used when the Quote Request is in state `Submitted`."""
 
     def __init__(self):
+
         super().__init__(action="cancelQuoteRequest")
 
     @classmethod

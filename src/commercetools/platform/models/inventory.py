@@ -43,9 +43,9 @@ __all__ = [
 
 
 class InventoryEntry(BaseResource):
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that last modified the InventoryEntry.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that created the InventoryEntry.
     created_by: typing.Optional["CreatedBy"]
     #: User-defined unique identifier of the InventoryEntry.
     key: typing.Optional[str]
@@ -192,6 +192,7 @@ class InventoryEntryResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.INVENTORY_ENTRY)
 
     @classmethod
@@ -209,7 +210,8 @@ class InventoryEntryResourceIdentifier(ResourceIdentifier):
 
 
 class InventoryEntryUpdate(_BaseType):
-    #: Expected version of the InventoryEntry on which the changes should be applied. If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error is returned.
+    #: Expected version of the InventoryEntry on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the InventoryEntry.
     actions: typing.List["InventoryEntryUpdateAction"]

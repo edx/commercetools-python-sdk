@@ -18,6 +18,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyProductSelectionsKeyByKeyRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _key: str
@@ -118,7 +119,7 @@ class ByProjectKeyProductSelectionsKeyByKeyRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["ProductSelection"]:
-        """Deletion will only succeed if the Product Selection is not assigned to any [Store](/../api/projects/stores#store)."""
+        """Deletion will only succeed if the Product Selection is not assigned to any [Store](ctp:api:type:Store)."""
         headers = {} if headers is None else headers
         response = self._client._delete(
             endpoint=f"/{self._project_key}/product-selections/key={self._key}",

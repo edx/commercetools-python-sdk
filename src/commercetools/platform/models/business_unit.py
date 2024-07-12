@@ -46,8 +46,10 @@ __all__ = [
     "BusinessUnitAddBillingAddressIdAction",
     "BusinessUnitAddShippingAddressIdAction",
     "BusinessUnitAddStoreAction",
+    "BusinessUnitApprovalRuleMode",
     "BusinessUnitAssociateMode",
     "BusinessUnitChangeAddressAction",
+    "BusinessUnitChangeApprovalRuleModeAction",
     "BusinessUnitChangeAssociateAction",
     "BusinessUnitChangeAssociateModeAction",
     "BusinessUnitChangeNameAction",
@@ -232,11 +234,11 @@ class AssociateRoleInheritanceMode(enum.Enum):
 class BusinessUnit(BaseResource):
     """Generic type to model the fields that all types of Business Units have in common."""
 
-    #: Present on resources updated after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the BusinessUnit.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the BusinessUnit.
     created_by: typing.Optional["CreatedBy"]
-    #: User-defined unique identifier of the Business Unit.
+    #: User-defined unique and immutable identifier of the Business Unit.
     key: str
     #: Indicates whether the Business Unit can be edited and used in [Orders](/../api/projects/orders).
     status: "BusinessUnitStatus"
@@ -270,12 +272,15 @@ class BusinessUnit(BaseResource):
     associate_mode: "BusinessUnitAssociateMode"
     #: Associates that are part of the Business Unit in specific [roles](ctp:api:type:AssociateRole).
     associates: typing.List["Associate"]
-    #: Associates that are inherited from a parent Business Unit. This value of this field is [eventually consistent](/../api/general-concepts#eventual-consistency) and is only present when the `associateMode` is set to `ExplicitAndFromParent`.
+    #: Associates that are inherited from a parent Business Unit. The value of this field is [eventually consistent](/../api/general-concepts#eventual-consistency) and is only present when the `associateMode` is set to `ExplicitAndFromParent`.
     inherited_associates: typing.Optional[typing.List["InheritedAssociate"]]
     #: Parent unit of the Business Unit. Only present when the `unitType` is `Division`.
     parent_unit: typing.Optional["BusinessUnitKeyReference"]
     #: Top-level unit of the Business Unit. The top-level unit is of `unitType` `Company`.
     top_level_unit: "BusinessUnitKeyReference"
+    #: Determines whether the Business Unit can inherit Approval Rules from a parent.
+    #: Always `Explicit` for [Companies](ctp:api:type:BusinessUnitType) and defaults to `ExplicitAndFromParent` for [Divisions](ctp:api:type:BusinessUnitType).
+    approval_rule_mode: "BusinessUnitApprovalRuleMode"
 
     def __init__(
         self,
@@ -303,7 +308,8 @@ class BusinessUnit(BaseResource):
         associates: typing.List["Associate"],
         inherited_associates: typing.Optional[typing.List["InheritedAssociate"]] = None,
         parent_unit: typing.Optional["BusinessUnitKeyReference"] = None,
-        top_level_unit: "BusinessUnitKeyReference"
+        top_level_unit: "BusinessUnitKeyReference",
+        approval_rule_mode: "BusinessUnitApprovalRuleMode"
     ):
         self.last_modified_by = last_modified_by
         self.created_by = created_by
@@ -325,6 +331,7 @@ class BusinessUnit(BaseResource):
         self.inherited_associates = inherited_associates
         self.parent_unit = parent_unit
         self.top_level_unit = top_level_unit
+        self.approval_rule_mode = approval_rule_mode
 
         super().__init__(
             id=id,
@@ -350,6 +357,13 @@ class BusinessUnit(BaseResource):
         return BusinessUnitSchema().dump(self)
 
 
+class BusinessUnitApprovalRuleMode(enum.Enum):
+    """Determines whether a Business Unit can inherit [Approval Rules](/projects/approval-rules) from a parent. Only Business Units of type `Division` can use `ExplicitAndFromParent`."""
+
+    EXPLICIT = "Explicit"
+    EXPLICIT_AND_FROM_PARENT = "ExplicitAndFromParent"
+
+
 class BusinessUnitAssociateMode(enum.Enum):
     """Determines whether a Business Unit can inherit Associates from a parent."""
 
@@ -360,7 +374,7 @@ class BusinessUnitAssociateMode(enum.Enum):
 class BusinessUnitDraft(_BaseType):
     """Generic draft type to model those fields all Business Units have in common. The additional fields required for creating a [Company](ctp:api:type:Company) or [Division](ctp:api:type:Division) are represented on [CompanyDraft](ctp:api:type:CompanyDraft) and [DivisionDraft](ctp:api:type:DivisionDraft)."""
 
-    #: User-defined unique identifier for the Business Unit.
+    #: User-defined unique and immutable identifier for the Business Unit.
     key: str
     #: Indicates whether the Business Unit can be edited and used in [Orders](/../api/projects/orders).
     status: typing.Optional["BusinessUnitStatus"]
@@ -385,6 +399,10 @@ class BusinessUnitDraft(_BaseType):
     associate_mode: typing.Optional["BusinessUnitAssociateMode"]
     #: List of members that are part of the Business Unit in specific [roles](ctp:api:type:AssociateRole).
     associates: typing.Optional[typing.List["AssociateDraft"]]
+    #: Determines whether the Business Unit can inherit Approval Rules from a parent.
+    #: For [Companies](ctp:api:type:BusinessUnitType), the value of this field is always `Explicit`.
+    #: For [Divisions](ctp:api:type:BusinessUnitType), the default value is `ExplicitAndFromParent`.
+    approval_rule_mode: typing.Optional["BusinessUnitApprovalRuleMode"]
     #: Addresses used by the Business Unit.
     addresses: typing.Optional[typing.List["BaseAddress"]]
     #: Indexes of entries in `addresses` to set as shipping addresses.
@@ -412,6 +430,7 @@ class BusinessUnitDraft(_BaseType):
         contact_email: typing.Optional[str] = None,
         associate_mode: typing.Optional["BusinessUnitAssociateMode"] = None,
         associates: typing.Optional[typing.List["AssociateDraft"]] = None,
+        approval_rule_mode: typing.Optional["BusinessUnitApprovalRuleMode"] = None,
         addresses: typing.Optional[typing.List["BaseAddress"]] = None,
         shipping_addresses: typing.Optional[typing.List["int"]] = None,
         default_shipping_address: typing.Optional[int] = None,
@@ -428,6 +447,7 @@ class BusinessUnitDraft(_BaseType):
         self.contact_email = contact_email
         self.associate_mode = associate_mode
         self.associates = associates
+        self.approval_rule_mode = approval_rule_mode
         self.addresses = addresses
         self.shipping_addresses = shipping_addresses
         self.default_shipping_address = default_shipping_address
@@ -455,9 +475,10 @@ class BusinessUnitDraft(_BaseType):
 
 
 class BusinessUnitKeyReference(KeyReference):
-    """[Reference](/../api/types#reference) to a [BusinessUnit](ctp:api:type:BusinessUnit) by its key."""
+    """[KeyReference](ctp:api:type:KeyReference) to a [BusinessUnit](ctp:api:type:BusinessUnit)."""
 
     def __init__(self, *, key: str):
+
         super().__init__(key=key, type_id=ReferenceTypeId.BUSINESS_UNIT)
 
     @classmethod
@@ -524,7 +545,7 @@ class BusinessUnitPagedQueryResponse(_BaseType):
 
 
 class BusinessUnitReference(Reference):
-    """[Reference](/../api/types#reference) to a [BusinessUnit](ctp:api:type:BusinessUnit)."""
+    """[Reference](ctp:api:type:Reference) to a [BusinessUnit](ctp:api:type:BusinessUnit)."""
 
     #: Contains the representation of the expanded BusinessUnit. Only present in responses to requests with [Reference Expansion](/../api/general-concepts#reference-expansion) for BusinessUnit.
     obj: typing.Optional["BusinessUnit"]
@@ -547,11 +568,12 @@ class BusinessUnitReference(Reference):
 
 
 class BusinessUnitResourceIdentifier(ResourceIdentifier):
-    """[ResourceIdentifier](/../api/types#resourceidentifier) to a [BusinessUnit](ctp:api:type:BusinessUnit). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
+    """[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [BusinessUnit](ctp:api:type:BusinessUnit). Either `id` or `key` is required. If both are set, an [InvalidJsonInput](/../api/errors#invalidjsoninput) error is returned."""
 
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.BUSINESS_UNIT)
 
     @classmethod
@@ -591,7 +613,7 @@ class BusinessUnitType(enum.Enum):
 
 class BusinessUnitUpdate(_BaseType):
     #: Expected version of the BusinessUnit on which the changes should be applied.
-    #: If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the BusinessUnit.
     actions: typing.List["BusinessUnitUpdateAction"]
@@ -656,6 +678,12 @@ class BusinessUnitUpdateAction(_BaseType):
             from ._schemas.business_unit import BusinessUnitChangeAddressActionSchema
 
             return BusinessUnitChangeAddressActionSchema().load(data)
+        if data["action"] == "changeApprovalRuleMode":
+            from ._schemas.business_unit import (
+                BusinessUnitChangeApprovalRuleModeActionSchema,
+            )
+
+            return BusinessUnitChangeApprovalRuleModeActionSchema().load(data)
         if data["action"] == "changeAssociate":
             from ._schemas.business_unit import BusinessUnitChangeAssociateActionSchema
 
@@ -788,8 +816,10 @@ class Company(BusinessUnit):
         associates: typing.List["Associate"],
         inherited_associates: typing.Optional[typing.List["InheritedAssociate"]] = None,
         parent_unit: typing.Optional["BusinessUnitKeyReference"] = None,
-        top_level_unit: "BusinessUnitKeyReference"
+        top_level_unit: "BusinessUnitKeyReference",
+        approval_rule_mode: "BusinessUnitApprovalRuleMode"
     ):
+
         super().__init__(
             id=id,
             version=version,
@@ -814,6 +844,7 @@ class Company(BusinessUnit):
             inherited_associates=inherited_associates,
             parent_unit=parent_unit,
             top_level_unit=top_level_unit,
+            approval_rule_mode=approval_rule_mode,
             unit_type=BusinessUnitType.COMPANY,
         )
 
@@ -843,6 +874,7 @@ class CompanyDraft(BusinessUnitDraft):
         contact_email: typing.Optional[str] = None,
         associate_mode: typing.Optional["BusinessUnitAssociateMode"] = None,
         associates: typing.Optional[typing.List["AssociateDraft"]] = None,
+        approval_rule_mode: typing.Optional["BusinessUnitApprovalRuleMode"] = None,
         addresses: typing.Optional[typing.List["BaseAddress"]] = None,
         shipping_addresses: typing.Optional[typing.List["int"]] = None,
         default_shipping_address: typing.Optional[int] = None,
@@ -850,6 +882,7 @@ class CompanyDraft(BusinessUnitDraft):
         default_billing_address: typing.Optional[int] = None,
         custom: typing.Optional["CustomFieldsDraft"] = None
     ):
+
         super().__init__(
             key=key,
             status=status,
@@ -859,6 +892,7 @@ class CompanyDraft(BusinessUnitDraft):
             contact_email=contact_email,
             associate_mode=associate_mode,
             associates=associates,
+            approval_rule_mode=approval_rule_mode,
             addresses=addresses,
             shipping_addresses=shipping_addresses,
             default_shipping_address=default_shipping_address,
@@ -911,8 +945,10 @@ class Division(BusinessUnit):
         associates: typing.List["Associate"],
         inherited_associates: typing.Optional[typing.List["InheritedAssociate"]] = None,
         parent_unit: "BusinessUnitKeyReference",
-        top_level_unit: "BusinessUnitKeyReference"
+        top_level_unit: "BusinessUnitKeyReference",
+        approval_rule_mode: "BusinessUnitApprovalRuleMode"
     ):
+
         super().__init__(
             id=id,
             version=version,
@@ -937,6 +973,7 @@ class Division(BusinessUnit):
             inherited_associates=inherited_associates,
             parent_unit=parent_unit,
             top_level_unit=top_level_unit,
+            approval_rule_mode=approval_rule_mode,
             unit_type=BusinessUnitType.DIVISION,
         )
 
@@ -972,6 +1009,7 @@ class DivisionDraft(BusinessUnitDraft):
         contact_email: typing.Optional[str] = None,
         associate_mode: typing.Optional["BusinessUnitAssociateMode"] = None,
         associates: typing.Optional[typing.List["AssociateDraft"]] = None,
+        approval_rule_mode: typing.Optional["BusinessUnitApprovalRuleMode"] = None,
         addresses: typing.Optional[typing.List["BaseAddress"]] = None,
         shipping_addresses: typing.Optional[typing.List["int"]] = None,
         default_shipping_address: typing.Optional[int] = None,
@@ -991,6 +1029,7 @@ class DivisionDraft(BusinessUnitDraft):
             contact_email=contact_email,
             associate_mode=associate_mode,
             associates=associates,
+            approval_rule_mode=approval_rule_mode,
             addresses=addresses,
             shipping_addresses=shipping_addresses,
             default_shipping_address=default_shipping_address,
@@ -1251,6 +1290,41 @@ class BusinessUnitChangeAddressAction(BusinessUnitUpdateAction):
         from ._schemas.business_unit import BusinessUnitChangeAddressActionSchema
 
         return BusinessUnitChangeAddressActionSchema().dump(self)
+
+
+class BusinessUnitChangeApprovalRuleModeAction(BusinessUnitUpdateAction):
+    """Updates [Approval Rules](/projects/approval-rules) inheritance behavior between Business Units.
+
+    Only Business Units of type `Division` can be changed to `ExplicitAndFromParent`.
+
+    This update action generates a [BusinessUnitApprovalRuleModeChanged](ctp:api:type:BusinessUnitApprovalRuleModeChangedMessage) Message.
+
+    """
+
+    #: The new value for `approvalRuleMode`.
+    approval_rule_mode: "BusinessUnitApprovalRuleMode"
+
+    def __init__(self, *, approval_rule_mode: "BusinessUnitApprovalRuleMode"):
+        self.approval_rule_mode = approval_rule_mode
+
+        super().__init__(action="changeApprovalRuleMode")
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "BusinessUnitChangeApprovalRuleModeAction":
+        from ._schemas.business_unit import (
+            BusinessUnitChangeApprovalRuleModeActionSchema,
+        )
+
+        return BusinessUnitChangeApprovalRuleModeActionSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.business_unit import (
+            BusinessUnitChangeApprovalRuleModeActionSchema,
+        )
+
+        return BusinessUnitChangeApprovalRuleModeActionSchema().dump(self)
 
 
 class BusinessUnitChangeAssociateAction(BusinessUnitUpdateAction):
@@ -1706,7 +1780,7 @@ class BusinessUnitSetCustomFieldAction(BusinessUnitUpdateAction):
 class BusinessUnitSetCustomTypeAction(BusinessUnitUpdateAction):
     """Adding or updating a Custom Type on a Business Unit generates the [BusinessUnitCustomTypeSet](ctp:api:type:BusinessUnitCustomTypeSetMessage) Message, removing one generates the [BusinessUnitCustomTypeRemoved](ctp:api:type:BusinessUnitCustomTypeRemovedMessage) Message."""
 
-    #: Defines the [Type](ctp:api:type:Type) that extends the BusinessUnit with [Custom Fields](/../api/projects/custom-fields).
+    #: Defines the [Type](ctp:api:type:Type) that extends the BusinessUnit with [Custom Fields](ctp:api:type:CustomFields).
     #: If absent, any existing Type and Custom Fields are removed from the BusinessUnit.
     type: typing.Optional["TypeResourceIdentifier"]
     #: Sets the [Custom Fields](/../api/projects/custom-fields) for the BusinessUnit.
@@ -1857,11 +1931,9 @@ class BusinessUnitSetStoresAction(BusinessUnitUpdateAction):
     """
 
     #: [Stores](ctp:api:type:Store) to set. Overrides the current list of Stores.
-    stores: typing.Optional[typing.List["StoreResourceIdentifier"]]
+    stores: typing.List["StoreResourceIdentifier"]
 
-    def __init__(
-        self, *, stores: typing.Optional[typing.List["StoreResourceIdentifier"]] = None
-    ):
+    def __init__(self, *, stores: typing.List["StoreResourceIdentifier"]):
         self.stores = stores
 
         super().__init__(action="setStores")

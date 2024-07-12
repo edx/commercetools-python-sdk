@@ -32,6 +32,7 @@ class ImportSummarySchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ImportSummary(**data)
 
 
@@ -53,4 +54,5 @@ class OperationStatesSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OperationStates(**data)

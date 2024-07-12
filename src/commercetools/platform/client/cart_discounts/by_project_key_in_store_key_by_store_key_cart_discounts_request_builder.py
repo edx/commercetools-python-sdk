@@ -25,6 +25,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyInStoreKeyByStoreKeyCartDiscountsRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _store_key: str
@@ -131,7 +132,11 @@ class ByProjectKeyInStoreKeyByStoreKeyCartDiscountsRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["CartDiscount"]:
-        """When using the endpoint, the Store specified in the path and the Stores specified in the payload's `stores` field are added to the CartDiscount."""
+        """When using the endpoint, the Store specified in the path and the Stores specified in the payload's `stores` field are added to the CartDiscount.
+
+        Creating a Cart Discount produces the [CartDiscountCreated](ctp:api:type:CartDiscountCreatedMessage) Message.
+
+        """
         headers = {} if headers is None else headers
         response = self._client._post(
             endpoint=f"/{self._project_key}/in-store/key={self._store_key}/cart-discounts",

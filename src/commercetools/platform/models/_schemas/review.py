@@ -114,6 +114,9 @@ class ReviewSchema(BaseResourceSchema):
             "product-selection": helpers.absmod(
                 __name__, ".product_selection.ProductSelectionReferenceSchema"
             ),
+            "product-tailoring": helpers.absmod(
+                __name__, ".product_tailoring.ProductTailoringReferenceSchema"
+            ),
             "product-type": helpers.absmod(
                 __name__, ".product_type.ProductTypeReferenceSchema"
             ),
@@ -179,6 +182,7 @@ class ReviewSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Review(**data)
 
 
@@ -254,6 +258,9 @@ class ReviewDraftSchema(helpers.BaseSchema):
             "product-selection": helpers.absmod(
                 __name__, ".product_selection.ProductSelectionResourceIdentifierSchema"
             ),
+            "product-tailoring": helpers.absmod(
+                __name__, ".product_tailoring.ProductTailoringResourceIdentifierSchema"
+            ),
             "product-type": helpers.absmod(
                 __name__, ".product_type.ProductTypeResourceIdentifierSchema"
             ),
@@ -318,6 +325,7 @@ class ReviewDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ReviewDraft(**data)
 
 
@@ -341,6 +349,7 @@ class ReviewPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ReviewPagedQueryResponse(**data)
 
 
@@ -364,6 +373,7 @@ class ReviewRatingStatisticsSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ReviewRatingStatistics(**data)
 
 
@@ -386,6 +396,7 @@ class ReviewReferenceSchema(ReferenceSchema):
 
 
 class ReviewResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -434,6 +445,7 @@ class ReviewUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ReviewUpdate(**data)
 
 
@@ -612,6 +624,9 @@ class ReviewSetTargetActionSchema(ReviewUpdateActionSchema):
             ),
             "product-selection": helpers.absmod(
                 __name__, ".product_selection.ProductSelectionResourceIdentifierSchema"
+            ),
+            "product-tailoring": helpers.absmod(
+                __name__, ".product_tailoring.ProductTailoringResourceIdentifierSchema"
             ),
             "product-type": helpers.absmod(
                 __name__, ".product_type.ProductTypeResourceIdentifierSchema"

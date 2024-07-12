@@ -27,6 +27,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyInStoreKeyByStoreKeyCartsRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _store_key: str
@@ -93,7 +94,7 @@ class ByProjectKeyInStoreKeyByStoreKeyCartsRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["CartPagedQueryResponse"]:
-        """Queries carts in a specific [Store](ctp:api:type:Store)."""
+        """Queries Carts in a specific [Store](ctp:api:type:Store)."""
         params = {
             "expand": expand,
             "sort": sort,
@@ -155,7 +156,15 @@ class ByProjectKeyInStoreKeyByStoreKeyCartsRequestBuilder:
     ) -> typing.Optional["Cart"]:
         """Creates a [Cart](ctp:api:type:Cart) in the [Store](ctp:api:type:Store) specified by `storeKey`.
         When using this endpoint the Cart's `store` field is always set to the [Store](ctp:api:type:Store) specified in the path parameter.
-        If the referenced [ShippingMethod](ctp:api:type:ShippingMethod) in the [CartDraft](ctp:api:type:CartDraft) has a predicate that does not match, an [InvalidOperation](ctp:api:type:InvalidOperationError) error is returned.
+        If the referenced [ShippingMethod](ctp:api:type:ShippingMethod) in the [CartDraft](ctp:api:type:CartDraft) has a predicate that does not match, or if the Shipping Method is not active, an [InvalidOperation](ctp:api:type:InvalidOperationError) error is returned.
+
+        Specific Error Codes:
+
+        - [DiscountCodeNonApplicable](ctp:api:type:DiscountCodeNonApplicableError)
+        - [InvalidItemShippingDetails](ctp:api:type:InvalidItemShippingDetailsError)
+        - [MatchingPriceNotFound](ctp:api:type:MatchingPriceNotFoundError)
+        - [MissingTaxRateForCountry](ctp:api:type:MissingTaxRateForCountryError)
+        - [CountryNotConfiguredInStore](ctp:api:type:CountryNotConfiguredInStoreError)
 
         """
         headers = {} if headers is None else headers

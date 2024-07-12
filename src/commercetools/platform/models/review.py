@@ -49,9 +49,9 @@ __all__ = [
 
 
 class Review(BaseResource):
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that last modified the Review.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that created the Review.
     created_by: typing.Optional["CreatedBy"]
     #: User-defined unique identifier of the Review.
     key: typing.Optional[str]
@@ -334,6 +334,7 @@ class ReviewResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.REVIEW)
 
     @classmethod

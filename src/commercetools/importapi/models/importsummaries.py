@@ -44,6 +44,8 @@ class ImportSummary(_BaseType):
 
 
 class OperationStates(_BaseType):
+    """The number of resources in each [Processing State](/processing-state#processingstate)."""
+
     #: The number of resources in the `processing` state.
     processing: int
     #: The number of resources in the `validationFailed` state.

@@ -38,6 +38,7 @@ class PriceFunctionSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.PriceFunction(**data)
 
 
@@ -94,6 +95,7 @@ class ShippingMethodSchema(BaseResourceSchema):
         load_default=None,
         data_key="zoneRates",
     )
+    active = marshmallow.fields.Boolean(allow_none=True, load_default=None)
     is_default = marshmallow.fields.Boolean(
         allow_none=True, load_default=None, data_key="isDefault"
     )
@@ -113,6 +115,7 @@ class ShippingMethodSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShippingMethod(**data)
 
 
@@ -155,6 +158,9 @@ class ShippingMethodDraftSchema(helpers.BaseSchema):
         load_default=None,
         data_key="zoneRates",
     )
+    active = marshmallow.fields.Boolean(
+        allow_none=True, metadata={"omit_empty": True}, load_default=None
+    )
     is_default = marshmallow.fields.Boolean(
         allow_none=True, load_default=None, data_key="isDefault"
     )
@@ -174,6 +180,7 @@ class ShippingMethodDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShippingMethodDraft(**data)
 
 
@@ -201,6 +208,7 @@ class ShippingMethodPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShippingMethodPagedQueryResponse(**data)
 
 
@@ -223,6 +231,7 @@ class ShippingMethodReferenceSchema(ReferenceSchema):
 
 
 class ShippingMethodResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -244,6 +253,9 @@ class ShippingMethodUpdateSchema(helpers.BaseSchema):
                 ),
                 "addZone": helpers.absmod(
                     __name__, ".ShippingMethodAddZoneActionSchema"
+                ),
+                "changeActive": helpers.absmod(
+                    __name__, ".ShippingMethodChangeActiveActionSchema"
                 ),
                 "changeIsDefault": helpers.absmod(
                     __name__, ".ShippingMethodChangeIsDefaultActionSchema"
@@ -290,6 +302,7 @@ class ShippingMethodUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShippingMethodUpdate(**data)
 
 
@@ -306,30 +319,16 @@ class ShippingMethodUpdateActionSchema(helpers.BaseSchema):
 
 
 class ShippingRateSchema(helpers.BaseSchema):
-    price = helpers.Discriminator(
+    price = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".common.CentPrecisionMoneySchema"),
         allow_none=True,
-        discriminator_field=("type", "type"),
-        discriminator_schemas={
-            "centPrecision": helpers.absmod(
-                __name__, ".common.CentPrecisionMoneySchema"
-            ),
-            "highPrecision": helpers.absmod(
-                __name__, ".common.HighPrecisionMoneySchema"
-            ),
-        },
+        unknown=marshmallow.EXCLUDE,
         load_default=None,
     )
-    free_above = helpers.Discriminator(
+    free_above = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".common.CentPrecisionMoneySchema"),
         allow_none=True,
-        discriminator_field=("type", "type"),
-        discriminator_schemas={
-            "centPrecision": helpers.absmod(
-                __name__, ".common.CentPrecisionMoneySchema"
-            ),
-            "highPrecision": helpers.absmod(
-                __name__, ".common.HighPrecisionMoneySchema"
-            ),
-        },
+        unknown=marshmallow.EXCLUDE,
         metadata={"omit_empty": True},
         load_default=None,
         data_key="freeAbove",
@@ -361,6 +360,7 @@ class ShippingRateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShippingRate(**data)
 
 
@@ -401,6 +401,7 @@ class ShippingRateDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShippingRateDraft(**data)
 
 
@@ -522,6 +523,7 @@ class ZoneRateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ZoneRate(**data)
 
 
@@ -546,6 +548,7 @@ class ZoneRateDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ZoneRateDraft(**data)
 
 
@@ -588,6 +591,18 @@ class ShippingMethodAddZoneActionSchema(ShippingMethodUpdateActionSchema):
     def post_load(self, data, **kwargs):
         del data["action"]
         return models.ShippingMethodAddZoneAction(**data)
+
+
+class ShippingMethodChangeActiveActionSchema(ShippingMethodUpdateActionSchema):
+    active = marshmallow.fields.Boolean(allow_none=True, load_default=None)
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.ShippingMethodChangeActiveAction(**data)
 
 
 class ShippingMethodChangeIsDefaultActionSchema(ShippingMethodUpdateActionSchema):
