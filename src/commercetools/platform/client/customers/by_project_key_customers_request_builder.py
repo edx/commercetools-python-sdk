@@ -19,6 +19,9 @@ from ..confirm.by_project_key_customers_email_confirm_request_builder import (
 from ..email_token.by_project_key_customers_email_token_request_builder import (
     ByProjectKeyCustomersEmailTokenRequestBuilder,
 )
+from ..indexing_status.by_project_key_customers_search_indexing_status_request_builder import (
+    ByProjectKeyCustomersSearchIndexingStatusRequestBuilder,
+)
 from ..password.by_project_key_customers_password_request_builder import (
     ByProjectKeyCustomersPasswordRequestBuilder,
 )
@@ -27,6 +30,9 @@ from ..password_token.by_project_key_customers_password_token_request_builder im
 )
 from ..reset.by_project_key_customers_password_reset_request_builder import (
     ByProjectKeyCustomersPasswordResetRequestBuilder,
+)
+from ..search.by_project_key_customers_search_request_builder import (
+    ByProjectKeyCustomersSearchRequestBuilder,
 )
 from .by_project_key_customers_by_id_request_builder import (
     ByProjectKeyCustomersByIDRequestBuilder,
@@ -46,6 +52,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyCustomersRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
 
@@ -116,6 +123,22 @@ class ByProjectKeyCustomersRequestBuilder:
     def with_id(self, id: str) -> ByProjectKeyCustomersByIDRequestBuilder:
         return ByProjectKeyCustomersByIDRequestBuilder(
             id=id,
+            project_key=self._project_key,
+            client=self._client,
+        )
+
+    def search(self) -> ByProjectKeyCustomersSearchRequestBuilder:
+        """This endpoint provides high-performance search queries over Customers."""
+        return ByProjectKeyCustomersSearchRequestBuilder(
+            project_key=self._project_key,
+            client=self._client,
+        )
+
+    def search_indexing_status(
+        self,
+    ) -> ByProjectKeyCustomersSearchIndexingStatusRequestBuilder:
+        """This endpoint provides information on the status of a Customer search for a project"""
+        return ByProjectKeyCustomersSearchIndexingStatusRequestBuilder(
             project_key=self._project_key,
             client=self._client,
         )
@@ -194,7 +217,8 @@ class ByProjectKeyCustomersRequestBuilder:
     ) -> typing.Optional["CustomerSignInResult"]:
         """If the `anonymousCart` field is set on the [CustomerDraft](ctp:api:type:CustomerDraft), then the newly created Customer will be assigned to that [Cart](ctp:api:type:Cart).
         Similarly, if the `anonymousId` field is set, the Customer will be set on all [Carts](ctp:api:type:Cart), [Orders](ctp:api:type:Order), [ShoppingLists](ctp:api:type:ShoppingList) and [Payments](ctp:api:type:Payment) with the same `anonymousId`.
-        Creating a Customer produces the [CustomerCreated](ctp:api:type:CustomerCreatedMessage) Message.
+
+        Creating a Customer produces the [CustomerCreated](ctp:api:type:CustomerCreatedMessage) Message. Simultaneously creating two Customers with the same email address can return a [LockedField](ctp:api:type:LockedFieldError) error.
 
         """
         headers = {} if headers is None else headers

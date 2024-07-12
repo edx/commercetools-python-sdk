@@ -31,11 +31,26 @@ from ..product_projections.by_project_key_in_store_key_by_store_key_product_proj
 from ..product_selection_assignments.by_project_key_in_store_key_by_store_key_product_selection_assignments_request_builder import (
     ByProjectKeyInStoreKeyByStoreKeyProductSelectionAssignmentsRequestBuilder,
 )
+from ..product_tailoring.by_project_key_in_store_key_by_store_key_product_tailoring_request_builder import (
+    ByProjectKeyInStoreKeyByStoreKeyProductTailoringRequestBuilder,
+)
+from ..products.by_project_key_in_store_key_by_store_key_products_request_builder import (
+    ByProjectKeyInStoreKeyByStoreKeyProductsRequestBuilder,
+)
+from ..quote_requests.by_project_key_in_store_key_by_store_key_quote_requests_request_builder import (
+    ByProjectKeyInStoreKeyByStoreKeyQuoteRequestsRequestBuilder,
+)
+from ..quotes.by_project_key_in_store_key_by_store_key_quotes_request_builder import (
+    ByProjectKeyInStoreKeyByStoreKeyQuotesRequestBuilder,
+)
 from ..shipping_methods.by_project_key_in_store_key_by_store_key_shipping_methods_request_builder import (
     ByProjectKeyInStoreKeyByStoreKeyShippingMethodsRequestBuilder,
 )
 from ..shopping_lists.by_project_key_in_store_key_by_store_key_shopping_lists_request_builder import (
     ByProjectKeyInStoreKeyByStoreKeyShoppingListsRequestBuilder,
+)
+from ..staged_quotes.by_project_key_in_store_key_by_store_key_staged_quotes_request_builder import (
+    ByProjectKeyInStoreKeyByStoreKeyStagedQuotesRequestBuilder,
 )
 
 if typing.TYPE_CHECKING:
@@ -43,6 +58,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyInStoreKeyByStoreKeyRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _store_key: str
@@ -142,6 +158,51 @@ class ByProjectKeyInStoreKeyByStoreKeyRequestBuilder:
         self,
     ) -> ByProjectKeyInStoreKeyByStoreKeyCartDiscountsRequestBuilder:
         return ByProjectKeyInStoreKeyByStoreKeyCartDiscountsRequestBuilder(
+            project_key=self._project_key,
+            store_key=self._store_key,
+            client=self._client,
+        )
+
+    def product_tailoring(
+        self,
+    ) -> ByProjectKeyInStoreKeyByStoreKeyProductTailoringRequestBuilder:
+        """A Product Tailoring holds tailored data of Product in the Store."""
+        return ByProjectKeyInStoreKeyByStoreKeyProductTailoringRequestBuilder(
+            project_key=self._project_key,
+            store_key=self._store_key,
+            client=self._client,
+        )
+
+    def products(self) -> ByProjectKeyInStoreKeyByStoreKeyProductsRequestBuilder:
+        return ByProjectKeyInStoreKeyByStoreKeyProductsRequestBuilder(
+            project_key=self._project_key,
+            store_key=self._store_key,
+            client=self._client,
+        )
+
+    def quote_requests(
+        self,
+    ) -> ByProjectKeyInStoreKeyByStoreKeyQuoteRequestsRequestBuilder:
+        """A request for a Quote holds product variants and can be ordered."""
+        return ByProjectKeyInStoreKeyByStoreKeyQuoteRequestsRequestBuilder(
+            project_key=self._project_key,
+            store_key=self._store_key,
+            client=self._client,
+        )
+
+    def staged_quotes(
+        self,
+    ) -> ByProjectKeyInStoreKeyByStoreKeyStagedQuotesRequestBuilder:
+        """A staged quote holds the negotiation between the [Buyer](/../api/quotes-overview#buyer) and the [Seller](/../api/quotes-overview#seller)."""
+        return ByProjectKeyInStoreKeyByStoreKeyStagedQuotesRequestBuilder(
+            project_key=self._project_key,
+            store_key=self._store_key,
+            client=self._client,
+        )
+
+    def quotes(self) -> ByProjectKeyInStoreKeyByStoreKeyQuotesRequestBuilder:
+        """A quote holds the negotiated offer."""
+        return ByProjectKeyInStoreKeyByStoreKeyQuotesRequestBuilder(
             project_key=self._project_key,
             store_key=self._store_key,
             client=self._client,

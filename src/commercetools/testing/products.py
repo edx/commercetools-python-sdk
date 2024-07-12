@@ -16,8 +16,7 @@ from commercetools.platform.models._schemas.product import (
     ProductUpdateSchema,
     ProductVariantSchema,
 )
-from commercetools.services.products import _ProductQuerySchema
-from commercetools.testing import utils
+from commercetools.testing import traits, utils
 from commercetools.testing.abstract import BaseModel, ServiceBackend
 from commercetools.testing.utils import (
     create_commercetools_response,
@@ -25,6 +24,16 @@ from commercetools.testing.utils import (
     get_product_variants,
     parse_request_params,
 )
+
+
+class _ProductQuerySchema(
+    traits.ExpandableSchema,
+    traits.SortableSchema,
+    traits.PagingSchema,
+    traits.QuerySchema,
+    traits.PriceSelectingSchema,
+):
+    pass
 
 
 class ProductsModel(BaseModel):
@@ -47,9 +56,11 @@ class ProductsModel(BaseModel):
             category_order_hints=draft.category_order_hints,
             description=draft.description,
             master_variant=master_variant,
-            variants=[self._create_variant_from_draft(vd) for vd in draft.variants]
-            if draft.variants
-            else [],
+            variants=(
+                [self._create_variant_from_draft(vd) for vd in draft.variants]
+                if draft.variants
+                else []
+            ),
             slug=draft.slug or models.LocalizedString(),
             search_keywords=models.SearchKeywords(),
         )

@@ -320,6 +320,7 @@ class CartSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Cart(**data)
 
 
@@ -543,6 +544,7 @@ class CartDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CartDraft(**data)
 
 
@@ -566,6 +568,7 @@ class CartPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CartPagedQueryResponse(**data)
 
 
@@ -588,6 +591,7 @@ class CartReferenceSchema(ReferenceSchema):
 
 
 class CartResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -813,6 +817,7 @@ class CartUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CartUpdate(**data)
 
 
@@ -943,6 +948,7 @@ class CustomLineItemSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomLineItem(**data)
 
 
@@ -1002,6 +1008,7 @@ class CustomLineItemDraftSchema(helpers.BaseSchema):
         CustomLineItemPriceMode,
         by_value=True,
         allow_none=True,
+        metadata={"omit_empty": True},
         load_default=None,
         data_key="priceMode",
     )
@@ -1011,6 +1018,7 @@ class CustomLineItemDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomLineItemDraft(**data)
 
 
@@ -1086,6 +1094,7 @@ class CustomShippingDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomShippingDraft(**data)
 
 
@@ -1142,6 +1151,7 @@ class DirectDiscountSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DirectDiscount(**data)
 
 
@@ -1151,16 +1161,16 @@ class DirectDiscountDraftSchema(helpers.BaseSchema):
         discriminator_field=("type", "type"),
         discriminator_schemas={
             "absolute": helpers.absmod(
-                __name__, ".cart_discount.CartDiscountValueAbsoluteSchema"
+                __name__, ".cart_discount.CartDiscountValueAbsoluteDraftSchema"
             ),
             "fixed": helpers.absmod(
-                __name__, ".cart_discount.CartDiscountValueFixedSchema"
+                __name__, ".cart_discount.CartDiscountValueFixedDraftSchema"
             ),
             "giftLineItem": helpers.absmod(
-                __name__, ".cart_discount.CartDiscountValueGiftLineItemSchema"
+                __name__, ".cart_discount.CartDiscountValueGiftLineItemDraftSchema"
             ),
             "relative": helpers.absmod(
-                __name__, ".cart_discount.CartDiscountValueRelativeSchema"
+                __name__, ".cart_discount.CartDiscountValueRelativeDraftSchema"
             ),
         },
         load_default=None,
@@ -1197,10 +1207,12 @@ class DirectDiscountDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DirectDiscountDraft(**data)
 
 
 class DirectDiscountReferenceSchema(ReferenceSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -1227,6 +1239,7 @@ class DiscountCodeInfoSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DiscountCodeInfo(**data)
 
 
@@ -1289,6 +1302,7 @@ class DiscountOnTotalPriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DiscountOnTotalPrice(**data)
 
 
@@ -1345,6 +1359,9 @@ class DiscountedLineItemPortionSchema(helpers.BaseSchema):
             "product-selection": helpers.absmod(
                 __name__, ".product_selection.ProductSelectionReferenceSchema"
             ),
+            "product-tailoring": helpers.absmod(
+                __name__, ".product_tailoring.ProductTailoringReferenceSchema"
+            ),
             "product-type": helpers.absmod(
                 __name__, ".product_type.ProductTypeReferenceSchema"
             ),
@@ -1396,7 +1413,119 @@ class DiscountedLineItemPortionSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DiscountedLineItemPortion(**data)
+
+
+class DiscountedLineItemPortionDraftSchema(helpers.BaseSchema):
+    discount = helpers.Discriminator(
+        allow_none=True,
+        discriminator_field=("typeId", "type_id"),
+        discriminator_schemas={
+            "associate-role": helpers.absmod(
+                __name__, ".associate_role.AssociateRoleReferenceSchema"
+            ),
+            "attribute-group": helpers.absmod(
+                __name__, ".attribute_group.AttributeGroupReferenceSchema"
+            ),
+            "business-unit": helpers.absmod(
+                __name__, ".business_unit.BusinessUnitReferenceSchema"
+            ),
+            "cart-discount": helpers.absmod(
+                __name__, ".cart_discount.CartDiscountReferenceSchema"
+            ),
+            "cart": helpers.absmod(__name__, ".CartReferenceSchema"),
+            "direct-discount": helpers.absmod(
+                __name__, ".DirectDiscountReferenceSchema"
+            ),
+            "category": helpers.absmod(__name__, ".category.CategoryReferenceSchema"),
+            "channel": helpers.absmod(__name__, ".channel.ChannelReferenceSchema"),
+            "key-value-document": helpers.absmod(
+                __name__, ".custom_object.CustomObjectReferenceSchema"
+            ),
+            "customer-group": helpers.absmod(
+                __name__, ".customer_group.CustomerGroupReferenceSchema"
+            ),
+            "customer-email-token": helpers.absmod(
+                __name__, ".customer.CustomerEmailTokenReferenceSchema"
+            ),
+            "customer-password-token": helpers.absmod(
+                __name__, ".customer.CustomerPasswordTokenReferenceSchema"
+            ),
+            "customer": helpers.absmod(__name__, ".customer.CustomerReferenceSchema"),
+            "discount-code": helpers.absmod(
+                __name__, ".discount_code.DiscountCodeReferenceSchema"
+            ),
+            "inventory-entry": helpers.absmod(
+                __name__, ".inventory.InventoryEntryReferenceSchema"
+            ),
+            "order-edit": helpers.absmod(
+                __name__, ".order_edit.OrderEditReferenceSchema"
+            ),
+            "order": helpers.absmod(__name__, ".order.OrderReferenceSchema"),
+            "payment": helpers.absmod(__name__, ".payment.PaymentReferenceSchema"),
+            "product-discount": helpers.absmod(
+                __name__, ".product_discount.ProductDiscountReferenceSchema"
+            ),
+            "product-selection": helpers.absmod(
+                __name__, ".product_selection.ProductSelectionReferenceSchema"
+            ),
+            "product-tailoring": helpers.absmod(
+                __name__, ".product_tailoring.ProductTailoringReferenceSchema"
+            ),
+            "product-type": helpers.absmod(
+                __name__, ".product_type.ProductTypeReferenceSchema"
+            ),
+            "product": helpers.absmod(__name__, ".product.ProductReferenceSchema"),
+            "quote-request": helpers.absmod(
+                __name__, ".quote_request.QuoteRequestReferenceSchema"
+            ),
+            "quote": helpers.absmod(__name__, ".quote.QuoteReferenceSchema"),
+            "review": helpers.absmod(__name__, ".review.ReviewReferenceSchema"),
+            "shipping-method": helpers.absmod(
+                __name__, ".shipping_method.ShippingMethodReferenceSchema"
+            ),
+            "shopping-list": helpers.absmod(
+                __name__, ".shopping_list.ShoppingListReferenceSchema"
+            ),
+            "staged-quote": helpers.absmod(
+                __name__, ".staged_quote.StagedQuoteReferenceSchema"
+            ),
+            "standalone-price": helpers.absmod(
+                __name__, ".standalone_price.StandalonePriceReferenceSchema"
+            ),
+            "state": helpers.absmod(__name__, ".state.StateReferenceSchema"),
+            "store": helpers.absmod(__name__, ".store.StoreReferenceSchema"),
+            "tax-category": helpers.absmod(
+                __name__, ".tax_category.TaxCategoryReferenceSchema"
+            ),
+            "type": helpers.absmod(__name__, ".type.TypeReferenceSchema"),
+            "zone": helpers.absmod(__name__, ".zone.ZoneReferenceSchema"),
+        },
+        load_default=None,
+    )
+    discounted_amount = helpers.Discriminator(
+        allow_none=True,
+        discriminator_field=("type", "type"),
+        discriminator_schemas={
+            "centPrecision": helpers.absmod(
+                __name__, ".common.CentPrecisionMoneyDraftSchema"
+            ),
+            "highPrecision": helpers.absmod(
+                __name__, ".common.HighPrecisionMoneyDraftSchema"
+            ),
+        },
+        load_default=None,
+        data_key="discountedAmount",
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+
+        return models.DiscountedLineItemPortionDraft(**data)
 
 
 class DiscountedLineItemPriceSchema(helpers.BaseSchema):
@@ -1427,6 +1556,7 @@ class DiscountedLineItemPriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DiscountedLineItemPrice(**data)
 
 
@@ -1445,6 +1575,7 @@ class DiscountedLineItemPriceForQuantitySchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DiscountedLineItemPriceForQuantity(**data)
 
 
@@ -1475,6 +1606,7 @@ class DiscountedTotalPricePortionSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DiscountedTotalPricePortion(**data)
 
 
@@ -1498,6 +1630,7 @@ class ExternalLineItemTotalPriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ExternalLineItemTotalPrice(**data)
 
 
@@ -1522,6 +1655,7 @@ class ExternalTaxAmountDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ExternalTaxAmountDraft(**data)
 
 
@@ -1555,6 +1689,7 @@ class ExternalTaxRateDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ExternalTaxRateDraft(**data)
 
 
@@ -1573,6 +1708,7 @@ class ItemShippingDetailsSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ItemShippingDetails(**data)
 
 
@@ -1590,6 +1726,7 @@ class ItemShippingDetailsDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ItemShippingDetailsDraft(**data)
 
 
@@ -1610,6 +1747,7 @@ class ItemShippingTargetSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ItemShippingTarget(**data)
 
 
@@ -1784,6 +1922,7 @@ class LineItemSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.LineItem(**data)
 
 
@@ -1893,6 +2032,7 @@ class LineItemDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.LineItemDraft(**data)
 
 
@@ -1914,6 +2054,7 @@ class MethodExternalTaxRateDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.MethodExternalTaxRateDraft(**data)
 
 
@@ -1935,6 +2076,7 @@ class MethodTaxRateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.MethodTaxRate(**data)
 
 
@@ -1956,6 +2098,7 @@ class MethodTaxedPriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.MethodTaxedPrice(**data)
 
 
@@ -2012,6 +2155,9 @@ class ReplicaCartDraftSchema(helpers.BaseSchema):
             "product-selection": helpers.absmod(
                 __name__, ".product_selection.ProductSelectionReferenceSchema"
             ),
+            "product-tailoring": helpers.absmod(
+                __name__, ".product_tailoring.ProductTailoringReferenceSchema"
+            ),
             "product-type": helpers.absmod(
                 __name__, ".product_type.ProductTypeReferenceSchema"
             ),
@@ -2052,6 +2198,7 @@ class ReplicaCartDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ReplicaCartDraft(**data)
 
 
@@ -2100,6 +2247,7 @@ class ShippingSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Shipping(**data)
 
 
@@ -2164,6 +2312,7 @@ class ShippingDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShippingDraft(**data)
 
 
@@ -2247,6 +2396,7 @@ class ShippingInfoSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShippingInfo(**data)
 
 
@@ -2344,6 +2494,7 @@ class TaxPortionSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.TaxPortion(**data)
 
 
@@ -2364,6 +2515,7 @@ class TaxPortionDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.TaxPortionDraft(**data)
 
 
@@ -2382,6 +2534,14 @@ class TaxedItemPriceSchema(helpers.BaseSchema):
         load_default=None,
         data_key="totalGross",
     )
+    tax_portions = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".TaxPortionSchema"),
+        allow_none=True,
+        many=True,
+        unknown=marshmallow.EXCLUDE,
+        load_default=None,
+        data_key="taxPortions",
+    )
     total_tax = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".common.CentPrecisionMoneySchema"),
         allow_none=True,
@@ -2396,6 +2556,7 @@ class TaxedItemPriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.TaxedItemPrice(**data)
 
 
@@ -2436,6 +2597,7 @@ class TaxedPriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.TaxedPrice(**data)
 
 
@@ -2462,12 +2624,28 @@ class TaxedPriceDraftSchema(helpers.BaseSchema):
         load_default=None,
         data_key="taxPortions",
     )
+    total_tax = helpers.Discriminator(
+        allow_none=True,
+        discriminator_field=("type", "type"),
+        discriminator_schemas={
+            "centPrecision": helpers.absmod(
+                __name__, ".common.CentPrecisionMoneyDraftSchema"
+            ),
+            "highPrecision": helpers.absmod(
+                __name__, ".common.HighPrecisionMoneyDraftSchema"
+            ),
+        },
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="totalTax",
+    )
 
     class Meta:
         unknown = marshmallow.EXCLUDE
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.TaxedPriceDraft(**data)
 
 
@@ -2714,6 +2892,15 @@ class CartAddLineItemActionSchema(CartUpdateActionSchema):
         metadata={"omit_empty": True},
         load_default=None,
         data_key="externalTaxRate",
+    )
+    per_method_external_tax_rate = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".MethodExternalTaxRateDraftSchema"),
+        allow_none=True,
+        many=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="perMethodExternalTaxRate",
     )
     inventory_mode = marshmallow_enum.EnumField(
         InventoryMode,
@@ -3103,6 +3290,7 @@ class CartChangeTaxRoundingModeActionSchema(CartUpdateActionSchema):
 
 
 class CartFreezeCartActionSchema(CartUpdateActionSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -4341,6 +4529,7 @@ class CartSetShippingRateInputActionSchema(CartUpdateActionSchema):
 
 
 class CartUnfreezeCartActionSchema(CartUpdateActionSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -4365,3 +4554,124 @@ class CartUpdateItemShippingAddressActionSchema(CartUpdateActionSchema):
     def post_load(self, data, **kwargs):
         del data["action"]
         return models.CartUpdateItemShippingAddressAction(**data)
+
+
+class ProductTailoringUpdateSchema(helpers.BaseSchema):
+    version = marshmallow.fields.Integer(allow_none=True, load_default=None)
+    actions = marshmallow.fields.List(
+        helpers.Discriminator(
+            allow_none=True,
+            discriminator_field=("action", "action"),
+            discriminator_schemas={
+                "addAsset": helpers.absmod(
+                    __name__, ".product_tailoring.ProductTailoringAddAssetActionSchema"
+                ),
+                "addExternalImage": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringAddExternalImageActionSchema",
+                ),
+                "addVariant": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringAddVariantActionSchema",
+                ),
+                "changeAssetName": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringChangeAssetNameActionSchema",
+                ),
+                "changeAssetOrder": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringChangeAssetOrderActionSchema",
+                ),
+                "moveImageToPosition": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringMoveImageToPositionActionSchema",
+                ),
+                "publish": helpers.absmod(
+                    __name__, ".product_tailoring.ProductTailoringPublishActionSchema"
+                ),
+                "removeAsset": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringRemoveAssetActionSchema",
+                ),
+                "removeImage": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringRemoveImageActionSchema",
+                ),
+                "removeVariant": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringRemoveVariantActionSchema",
+                ),
+                "setAssetCustomField": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetAssetCustomFieldActionSchema",
+                ),
+                "setAssetCustomType": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetAssetCustomTypeActionSchema",
+                ),
+                "setAssetDescription": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetAssetDescriptionActionSchema",
+                ),
+                "setAssetKey": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetAssetKeyActionSchema",
+                ),
+                "setAssetSources": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetAssetSourcesActionSchema",
+                ),
+                "setAssetTags": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetAssetTagsActionSchema",
+                ),
+                "setDescription": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetDescriptionActionSchema",
+                ),
+                "setImages": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetExternalImagesActionSchema",
+                ),
+                "setImageLabel": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetImageLabelActionSchema",
+                ),
+                "setMetaAttributes": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetMetaAttributesActionSchema",
+                ),
+                "setMetaDescription": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetMetaDescriptionActionSchema",
+                ),
+                "setMetaKeywords": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetMetaKeywordsActionSchema",
+                ),
+                "setMetaTitle": helpers.absmod(
+                    __name__,
+                    ".product_tailoring.ProductTailoringSetMetaTitleActionSchema",
+                ),
+                "setName": helpers.absmod(
+                    __name__, ".product_tailoring.ProductTailoringSetNameActionSchema"
+                ),
+                "setSlug": helpers.absmod(
+                    __name__, ".product_tailoring.ProductTailoringSetSlugActionSchema"
+                ),
+                "unpublish": helpers.absmod(
+                    __name__, ".product_tailoring.ProductTailoringUnpublishActionSchema"
+                ),
+            },
+        ),
+        allow_none=True,
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+
+        return models.ProductTailoringUpdate(**data)

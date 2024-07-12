@@ -1,18 +1,26 @@
 import typing
 
+from marshmallow import fields
+
 from commercetools.platform import models
 from commercetools.platform.models._schemas.product import (
     ProductProjectionPagedQueryResponseSchema,
     ProductProjectionSchema,
     ProductSchema,
 )
-from commercetools.services.product_projections import (
-    _ProductProjectionQuerySchema,
-    _ProductProjectionSearchSchema,
-)
-from commercetools.testing import utils
+from commercetools.testing import traits, utils
 from commercetools.testing.abstract import ServiceBackend
 from commercetools.testing.utils import create_commercetools_response
+
+
+class _ProductProjectionQuerySchema(
+    traits.ExpandableSchema,
+    traits.SortableSchema,
+    traits.PagingSchema,
+    traits.QuerySchema,
+    traits.PriceSelectingSchema,
+):
+    staged = fields.Bool(required=False, missing=False)
 
 
 class ProductProjectionsBackend(ServiceBackend):
@@ -22,7 +30,6 @@ class ProductProjectionsBackend(ServiceBackend):
     def urls(self):
         return [
             ("^$", "GET", self.query),
-            ("^search", "GET", self.search),
             ("^search", "POST", self.search),
             ("^key=(?P<key>[^/]+)$", "GET", self.get_by_key),
             ("^(?P<id>[^/]+)$", "GET", self.get_by_id),
@@ -57,7 +64,7 @@ class ProductProjectionsBackend(ServiceBackend):
         return create_commercetools_response(request, text=content)
 
     def search(self, request):
-        params = utils.parse_request_params(_ProductProjectionSearchSchema, request)
+        params = utils.parse_request_params(_ProductProjectionQuerySchema, request)
 
         limit = params.get("limit")
 

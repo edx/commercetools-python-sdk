@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyStandalonePricesByIDRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _id: str

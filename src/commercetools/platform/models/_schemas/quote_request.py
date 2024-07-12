@@ -246,6 +246,7 @@ class QuoteRequestSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.QuoteRequest(**data)
 
 
@@ -291,6 +292,7 @@ class QuoteRequestDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.QuoteRequestDraft(**data)
 
 
@@ -314,6 +316,7 @@ class QuoteRequestPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.QuoteRequestPagedQueryResponse(**data)
 
 
@@ -336,6 +339,7 @@ class QuoteRequestReferenceSchema(ReferenceSchema):
 
 
 class QuoteRequestResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -378,6 +382,7 @@ class QuoteRequestUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.QuoteRequestUpdate(**data)
 
 

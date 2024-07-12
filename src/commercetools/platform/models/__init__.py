@@ -20,6 +20,7 @@ from .common import *  # noqa
 from .custom_object import *  # noqa
 from .customer import *  # noqa
 from .customer_group import *  # noqa
+from .customer_search import *  # noqa
 from .discount_code import *  # noqa
 from .error import *  # noqa
 from .extension import *  # noqa
@@ -32,12 +33,15 @@ from .order_edit import *  # noqa
 from .payment import *  # noqa
 from .product import *  # noqa
 from .product_discount import *  # noqa
+from .product_search import *  # noqa
 from .product_selection import *  # noqa
+from .product_tailoring import *  # noqa
 from .product_type import *  # noqa
 from .project import *  # noqa
 from .quote import *  # noqa
 from .quote_request import *  # noqa
 from .review import *  # noqa
+from .search import *  # noqa
 from .shipping_method import *  # noqa
 from .shopping_list import *  # noqa
 from .staged_quote import *  # noqa

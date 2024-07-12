@@ -94,6 +94,7 @@ class ChangeSubscriptionResourceTypeId(enum.Enum):
     APPROVAL_FLOW = "approval-flow"
     APPROVAL_RULE = "approval-rule"
     ASSOCIATE_ROLE = "associate-role"
+    ATTRIBUTE_GROUP = "attribute-group"
     BUSINESS_UNIT = "business-unit"
     CART = "cart"
     CART_DISCOUNT = "cart-discount"
@@ -112,8 +113,8 @@ class ChangeSubscriptionResourceTypeId(enum.Enum):
     PAYMENT = "payment"
     PRODUCT = "product"
     PRODUCT_DISCOUNT = "product-discount"
-    PRODUCT_PRICE = "product-price"
     PRODUCT_SELECTION = "product-selection"
+    PRODUCT_TAILORING = "product-tailoring"
     PRODUCT_TYPE = "product-type"
     QUOTE = "quote"
     QUOTE_REQUEST = "quote-request"
@@ -696,6 +697,7 @@ class PlatformFormat(DeliveryFormat):
     """The PlatformFormat uses constructs that are similar to the ones used in the REST API, for example, on the [Messages Query HTTP API](/../api/projects/messages)."""
 
     def __init__(self):
+
         super().__init__(type="Platform")
 
     @classmethod
@@ -760,7 +762,7 @@ class ResourceDeletedDeliveryPayload(DeliveryPayload):
     version: int
     #: Date and time (UTC) the resource was last deleted.
     modified_at: datetime.datetime
-    #: `true` if the `dataErasure` [parameter](/../api/general-concepts#data-erasure-of-personal-data) on the `DELETE` request was set to `true`.
+    #: `true` if the `dataErasure` [parameter](/../api/gdpr#data-erasure-of-personal-data) on the `DELETE` request was set to `true`.
     data_erasure: typing.Optional[bool]
 
     def __init__(
@@ -947,9 +949,9 @@ class SqsDestination(Destination):
 
 
 class Subscription(BaseResource):
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the Subscription.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the Subscription.
     created_by: typing.Optional["CreatedBy"]
     #: Change notifications subscribed to.
     changes: typing.List["ChangeSubscription"]
@@ -1052,12 +1054,13 @@ class SubscriptionDraft(_BaseType):
 
 
 class SubscriptionHealthStatus(enum.Enum):
-    """The health status of the Subscription that indicates whether messages are being delivered to the Destination."""
+    """The health status of the Subscription that indicates whether messages are being delivered."""
 
     HEALTHY = "Healthy"
     CONFIGURATION_ERROR = "ConfigurationError"
     CONFIGURATION_ERROR_DELIVERY_STOPPED = "ConfigurationErrorDeliveryStopped"
     TEMPORARY_ERROR = "TemporaryError"
+    MANUALLY_SUSPENDED = "ManuallySuspended"
 
 
 class SubscriptionPagedQueryResponse(_BaseType):
@@ -1110,7 +1113,8 @@ class SubscriptionPagedQueryResponse(_BaseType):
 
 
 class SubscriptionUpdate(_BaseType):
-    #: Expected version of the Subscription on which the changes should be applied. If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) will be returned.
+    #: Expected version of the Subscription on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the Subscription.
     actions: typing.List["SubscriptionUpdateAction"]

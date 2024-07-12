@@ -40,9 +40,9 @@ __all__ = [
 
 
 class Extension(BaseResource):
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the Extension.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the Extension.
     created_by: typing.Optional["CreatedBy"]
     #: User-defined unique identifier of the Extension.
     key: typing.Optional[str]
@@ -174,7 +174,7 @@ class ExtensionDraft(_BaseType):
     #: The maximum value is 10000 ms (10 seconds) for `payment` Extensions and 2000 ms (2 seconds) for all other Extensions.
     #:
     #: This limit can be increased per Project after we review the performance impact.
-    #: Please contact our support via the [Support Portal](https://support.commercetools.com) and provide the Region, Project key, and use case.
+    #: Please contact the [Composable Commerce support team](https://support.commercetools.com) and provide the Region, Project key, and use case.
     timeout_in_ms: typing.Optional[int]
 
     def __init__(
@@ -324,7 +324,8 @@ class ExtensionTrigger(_BaseType):
 
 
 class ExtensionUpdate(_BaseType):
-    #: Expected version of the Extension on which the changes should be applied. If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error is returned.
+    #: Expected version of the Extension on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the Extension.
     actions: typing.List["ExtensionUpdateAction"]
@@ -595,7 +596,7 @@ class ExtensionSetTimeoutInMsAction(ExtensionUpdateAction):
     #: The maximum value is 10000 ms (10 seconds) for `payment` Extensions and 2000 ms (2 seconds) for all other Extensions.
     #:
     #: This limit can be increased per Project after we review the performance impact.
-    #: Please contact our support via the [Support Portal](https://support.commercetools.com/) and provide the Region, Project key, and use case.
+    #: Please contact the [Composable Commerce support team](https://support.commercetools.com/) and provide the Region, Project key, and use case.
     timeout_in_ms: typing.Optional[int]
 
     def __init__(self, *, timeout_in_ms: typing.Optional[int] = None):

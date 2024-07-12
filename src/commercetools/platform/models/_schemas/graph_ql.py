@@ -165,6 +165,9 @@ class GraphQLErrorSchema(helpers.BaseSchema):
             "LanguageUsedInStores": helpers.absmod(
                 __name__, ".error.GraphQLLanguageUsedInStoresErrorSchema"
             ),
+            "LockedField": helpers.absmod(
+                __name__, ".error.GraphQLLockedFieldErrorSchema"
+            ),
             "MatchingPriceNotFound": helpers.absmod(
                 __name__, ".error.GraphQLMatchingPriceNotFoundErrorSchema"
             ),
@@ -188,9 +191,6 @@ class GraphQLErrorSchema(helpers.BaseSchema):
             ),
             "NoMatchingProductDiscountFound": helpers.absmod(
                 __name__, ".error.GraphQLNoMatchingProductDiscountFoundErrorSchema"
-            ),
-            "NotEnabled": helpers.absmod(
-                __name__, ".error.GraphQLNotEnabledErrorSchema"
             ),
             "ObjectNotFound": helpers.absmod(
                 __name__, ".error.GraphQLObjectNotFoundErrorSchema"
@@ -274,6 +274,7 @@ class GraphQLErrorSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.GraphQLError(**data)
 
 
@@ -286,6 +287,7 @@ class GraphQLErrorLocationSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.GraphQLErrorLocation(**data)
 
 
@@ -310,6 +312,7 @@ class GraphQLRequestSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.GraphQLRequest(**data)
 
 
@@ -331,6 +334,7 @@ class GraphQLResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.GraphQLResponse(**data)
 
 

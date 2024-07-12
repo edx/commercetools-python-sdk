@@ -61,9 +61,9 @@ class SubRate(_BaseType):
 
 
 class TaxCategory(BaseResource):
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the TaxCategory.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the TaxCategory.
     created_by: typing.Optional["CreatedBy"]
     #: Name of the TaxCategory.
     name: str
@@ -229,6 +229,7 @@ class TaxCategoryResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.TAX_CATEGORY)
 
     @classmethod
@@ -246,7 +247,8 @@ class TaxCategoryResourceIdentifier(ResourceIdentifier):
 
 
 class TaxCategoryUpdate(_BaseType):
-    #: Expected version of the TaxCategory on which the changes should be applied. If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error is returned.
+    #: Expected version of the TaxCategory on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the TaxCategory.
     actions: typing.List["TaxCategoryUpdateAction"]
@@ -323,7 +325,7 @@ class TaxRate(_BaseType):
     key: typing.Optional[str]
     #: Name of the TaxRate.
     name: str
-    #: Tax rate. If subrates are used, the amount must be the sum of all subrates.
+    #: Tax rate. If subrates are used, the amount is the sum of all rates in `subRates`.
     amount: float
     #: If `true`, tax is included in [Embedded Prices](ctp:api:type:Price) or [Standalone Prices](ctp:api:type:StandalonePrice), and the `taxedPrice` is present on [LineItems](ctp:api:type:LineItem). In this case, the `totalNet` price on [TaxedPrice](ctp:api:type:TaxedPrice) includes the TaxRate.
     included_in_price: bool
@@ -331,7 +333,8 @@ class TaxRate(_BaseType):
     country: str
     #: State within the country, such as Texas in the United States.
     state: typing.Optional[str]
-    #: Used to calculate the [taxPortions](/../api/projects/carts#taxedprice) field in a Cart or Order. It is useful if the total tax of a country (such as the US) is a combination of multiple taxes (such as state and local taxes).
+    #: Used when the total tax is a combination of multiple taxes (for example, local, state/provincial, and/or federal taxes). The total of all subrates must equal the TaxRate `amount`.
+    #: These subrates are used to calculate the `taxPortions` field of a [Cart](ctp:api:type:Cart) or [Order](ctp:api:type:Order) and the `taxedPrice` field of [LineItems](ctp:api:type:LineItem), [CustomLineItems](ctp:api:type:CustomLineItem), and [ShippingInfos](ctp:api:type:ShippingInfo).
     sub_rates: typing.Optional[typing.List["SubRate"]]
 
     def __init__(
@@ -382,7 +385,8 @@ class TaxRateDraft(_BaseType):
     country: str
     #: State within the country, such as Texas in the United States.
     state: typing.Optional[str]
-    #: Used to calculate the [taxPortions](/../api/projects/carts#taxedprice) field in a Cart or Order. It is useful if the total tax of a country (such as the US) is a combination of multiple taxes (such as state and local taxes).
+    #: Used when the total tax is a combination of multiple taxes (for example, local, state/provincial, and/or federal taxes). The total of all subrates must equal the TaxRate `amount`.
+    #: These subrates are used to calculate the `taxPortions` field of a [Cart](ctp:api:type:Cart) or [Order](ctp:api:type:Order) and the `taxedPrice` field of [LineItems](ctp:api:type:LineItem), [CustomLineItems](ctp:api:type:CustomLineItem), and [ShippingInfos](ctp:api:type:ShippingInfo).
     sub_rates: typing.Optional[typing.List["SubRate"]]
     #: User-defined unique identifier of the TaxRate.
     key: typing.Optional[str]

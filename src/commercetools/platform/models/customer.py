@@ -101,11 +101,11 @@ class Customer(BaseResource):
     #:
     #: Can be used to refer to a Customer in a human-readable way (in emails, invoices, and other correspondence).
     customer_number: typing.Optional[str]
-    #: Optional identifier for use in external systems like Customer Relationship Management (CRM) or Enterprise Resource Planning (ERP).
+    #: Optional identifier for use in external systems like customer relationship management (CRM) or enterprise resource planning (ERP).
     external_id: typing.Optional[str]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the Customer.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the Customer.
     created_by: typing.Optional["CreatedBy"]
     #: Email address of the Customer that is [unique](/../api/customers-overview#customer-uniqueness) for an entire Project or to a Store the Customer is assigned to.
     #: It is the mandatory unique identifier of a Customer.
@@ -148,9 +148,9 @@ class Customer(BaseResource):
     salutation: typing.Optional[str]
     #: [Stores](ctp:api:type:Store) to which the Customer is assigned to.
     #:
-    #: - If no Stores are specified, the Customer is a global customer, and can log in using the [Password Flow for global Customers](/../api/authorization#password-flow-for-global-customers).
+    #: - If `stores` is empty, the Customer is a global customer, and can log in using the [Password Flow for global Customers](/../api/authorization#password-flow-for-global-customers).
     #: - If any Stores are specified, the Customer can only log in using the [Password Flow for Customers in a Store](/../api/authorization#password-flow-for-customers-in-a-store) for those specific Stores.
-    stores: typing.Optional[typing.List["StoreKeyReference"]]
+    stores: typing.List["StoreKeyReference"]
     #: Indicates whether the `password` is required for the Customer.
     authentication_mode: "AuthenticationMode"
 
@@ -185,7 +185,7 @@ class Customer(BaseResource):
         custom: typing.Optional["CustomFields"] = None,
         locale: typing.Optional[str] = None,
         salutation: typing.Optional[str] = None,
-        stores: typing.Optional[typing.List["StoreKeyReference"]] = None,
+        stores: typing.List["StoreKeyReference"],
         authentication_mode: "AuthenticationMode"
     ):
         self.key = key
@@ -336,7 +336,7 @@ class CustomerDraft(_BaseType):
     #:
     #: Can be used to refer to a Customer in a human-readable way (in emails, invoices, and other correspondence).
     customer_number: typing.Optional[str]
-    #: Optional identifier for use in external systems like Customer Relationship Management (CRM) or Enterprise Resource Planning (ERP).
+    #: Optional identifier for use in external systems like customer relationship management (CRM) or enterprise resource planning (ERP).
     external_id: typing.Optional[str]
     #: Email address of the Customer that must be [unique](/../api/customers-overview#customer-uniqueness) for an entire Project or to a Store the Customer is assigned to.
     #: It is the mandatory unique identifier of a Customer.
@@ -476,6 +476,7 @@ class CustomerEmailTokenReference(Reference):
     """[Reference](ctp:api:type:Reference) to a [CustomerToken](ctp:api:type:CustomerToken) for email verification."""
 
     def __init__(self, *, id: str):
+
         super().__init__(id=id, type_id=ReferenceTypeId.CUSTOMER_EMAIL_TOKEN)
 
     @classmethod
@@ -569,6 +570,7 @@ class CustomerPasswordTokenReference(Reference):
     """[Reference](ctp:api:type:Reference) to a [CustomerToken](ctp:api:type:CustomerToken) for password reset."""
 
     def __init__(self, *, id: str):
+
         super().__init__(id=id, type_id=ReferenceTypeId.CUSTOMER_PASSWORD_TOKEN)
 
     @classmethod
@@ -647,6 +649,7 @@ class CustomerResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.CUSTOMER)
 
     @classmethod
@@ -787,7 +790,8 @@ class CustomerToken(_BaseType):
 
 
 class CustomerUpdate(_BaseType):
-    #: Expected version of the Customer on which the changes should be applied. If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: Expected version of the Customer on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the Customer.
     actions: typing.List["CustomerUpdateAction"]
@@ -1580,7 +1584,11 @@ class CustomerSetCustomTypeAction(CustomerUpdateAction):
 
 
 class CustomerSetCustomerGroupAction(CustomerUpdateAction):
-    """Setting the Customer Group of the Customer produces the [CustomerGroupSet](ctp:api:type:CustomerGroupSetMessage) Message."""
+    """Setting the Customer Group of the Customer produces the [CustomerGroupSet](ctp:api:type:CustomerGroupSetMessage) Message.
+
+    To reflect the new Customer Group, this update action can result in [updates](/api/carts-orders-overview#cart-updates) to the most recently modified active Cart. When this occurs, the following errors can be returned: [MatchingPriceNotFound](ctp:api:type:MatchingPriceNotFoundError) and [MissingTaxRateForCountry](ctp:api:type:MissingTaxRateForCountryError).
+
+    """
 
     #: Value to set.
     #: If empty, any existing value is removed.
@@ -1701,8 +1709,6 @@ class CustomerSetDefaultShippingAddressAction(CustomerUpdateAction):
     """Sets the default shipping address from `addresses`.
     The action adds the `id` of the specified address to the `shippingAddressIds` if not contained already. Either `addressId` or `addressKey` is required.
 
-    If the Tax Category of the Cart [ShippingInfo](ctp:api:type:ShippingInfo) is missing the TaxRate matching country and state given in the `shippingAddress` of that Cart, a [MissingTaxRateForCountry](ctp:api:type:MissingTaxRateForCountryError) error is returned.
-
     """
 
     #: `id` of the [Address](ctp:api:type:Address) to become the default shipping address.
@@ -1760,6 +1766,8 @@ class CustomerSetExternalIdAction(CustomerUpdateAction):
 
 
 class CustomerSetFirstNameAction(CustomerUpdateAction):
+    """Setting the first name of the Customer produces the [CustomeFirstNameSet](ctp:api:type:CustomerFirstNameSetMessage) Message."""
+
     #: Value to set. If empty, any existing value is removed.
     first_name: typing.Optional[str]
 
@@ -1804,7 +1812,7 @@ class CustomerSetKeyAction(CustomerUpdateAction):
 
 
 class CustomerSetLastNameAction(CustomerUpdateAction):
-    """Setting the last name of the Customer produces the [CustomerLastNameSetMessage](ctp:api:type:CustomerLastNameSetMessage)."""
+    """Setting the last name of the Customer produces the [CustomerLastNameSet](ctp:api:type:CustomerLastNameSetMessage) Message."""
 
     #: Value to set. If empty, any existing value is removed.
     last_name: typing.Optional[str]
@@ -1905,11 +1913,9 @@ class CustomerSetStoresAction(CustomerUpdateAction):
     """
 
     #: ResourceIdentifier of the Stores to set.
-    stores: typing.Optional[typing.List["StoreResourceIdentifier"]]
+    stores: typing.List["StoreResourceIdentifier"]
 
-    def __init__(
-        self, *, stores: typing.Optional[typing.List["StoreResourceIdentifier"]] = None
-    ):
+    def __init__(self, *, stores: typing.List["StoreResourceIdentifier"]):
         self.stores = stores
 
         super().__init__(action="setStores")
@@ -1929,7 +1935,7 @@ class CustomerSetStoresAction(CustomerUpdateAction):
 
 
 class CustomerSetTitleAction(CustomerUpdateAction):
-    """Setting the title of the Customer produces the [CustomerTitleSetMessage](ctp:api:type:CustomerTitleSetMessage)."""
+    """Setting the title of the Customer produces the [CustomerTitleSet](ctp:api:type:CustomerTitleSetMessage) Message."""
 
     #: Value to set. If empty, any existing value is removed.
     title: typing.Optional[str]

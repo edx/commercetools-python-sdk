@@ -108,6 +108,7 @@ __all__ = [
     "GraphQLInvalidSubjectError",
     "GraphQLInvalidTokenError",
     "GraphQLLanguageUsedInStoresError",
+    "GraphQLLockedFieldError",
     "GraphQLMatchingPriceNotFoundError",
     "GraphQLMaxCartDiscountsReachedError",
     "GraphQLMaxResourceLimitExceededError",
@@ -116,7 +117,6 @@ __all__ = [
     "GraphQLMissingTaxRateForCountryError",
     "GraphQLMoneyOverflowError",
     "GraphQLNoMatchingProductDiscountFoundError",
-    "GraphQLNotEnabledError",
     "GraphQLObjectNotFoundError",
     "GraphQLOutOfStockError",
     "GraphQLOverCapacityError",
@@ -153,6 +153,7 @@ __all__ = [
     "InvalidSubjectError",
     "InvalidTokenError",
     "LanguageUsedInStoresError",
+    "LockedFieldError",
     "MatchingPriceNotFoundError",
     "MaxCartDiscountsReachedError",
     "MaxResourceLimitExceededError",
@@ -161,7 +162,6 @@ __all__ = [
     "MissingTaxRateForCountryError",
     "MoneyOverflowError",
     "NoMatchingProductDiscountFoundError",
-    "NotEnabledError",
     "ObjectNotFoundError",
     "OutOfStockError",
     "OverCapacityError",
@@ -403,6 +403,10 @@ class ErrorObject(_BaseType):
             from ._schemas.error import LanguageUsedInStoresErrorSchema
 
             return LanguageUsedInStoresErrorSchema().load(data)
+        if data["code"] == "LockedField":
+            from ._schemas.error import LockedFieldErrorSchema
+
+            return LockedFieldErrorSchema().load(data)
         if data["code"] == "MatchingPriceNotFound":
             from ._schemas.error import MatchingPriceNotFoundErrorSchema
 
@@ -435,10 +439,6 @@ class ErrorObject(_BaseType):
             from ._schemas.error import NoMatchingProductDiscountFoundErrorSchema
 
             return NoMatchingProductDiscountFoundErrorSchema().load(data)
-        if data["code"] == "NotEnabled":
-            from ._schemas.error import NotEnabledErrorSchema
-
-            return NotEnabledErrorSchema().load(data)
         if data["code"] == "ObjectNotFound":
             from ._schemas.error import ObjectNotFoundErrorSchema
 
@@ -552,6 +552,7 @@ class AnonymousIdAlreadyInUseError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="AnonymousIdAlreadyInUse", **kwargs)
 
@@ -615,7 +616,7 @@ class AssociateMissingPermissionError(ErrorObject):
 class AttributeDefinitionAlreadyExistsError(ErrorObject):
     """Returned when the `name` of the [AttributeDefinition](ctp:api:type:AttributeDefinition) conflicts with an existing Attribute.
 
-    The error is returned as a failed response to the [Create ProductType](/../api/projects/productTypes#create-producttype) request or [Change AttributeDefinition Name](ctp:api:type:ProductTypeChangeAttributeNameAction) update action.
+    The error is returned as a failed response to the [Create ProductType](ctp:api:endpoint:/{projectKey}/product-types:POST) request or [Change AttributeDefinition Name](ctp:api:type:ProductTypeChangeAttributeNameAction) update action.
 
     """
 
@@ -660,7 +661,7 @@ class AttributeDefinitionAlreadyExistsError(ErrorObject):
 class AttributeDefinitionTypeConflictError(ErrorObject):
     """Returned when the `type` is different for an AttributeDefinition using the same `name` in multiple Product Types.
 
-    The error is returned as a failed response to the [Create ProductType](/../api/projects/productTypes#create-producttype) request.
+    The error is returned as a failed response to the [Create ProductType](ctp:api:endpoint:/{projectKey}/product-types:POST) request.
 
     """
 
@@ -739,6 +740,7 @@ class BadGatewayError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="BadGateway", **kwargs)
 
@@ -788,6 +790,7 @@ class ContentTooLargeError(ErrorObject):
     """Returned when the request results in too much data being returned from the API. Adjust the request query to reduce the size of the data returned."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="ContentTooLarge", **kwargs)
 
@@ -810,12 +813,10 @@ class CountryNotConfiguredInStoreError(ErrorObject):
 
     - [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/carts:POST) request and [Set Country](ctp:api:type:CartSetCountryAction) update action on Carts.
     - [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/me/carts:POST) request and [Set Country](ctp:api:type:MyCartSetCountryAction) update action on My Carts.
-    - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
-    - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
-    - [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST) requests on Orders.
-    - [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
+    - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST) requests on Orders.
+    - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
     - [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) request on Order Import.
-    - [Set Country](ctp:api:type:StagedOrderSetCountryAction) on Order Edits.
+    - [Set Country](ctp:api:type:StagedOrderSetCountryAction) update action on Order Edits.
 
     """
 
@@ -856,8 +857,13 @@ class DiscountCodeNonApplicableError(ErrorObject):
 
     The error is returned as a failed response to:
 
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts:POST) requests and [Add DiscountCode](ctp:api:type:CartAddDiscountCodeAction) update action on Carts.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/me/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/carts:POST) requests and [Add DiscountCode](ctp:api:type:MyCartAddDiscountCodeAction) update action on My Carts.
+    - [Create Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts:POST) request on Associate Carts.
     - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
     - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Add DiscountCode](ctp:api:type:StagedOrderAddDiscountCodeAction) update action on Order Edits.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) request on Associate Orders.
 
     """
 
@@ -1115,7 +1121,7 @@ class DuplicateStandalonePriceScopeError(ErrorObject):
     """Returned when the given Price scope conflicts with the Price scope of an existing Standalone Price.
     Every Standalone Price associated with the same SKU must have a distinct combination of currency, country, Customer Group, Channel, and validity periods (`validFrom` and `validUntil`).
 
-    The error is returned as a failed response to the [Create StandalonePrice](/../api/projects/standalone-prices#create-standaloneprice) request.
+    The error is returned as a failed response to the [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
 
     """
 
@@ -1205,7 +1211,7 @@ class DuplicateVariantValuesError(ErrorObject):
 class EditPreviewFailedError(ErrorObject):
     """Returned when a preview to find an appropriate Shipping Method for an OrderEdit could not be generated.
 
-    The error is returned as a failed response to the [Get Shipping Methods for an OrderEdit](/../api/projects/shippingMethods#for-an-orderedit) request.
+    The error is returned as a failed response to the [Get Shipping Methods for an OrderEdit](ctp:api:endpoint:/{projectKey}/shipping-methods/matching-orderedit:GET) request.
 
     """
 
@@ -1313,6 +1319,7 @@ class EnumValueIsUsedError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="EnumValueIsUsed", **kwargs)
 
@@ -1336,6 +1343,7 @@ class EnumValuesMustMatchError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="EnumValuesMustMatch", **kwargs)
 
@@ -1628,6 +1636,7 @@ class ExternalOAuthFailedError(ErrorObject):
     """Returned when an [external OAuth Introspection endpoint](/../api/authorization#requesting-an-access-token-using-an-external-oauth-server) does not return a response within the [time limit](/../api/authorization#time-limits), or the response isn't compliant with [RFC 7662](https://www.rfc-editor.org/rfc/rfc7662.html) (for example, an HTTP status code like `500`)."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="ExternalOAuthFailed", **kwargs)
 
@@ -1649,6 +1658,7 @@ class FeatureRemovedError(ErrorObject):
     """Returned when the requested feature was removed."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="FeatureRemoved", **kwargs)
 
@@ -1665,13 +1675,14 @@ class FeatureRemovedError(ErrorObject):
 
 
 class GeneralError(ErrorObject):
-    """Returned when a server-side problem occurs.
+    """Returned when a server-side problem occurs before or after data persistence. In some cases, the requested action may successfully complete after the error is returned. Therefore, it is recommended to verify the status of the requested resource after receiving a 500 error.
 
-    If you encounter this error, report it using the [Support Portal](https://support.commercetools.com).
+    If you encounter this error, report it to the [Composable Commerce support team](https://support.commercetools.com).
 
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="General", **kwargs)
 
@@ -1688,7 +1699,9 @@ class GeneralError(ErrorObject):
 
 
 class InsufficientScopeError(ErrorObject):
+
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="insufficient_scope", **kwargs)
 
@@ -1710,6 +1723,7 @@ class InternalConstraintViolatedError(ErrorObject):
     """Returned when certain API-specific constraints were not met. For example, the specified [Discount Code](ctp:api:type:DiscountCode) was never applied and cannot be updated."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="InternalConstraintViolated", **kwargs)
 
@@ -1732,12 +1746,13 @@ class InvalidCredentialsError(ErrorObject):
 
     The error is returned as a failed response to:
 
-    - [Authenticate a global Customer (Sign-in)](/../api/projects/customers#authenticate-sign-in-customer) and [Authenticate Customer (Sign-in) in a Store](/../api/projects/customers#authenticate-sign-in-customer-in-store) requests on Customers.
-    - [Authenticating Customer (Sign-in)](/../api/projects/me-profile#authenticate-sign-in-customer) and [Authenticate Customer (Sign-in) in a Store](/../api/projects/me-profile#authenticate-sign-in-customer-in-store) requests on My Customer Profile.
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/login:POST) requests on Customers.
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/me/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/login:POST) requests on My Customer Profile.
 
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="InvalidCredentials", **kwargs)
 
@@ -1760,12 +1775,13 @@ class InvalidCurrentPasswordError(ErrorObject):
 
     The error is returned as a failed response to:
 
-    - [Change Customer Password](/../api/projects/customers#change-password-of-customer) and [Change Customer Password in a Store](/../api/projects/customers#change-password-of-customer-in-store) requests on Customers.
-    - [Change Customer Password](/../api/projects/me-profile#change-password-of-customer) and [Change Customer Password in a Store](/../api/projects/me-profile#change-password-of-customer-in-store) requests on My Customer Profile.
+    - [Change Customer Password](ctp:api:endpoint:/{projectKey}/customers/password:POST) and [Change Customer Password in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/customers/password:POST) requests on Customers.
+    - [Change Customer Password](ctp:api:endpoint:/{projectKey}/me/password:POST) and [Change Customer Password in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/password:POST) requests on My Customer Profile.
 
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="InvalidCurrentPassword", **kwargs)
 
@@ -1824,6 +1840,7 @@ class InvalidInputError(ErrorObject):
     """Returned when an invalid input has been sent."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="InvalidInput", **kwargs)
 
@@ -1842,7 +1859,17 @@ class InvalidInputError(ErrorObject):
 class InvalidItemShippingDetailsError(ErrorObject):
     """Returned when Line Item or Custom Line Item quantities set under [ItemShippingDetails](ctp:api:type:ItemShippingDetails) do not match the sum of the quantities in their respective shipping details.
 
-    The error is returned as a failed response to the [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests.
+    When a Cart is frozen, the error can be returned as a failed response to all update actions on [Carts](ctp:api:type:CartUpdateAction) and [My Carts](ctp:api:type:MyCartUpdateAction).
+
+    The error is also returned as a failed response to:
+
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts:POST) requests and [Add LineItem](ctp:api:type:CartAddLineItemAction), [Add CustomLineItem](ctp:api:type:CartAddCustomLineItemAction), [Set LineItem ShippingDetails](ctp:api:type:CartSetLineItemShippingDetailsAction), [Set CustomLineItem ShippingDetails](ctp:api:type:CartSetCustomLineItemShippingDetailsAction), [Add Shopping List](ctp:api:type:CartAddShoppingListAction), and [Remove LineItem](ctp:api:type:CartRemoveLineItemAction) update actions on Carts.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/me/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/carts:POST) requests, and [Add LineItem](ctp:api:type:MyCartAddLineItemAction), [Set LineItem ShippingDetails](ctp:api:type:MyCartSetLineItemShippingDetailsAction), and [Remove LineItem](ctp:api:type:MyCartRemoveLineItemAction) update actions on My Carts.
+    - [Create Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts:POST) request on Associate Carts.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST), and [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST), and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
+    - [Add LineItem](ctp:api:type:StagedOrderAddLineItemAction), [Add CustomLineItem](ctp:api:type:StagedOrderAddCustomLineItemAction), [Set LineItem ShippingDetails](ctp:api:type:StagedOrderSetLineItemShippingDetailsAction), [Set CustomLineItem ShippingDetails](ctp:api:type:StagedOrderSetCustomLineItemShippingDetailsAction), [Add Shopping List](ctp:api:type:StagedOrderAddShoppingListAction), and [Remove LineItem](ctp:api:type:StagedOrderRemoveLineItemAction) update actions on Order Edits.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) and [Create Order from Quote in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders/quotes:POST) requests on Associate Orders.
 
     """
 
@@ -1907,6 +1934,7 @@ class InvalidOperationError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="InvalidOperation", **kwargs)
 
@@ -1923,7 +1951,9 @@ class InvalidOperationError(ErrorObject):
 
 
 class InvalidSubjectError(ErrorObject):
+
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="InvalidSubject", **kwargs)
 
@@ -1940,7 +1970,9 @@ class InvalidSubjectError(ErrorObject):
 
 
 class InvalidTokenError(ErrorObject):
+
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="invalid_token", **kwargs)
 
@@ -1964,6 +1996,7 @@ class LanguageUsedInStoresError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="LanguageUsedInStores", **kwargs)
 
@@ -1981,15 +2014,48 @@ class LanguageUsedInStoresError(ErrorObject):
         return LanguageUsedInStoresErrorSchema().dump(self)
 
 
+class LockedFieldError(ErrorObject):
+    """Returned when two [Customers](ctp:api:type:Customer) are simultaneously created or updated with the same email address.
+
+    To confirm if the operation was successful, repeat the request.
+
+    """
+
+    #: Field that is currently locked.
+    field: str
+
+    def __init__(self, *, message: str, field: str, **kwargs):
+        self.field = field
+        kwargs.pop("code", None)
+        super().__init__(message=message, code="LockedField", **kwargs)
+
+    @classmethod
+    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "LockedFieldError":
+        from ._schemas.error import LockedFieldErrorSchema
+
+        return LockedFieldErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.error import LockedFieldErrorSchema
+
+        return LockedFieldErrorSchema().dump(self)
+
+
 class MatchingPriceNotFoundError(ErrorObject):
     """Returned when the Product Variant does not have a Price according to the [Product](ctp:api:type:Product) `priceMode` value for a selected currency, country, Customer Group, or Channel.
 
-    The error is returned as a failed response to:
+    The error can be returned as a failed response to all update actions on [Carts](ctp:api:type:CartUpdateAction) and [Staged Orders](ctp:api:type:StagedOrderUpdateAction).
 
-    - [Add LineItem](ctp:api:type:CartAddLineItemAction), [Add CustomLineItem](ctp:api:type:CartAddCustomLineItemAction), and [Add DiscountCode](ctp:api:type:CartAddDiscountCodeAction) update actions on Carts.
-    - [Add LineItem](ctp:api:type:StagedOrderAddLineItemAction), [Add CustomLineItem](ctp:api:type:StagedOrderAddCustomLineItemAction), and [Add DiscountCode](ctp:api:type:StagedOrderAddDiscountCodeAction) update actions on Order Edits.
+    The error is also returned as a failed response to:
+
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/login:POST) requests and [Set CustomerGroup](ctp:api:type:CustomerSetCustomerGroupAction) update action on Customers.
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/me/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/login:POST) requests on My Customer Profile.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/carts:POST), [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts:POST), [Replicate Cart](ctp:api:endpoint:/{projectKey}/carts/replicate:POST), and [Replicate Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts/replicate:POST) requests on Carts.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/me/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/carts:POST) and [Replicate My Cart](ctp:api:endpoint:/{projectKey}/me/carts/replicate:POST) requests on My Carts.
+    - [Create Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts:POST) and [Replicate Cart in Business Unit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts/replicate:POST) requests on Associate Carts.
     - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
     - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) request on Associate Orders.
 
     """
 
@@ -2052,6 +2118,7 @@ class MaxCartDiscountsReachedError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="MaxCartDiscountsReached", **kwargs)
 
@@ -2109,6 +2176,7 @@ class MaxStoreReferencesReachedError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="MaxStoreReferencesReached", **kwargs)
 
@@ -2130,12 +2198,12 @@ class MissingRoleOnChannelError(ErrorObject):
     """Returned when one of the following states occur:
 
     - [Channel](ctp:api:type:Channel) is added or set on a [Store](ctp:api:type:Store) with missing Channel `roles`.
-    - [Standalone Price](/../api/projects/standalone-prices#create-standaloneprice) references a Channel that does not contain the `ProductDistribution` role.
+    - [Standalone Price](ctp:api:type:StandalonePrice) references a Channel that does not contain the `ProductDistribution` role.
 
     The error is returned as a failed response to:
 
     - [Add Distribution Channel](ctp:api:type:StoreAddDistributionChannelAction), [Set Distribution Channel](ctp:api:type:StoreSetDistributionChannelsAction), [Add Supply Channel](ctp:api:type:StoreAddSupplyChannelAction), and [Set Supply Channel](ctp:api:type:StoreSetSupplyChannelsAction) update actions.
-    - [Create a Standalone Price](/../api/projects/standalone-prices#create-standaloneprice) request.
+    - [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
 
     """
 
@@ -2175,10 +2243,18 @@ class MissingRoleOnChannelError(ErrorObject):
 class MissingTaxRateForCountryError(ErrorObject):
     """Returned when the Tax Category of at least one of the `lineItems`, `customLineItems`, or `shippingInfo` in the [Cart](ctp:api:type:Cart) is missing the [TaxRate](ctp:api:type:TaxRate) matching `country` and `state` given in the `shippingAddress` of that Cart.
 
-    The error is returned as a failed response to:
+    The error can be returned as a failed response to all update actions on [Carts](ctp:api:type:CartUpdateAction) and [Staged Orders](ctp:api:type:StagedOrderUpdateAction).
 
-    - [Set Default Shipping Address](ctp:api:type:CustomerSetDefaultShippingAddressAction), [Add LineItem](ctp:api:type:CartAddLineItemAction), [Add CustomLineItem](ctp:api:type:CartAddCustomLineItemAction), [Set Shipping Address](ctp:api:type:CartSetShippingAddressAction), [Add LineItem](ctp:api:type:MyCartAddLineItemAction), [Add LineItem](ctp:api:type:StagedOrderAddLineItemAction), and [Add CustomLineItem](ctp:api:type:StagedOrderAddCustomLineItemAction) update actions
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests.
+    The error is also returned as a failed response to:
+
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/login:POST) requests and [Set CustomerGroup](ctp:api:type:CustomerSetCustomerGroupAction) update action on Customers.
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/me/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/login:POST) on My Customer Profile.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/carts:POST), [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts:POST), [Replicate Cart](ctp:api:endpoint:/{projectKey}/carts/replicate:POST), and [Replicate Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts/replicate:POST) requests on Carts.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/me/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/carts:POST) and [Replicate My Cart](ctp:api:endpoint:/{projectKey}/me/carts/replicate:POST) requests on My Carts.
+    - [Create Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts:POST) and [Replicate Cart in Business Unit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts/replicate:POST) requests on Associate Carts.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) requests on Associate Orders.
 
     """
 
@@ -2225,6 +2301,7 @@ class MoneyOverflowError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="MoneyOverflow", **kwargs)
 
@@ -2243,11 +2320,12 @@ class MoneyOverflowError(ErrorObject):
 class NoMatchingProductDiscountFoundError(ErrorObject):
     """Returned when a Product Discount could not be found that could be applied to the Price of a Product Variant.
 
-    The error is returned as a failed response to the [Get Matching ProductDiscount](/../api/projects/productDiscounts#get-matching-productdiscount) request.
+    The error is returned as a failed response to the [Get Matching ProductDiscount](ctp:api:endpoint:/{projectKey}/product-discounts/matching:POST) request.
 
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(
             message=message, code="NoMatchingProductDiscountFound", **kwargs
@@ -2267,29 +2345,11 @@ class NoMatchingProductDiscountFoundError(ErrorObject):
         return NoMatchingProductDiscountFoundErrorSchema().dump(self)
 
 
-class NotEnabledError(ErrorObject):
-    """Returned when the [Project-specific category recommendations feature](/../api/projects/categoryRecommendations#project-specific-category-recommendations) is not enabled for the Project."""
-
-    def __init__(self, *, message: str, **kwargs):
-        kwargs.pop("code", None)
-        super().__init__(message=message, code="NotEnabled", **kwargs)
-
-    @classmethod
-    def deserialize(cls, data: typing.Dict[str, typing.Any]) -> "NotEnabledError":
-        from ._schemas.error import NotEnabledErrorSchema
-
-        return NotEnabledErrorSchema().load(data)
-
-    def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.error import NotEnabledErrorSchema
-
-        return NotEnabledErrorSchema().dump(self)
-
-
 class ObjectNotFoundError(ErrorObject):
     """Returned when the requested resource was not found."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="ObjectNotFound", **kwargs)
 
@@ -2310,8 +2370,9 @@ class OutOfStockError(ErrorObject):
 
     The error is returned as a failed response to:
 
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), and [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) requests on Orders.
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST), and [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST), and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) and [Create Order from Quote in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders/quotes:POST) requests on Associate Orders.
 
     """
 
@@ -2353,6 +2414,7 @@ class OverCapacityError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="OverCapacity", **kwargs)
 
@@ -2372,7 +2434,7 @@ class OverlappingStandalonePriceValidityError(ErrorObject):
     """Returned when a given Price validity period conflicts with an existing one.
     Every Standalone Price associated with the same SKU and with the same combination of currency, country, Customer Group, and Channel, must have non-overlapping validity periods (`validFrom` and `validUntil`).
 
-    The error is returned as a failed response to the [Create StandalonePrice](/../api/projects/standalone-prices#create-standaloneprice) request.
+    The error is returned as a failed response to the [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
 
     """
 
@@ -2446,11 +2508,12 @@ class PendingOperationError(ErrorObject):
     """Returned when a previous conflicting operation is still pending and needs to finish before the request can succeed.
 
     The client application should retry the request with exponential backoff up to a point where further delay is unacceptable.
-    If the error persists, report it using the [Support Portal](https://support.commercetools.com).
+    If the error persists, report it to the [Composable Commerce support team](https://support.commercetools.com).
 
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="PendingOperation", **kwargs)
 
@@ -2467,12 +2530,15 @@ class PendingOperationError(ErrorObject):
 
 
 class PriceChangedError(ErrorObject):
-    """Returned when the Price, Tax Rate, or Shipping Rate of some Line Items changed since they were last added to the Cart.
+    """Returned when the Price or Tax Rate of some Line Items or Shipping Rate of some Shipping Methods changed since they were last added to the Cart.
 
-    The error is returned as a failed response to:
+    When a Cart is frozen, the error can be returned as a failed response to all update actions on [Carts](ctp:api:type:CartUpdateAction) and [My Carts](ctp:api:type:MyCartUpdateAction).
 
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    The error is also returned as a failed response to:
+
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST), and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) request on Associate Orders.
 
     """
 
@@ -2614,7 +2680,9 @@ class ProjectNotConfiguredForLanguagesError(ErrorObject):
 
 
 class QueryComplexityLimitExceededError(ErrorObject):
+
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="QueryComplexityLimitExceeded", **kwargs)
 
@@ -2640,6 +2708,7 @@ class QueryTimedOutError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="QueryTimedOut", **kwargs)
 
@@ -2750,6 +2819,7 @@ class ResourceNotFoundError(ErrorObject):
     """Returned when the resource addressed by the request URL does not exist."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="ResourceNotFound", **kwargs)
 
@@ -2769,6 +2839,7 @@ class ResourceSizeLimitExceededError(ErrorObject):
     """Returned when the resource exceeds the maximum allowed size of 16 MB."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="ResourceSizeLimitExceeded", **kwargs)
 
@@ -2794,6 +2865,7 @@ class SearchDeactivatedError(ErrorObject):
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="SearchDeactivated", **kwargs)
 
@@ -2815,6 +2887,7 @@ class SearchExecutionFailureError(ErrorObject):
     """Returned when a search query could not be completed due to an unexpected failure."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="SearchExecutionFailure", **kwargs)
 
@@ -2836,6 +2909,7 @@ class SearchFacetPathNotFoundError(ErrorObject):
     """Returned when a search facet path could not be found."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="SearchFacetPathNotFound", **kwargs)
 
@@ -2857,6 +2931,7 @@ class SearchIndexingInProgressError(ErrorObject):
     """Returned when the indexing of Product information is still in progress for Projects that have indexing activated."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="SearchIndexingInProgress", **kwargs)
 
@@ -2878,6 +2953,7 @@ class SemanticErrorError(ErrorObject):
     """Returned when a [Discount predicate](/../api/predicates/predicate-operators) or [API Extension predicate](/../api/predicates/query#using-predicates-in-conditional-api-extensions) is not semantically correct."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="SemanticError", **kwargs)
 
@@ -2896,11 +2972,18 @@ class SemanticErrorError(ErrorObject):
 class ShippingMethodDoesNotMatchCartError(ErrorObject):
     """Returned when the Cart contains a [ShippingMethod](ctp:api:type:ShippingMethod) that is not allowed for the [Cart](ctp:api:type:Cart). In this case, the [ShippingMethodState](ctp:api:type:ShippingMethodState) value is `DoesNotMatchCart`.
 
-    The error is returned as a failed response to the [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) or [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests.
+    When a Cart is frozen, the error can be returned as a failed response to all update actions on [Carts](ctp:api:type:CartUpdateAction) and [My Carts](ctp:api:type:MyCartUpdateAction).
+
+    The error is also returned as a failed response to:
+
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) request on Associate Orders.
 
     """
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(
             message=message, code="ShippingMethodDoesNotMatchCart", **kwargs
@@ -2960,6 +3043,7 @@ class SyntaxErrorError(ErrorObject):
     """Returned when a [Discount predicate](/../api/predicates/predicate-operators), [API Extension predicate](/../api/predicates/query#using-predicates-in-conditional-api-extensions), or [search query](/../api/projects/products-search) does not have the correct syntax."""
 
     def __init__(self, *, message: str, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(message=message, code="SyntaxError", **kwargs)
 
@@ -3202,6 +3286,10 @@ class GraphQLErrorObject(_BaseType):
             from ._schemas.error import GraphQLLanguageUsedInStoresErrorSchema
 
             return GraphQLLanguageUsedInStoresErrorSchema().load(data)
+        if data["code"] == "LockedField":
+            from ._schemas.error import GraphQLLockedFieldErrorSchema
+
+            return GraphQLLockedFieldErrorSchema().load(data)
         if data["code"] == "MatchingPriceNotFound":
             from ._schemas.error import GraphQLMatchingPriceNotFoundErrorSchema
 
@@ -3234,10 +3322,6 @@ class GraphQLErrorObject(_BaseType):
             from ._schemas.error import GraphQLNoMatchingProductDiscountFoundErrorSchema
 
             return GraphQLNoMatchingProductDiscountFoundErrorSchema().load(data)
-        if data["code"] == "NotEnabled":
-            from ._schemas.error import GraphQLNotEnabledErrorSchema
-
-            return GraphQLNotEnabledErrorSchema().load(data)
         if data["code"] == "ObjectNotFound":
             from ._schemas.error import GraphQLObjectNotFoundErrorSchema
 
@@ -3357,6 +3441,7 @@ class GraphQLAnonymousIdAlreadyInUseError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="AnonymousIdAlreadyInUse", **kwargs)
 
@@ -3419,7 +3504,7 @@ class GraphQLAssociateMissingPermissionError(GraphQLErrorObject):
 class GraphQLAttributeDefinitionAlreadyExistsError(GraphQLErrorObject):
     """Returned when the `name` of the [AttributeDefinition](ctp:api:type:AttributeDefinition) conflicts with an existing Attribute.
 
-    The error is returned as a failed response to the [Create ProductType](/../api/projects/productTypes#create-producttype) request or [Change AttributeDefinition Name](ctp:api:type:ProductTypeChangeAttributeNameAction) update action.
+    The error is returned as a failed response to the [Create ProductType](ctp:api:endpoint:/{projectKey}/product-types:POST) request or [Change AttributeDefinition Name](ctp:api:type:ProductTypeChangeAttributeNameAction) update action.
 
     """
 
@@ -3461,7 +3546,7 @@ class GraphQLAttributeDefinitionAlreadyExistsError(GraphQLErrorObject):
 class GraphQLAttributeDefinitionTypeConflictError(GraphQLErrorObject):
     """Returned when the `type` is different for an AttributeDefinition using the same `name` in multiple Product Types.
 
-    The error is returned as a failed response to the [Create ProductType](/../api/projects/productTypes#create-producttype) request.
+    The error is returned as a failed response to the [Create ProductType](ctp:api:endpoint:/{projectKey}/product-types:POST) request.
 
     """
 
@@ -3537,6 +3622,7 @@ class GraphQLBadGatewayError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="BadGateway", **kwargs)
 
@@ -3586,6 +3672,7 @@ class GraphQLContentTooLargeError(GraphQLErrorObject):
     """Returned when the request results in too much data being returned from the API. Adjust the request query to reduce the size of the data returned."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="ContentTooLarge", **kwargs)
 
@@ -3610,12 +3697,10 @@ class GraphQLCountryNotConfiguredInStoreError(GraphQLErrorObject):
 
     - [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/carts:POST) request and [Set Country](ctp:api:type:CartSetCountryAction) update action on Carts.
     - [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/me/carts:POST) request and [Set Country](ctp:api:type:MyCartSetCountryAction) update action on My Carts.
-    - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
-    - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
-    - [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST) requests on Orders.
-    - [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
+    - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST) requests on Orders.
+    - [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
     - [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) request on Order Import.
-    - [Set Country](ctp:api:type:StagedOrderSetCountryAction) on Order Edits.
+    - [Set Country](ctp:api:type:StagedOrderSetCountryAction) update action on Order Edits.
 
     """
 
@@ -3649,8 +3734,13 @@ class GraphQLDiscountCodeNonApplicableError(GraphQLErrorObject):
 
     The error is returned as a failed response to:
 
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts:POST) requests and [Add DiscountCode](ctp:api:type:CartAddDiscountCodeAction) update action on Carts.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/me/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/carts:POST) requests and [Add DiscountCode](ctp:api:type:MyCartAddDiscountCodeAction) update action on My Carts.
+    - [Create Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts:POST) request on Associate Carts.
     - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
     - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Add DiscountCode](ctp:api:type:StagedOrderAddDiscountCodeAction) update action on Order Edits.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) request on Associate Orders.
 
     """
 
@@ -3908,7 +3998,7 @@ class GraphQLDuplicateStandalonePriceScopeError(GraphQLErrorObject):
     """Returned when the given Price scope conflicts with the Price scope of an existing Standalone Price.
     Every Standalone Price associated with the same SKU must have a distinct combination of currency, country, Customer Group, Channel, and validity periods (`validFrom` and `validUntil`).
 
-    The error is returned as a failed response to the [Create StandalonePrice](/../api/projects/standalone-prices#create-standaloneprice) request.
+    The error is returned as a failed response to the [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
 
     """
 
@@ -3995,7 +4085,7 @@ class GraphQLDuplicateVariantValuesError(GraphQLErrorObject):
 class GraphQLEditPreviewFailedError(GraphQLErrorObject):
     """Returned when a preview to find an appropriate Shipping Method for an OrderEdit could not be generated.
 
-    The error is returned as a failed response to the [Get Shipping Methods for an OrderEdit](/../api/projects/shippingMethods#for-an-orderedit) request.
+    The error is returned as a failed response to the [Get Shipping Methods for an OrderEdit](ctp:api:endpoint:/{projectKey}/shipping-methods/matching-orderedit:GET) request.
 
     """
 
@@ -4093,6 +4183,7 @@ class GraphQLEnumValueIsUsedError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="EnumValueIsUsed", **kwargs)
 
@@ -4118,6 +4209,7 @@ class GraphQLEnumValuesMustMatchError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="EnumValuesMustMatch", **kwargs)
 
@@ -4289,6 +4381,7 @@ class GraphQLExternalOAuthFailedError(GraphQLErrorObject):
     """Returned when an [external OAuth Introspection endpoint](/../api/authorization#requesting-an-access-token-using-an-external-oauth-server) does not return a response within the [time limit](/../api/authorization#time-limits), or the response isn't compliant with [RFC 7662](https://www.rfc-editor.org/rfc/rfc7662.html) (for example, an HTTP status code like `500`)."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="ExternalOAuthFailed", **kwargs)
 
@@ -4310,6 +4403,7 @@ class GraphQLFeatureRemovedError(GraphQLErrorObject):
     """Returned when the requested feature was removed."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="FeatureRemoved", **kwargs)
 
@@ -4328,13 +4422,14 @@ class GraphQLFeatureRemovedError(GraphQLErrorObject):
 
 
 class GraphQLGeneralError(GraphQLErrorObject):
-    """Returned when a server-side problem occurs.
+    """Returned when a server-side problem occurs before or after data persistence. In some cases, the requested action may successfully complete after the error is returned. Therefore, it is recommended to verify the status of the requested resource after receiving a 500 error.
 
-    If you encounter this error, report it using the [Support Portal](https://support.commercetools.com).
+    If you encounter this error, report it to the [Composable Commerce support team](https://support.commercetools.com).
 
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="General", **kwargs)
 
@@ -4351,7 +4446,9 @@ class GraphQLGeneralError(GraphQLErrorObject):
 
 
 class GraphQLInsufficientScopeError(GraphQLErrorObject):
+
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="insufficient_scope", **kwargs)
 
@@ -4373,6 +4470,7 @@ class GraphQLInternalConstraintViolatedError(GraphQLErrorObject):
     """Returned when certain API-specific constraints were not met. For example, the specified [Discount Code](ctp:api:type:DiscountCode) was never applied and cannot be updated."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="InternalConstraintViolated", **kwargs)
 
@@ -4395,12 +4493,13 @@ class GraphQLInvalidCredentialsError(GraphQLErrorObject):
 
     The error is returned as a failed response to:
 
-    - [Authenticate a global Customer (Sign-in)](/../api/projects/customers#authenticate-sign-in-customer) and [Authenticate Customer (Sign-in) in a Store](/../api/projects/customers#authenticate-sign-in-customer-in-store) requests on Customers.
-    - [Authenticating Customer (Sign-in)](/../api/projects/me-profile#authenticate-sign-in-customer) and [Authenticate Customer (Sign-in) in a Store](/../api/projects/me-profile#authenticate-sign-in-customer-in-store) requests on My Customer Profile.
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/login:POST) requests on Customers.
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/me/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/login:POST) requests on My Customer Profile.
 
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="InvalidCredentials", **kwargs)
 
@@ -4423,12 +4522,13 @@ class GraphQLInvalidCurrentPasswordError(GraphQLErrorObject):
 
     The error is returned as a failed response to:
 
-    - [Change Customer Password](/../api/projects/customers#change-password-of-customer) and [Change Customer Password in a Store](/../api/projects/customers#change-password-of-customer-in-store) requests on Customers.
-    - [Change Customer Password](/../api/projects/me-profile#change-password-of-customer) and [Change Customer Password in a Store](/../api/projects/me-profile#change-password-of-customer-in-store) requests on My Customer Profile.
+    - [Change Customer Password](ctp:api:endpoint:/{projectKey}/customers/password:POST) and [Change Customer Password in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/customers/password:POST) requests on Customers.
+    - [Change Customer Password](ctp:api:endpoint:/{projectKey}/me/password:POST) and [Change Customer Password in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/password:POST) requests on My Customer Profile.
 
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="InvalidCurrentPassword", **kwargs)
 
@@ -4488,6 +4588,7 @@ class GraphQLInvalidInputError(GraphQLErrorObject):
     """Returned when an invalid input has been sent."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="InvalidInput", **kwargs)
 
@@ -4508,7 +4609,17 @@ class GraphQLInvalidInputError(GraphQLErrorObject):
 class GraphQLInvalidItemShippingDetailsError(GraphQLErrorObject):
     """Returned when Line Item or Custom Line Item quantities set under [ItemShippingDetails](ctp:api:type:ItemShippingDetails) do not match the sum of the quantities in their respective shipping details.
 
-    The error is returned as a failed response to the [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests.
+    When a Cart is frozen, the error can be returned as a failed response to all update actions on [Carts](ctp:api:type:CartUpdateAction) and [My Carts](ctp:api:type:MyCartUpdateAction).
+
+    The error is also returned as a failed response to:
+
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts:POST) requests and [Add LineItem](ctp:api:type:CartAddLineItemAction), [Add CustomLineItem](ctp:api:type:CartAddCustomLineItemAction), [Set LineItem ShippingDetails](ctp:api:type:CartSetLineItemShippingDetailsAction), [Set CustomLineItem ShippingDetails](ctp:api:type:CartSetCustomLineItemShippingDetailsAction), [Add Shopping List](ctp:api:type:CartAddShoppingListAction), and [Remove LineItem](ctp:api:type:CartRemoveLineItemAction) update actions on Carts.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/me/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/carts:POST) requests, and [Add LineItem](ctp:api:type:MyCartAddLineItemAction), [Set LineItem ShippingDetails](ctp:api:type:MyCartSetLineItemShippingDetailsAction), and [Remove LineItem](ctp:api:type:MyCartRemoveLineItemAction) update actions on My Carts.
+    - [Create Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts:POST) request on Associate Carts.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST), and [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST), and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
+    - [Add LineItem](ctp:api:type:StagedOrderAddLineItemAction), [Add CustomLineItem](ctp:api:type:StagedOrderAddCustomLineItemAction), [Set LineItem ShippingDetails](ctp:api:type:StagedOrderSetLineItemShippingDetailsAction), [Set CustomLineItem ShippingDetails](ctp:api:type:StagedOrderSetCustomLineItemShippingDetailsAction), [Add Shopping List](ctp:api:type:StagedOrderAddShoppingListAction), and [Remove LineItem](ctp:api:type:StagedOrderRemoveLineItemAction) update actions on Order Edits.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) and [Create Order from Quote in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders/quotes:POST) requests on Associate Orders.
 
     """
 
@@ -4575,6 +4686,7 @@ class GraphQLInvalidOperationError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="InvalidOperation", **kwargs)
 
@@ -4593,7 +4705,9 @@ class GraphQLInvalidOperationError(GraphQLErrorObject):
 
 
 class GraphQLInvalidSubjectError(GraphQLErrorObject):
+
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="InvalidSubject", **kwargs)
 
@@ -4612,7 +4726,9 @@ class GraphQLInvalidSubjectError(GraphQLErrorObject):
 
 
 class GraphQLInvalidTokenError(GraphQLErrorObject):
+
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="invalid_token", **kwargs)
 
@@ -4638,6 +4754,7 @@ class GraphQLLanguageUsedInStoresError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="LanguageUsedInStores", **kwargs)
 
@@ -4655,15 +4772,50 @@ class GraphQLLanguageUsedInStoresError(GraphQLErrorObject):
         return GraphQLLanguageUsedInStoresErrorSchema().dump(self)
 
 
+class GraphQLLockedFieldError(GraphQLErrorObject):
+    """Returned when two [Customers](ctp:api:type:Customer) are simultaneously created or updated with the same email address.
+
+    To confirm if the operation was successful, repeat the request.
+
+    """
+
+    #: Field that is currently locked.
+    field: str
+
+    def __init__(self, *, field: str, **kwargs):
+        self.field = field
+        kwargs.pop("code", None)
+        super().__init__(code="LockedField", **kwargs)
+
+    @classmethod
+    def deserialize(
+        cls, data: typing.Dict[str, typing.Any]
+    ) -> "GraphQLLockedFieldError":
+        from ._schemas.error import GraphQLLockedFieldErrorSchema
+
+        return GraphQLLockedFieldErrorSchema().load(data)
+
+    def serialize(self) -> typing.Dict[str, typing.Any]:
+        from ._schemas.error import GraphQLLockedFieldErrorSchema
+
+        return GraphQLLockedFieldErrorSchema().dump(self)
+
+
 class GraphQLMatchingPriceNotFoundError(GraphQLErrorObject):
     """Returned when the Product Variant does not have a Price according to the [Product](ctp:api:type:Product) `priceMode` value for a selected currency, country, Customer Group, or Channel.
 
-    The error is returned as a failed response to:
+    The error can be returned as a failed response to all update actions on [Carts](ctp:api:type:CartUpdateAction) and [Staged Orders](ctp:api:type:StagedOrderUpdateAction).
 
-    - [Add LineItem](ctp:api:type:CartAddLineItemAction), [Add CustomLineItem](ctp:api:type:CartAddCustomLineItemAction), and [Add DiscountCode](ctp:api:type:CartAddDiscountCodeAction) update actions on Carts.
-    - [Add LineItem](ctp:api:type:StagedOrderAddLineItemAction), [Add CustomLineItem](ctp:api:type:StagedOrderAddCustomLineItemAction), and [Add DiscountCode](ctp:api:type:StagedOrderAddDiscountCodeAction) update actions on Order Edits.
+    The error is also returned as a failed response to:
+
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/login:POST) requests and [Set CustomerGroup](ctp:api:type:CustomerSetCustomerGroupAction) update action on Customers.
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/me/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/login:POST) requests on My Customer Profile.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/carts:POST), [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts:POST), [Replicate Cart](ctp:api:endpoint:/{projectKey}/carts/replicate:POST), and [Replicate Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts/replicate:POST) requests on Carts.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/me/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/carts:POST) and [Replicate My Cart](ctp:api:endpoint:/{projectKey}/me/carts/replicate:POST) requests on My Carts.
+    - [Create Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts:POST) and [Replicate Cart in Business Unit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts/replicate:POST) requests on Associate Carts.
     - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
     - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) request on Associate Orders.
 
     """
 
@@ -4725,6 +4877,7 @@ class GraphQLMaxCartDiscountsReachedError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="MaxCartDiscountsReached", **kwargs)
 
@@ -4782,6 +4935,7 @@ class GraphQLMaxStoreReferencesReachedError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="MaxStoreReferencesReached", **kwargs)
 
@@ -4803,12 +4957,12 @@ class GraphQLMissingRoleOnChannelError(GraphQLErrorObject):
     """Returned when one of the following states occur:
 
     - [Channel](ctp:api:type:Channel) is added or set on a [Store](ctp:api:type:Store) with missing Channel `roles`.
-    - [Standalone Price](/../api/projects/standalone-prices#create-standaloneprice) references a Channel that does not contain the `ProductDistribution` role.
+    - [Standalone Price](ctp:api:type:StandalonePrice) references a Channel that does not contain the `ProductDistribution` role.
 
     The error is returned as a failed response to:
 
     - [Add Distribution Channel](ctp:api:type:StoreAddDistributionChannelAction), [Set Distribution Channel](ctp:api:type:StoreSetDistributionChannelsAction), [Add Supply Channel](ctp:api:type:StoreAddSupplyChannelAction), and [Set Supply Channel](ctp:api:type:StoreSetSupplyChannelsAction) update actions.
-    - [Create a Standalone Price](/../api/projects/standalone-prices#create-standaloneprice) request.
+    - [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
 
     """
 
@@ -4847,10 +5001,18 @@ class GraphQLMissingRoleOnChannelError(GraphQLErrorObject):
 class GraphQLMissingTaxRateForCountryError(GraphQLErrorObject):
     """Returned when the Tax Category of at least one of the `lineItems`, `customLineItems`, or `shippingInfo` in the [Cart](ctp:api:type:Cart) is missing the [TaxRate](ctp:api:type:TaxRate) matching `country` and `state` given in the `shippingAddress` of that Cart.
 
-    The error is returned as a failed response to:
+    The error can be returned as a failed response to all update actions on [Carts](ctp:api:type:CartUpdateAction) and [Staged Orders](ctp:api:type:StagedOrderUpdateAction).
 
-    - [Set Default Shipping Address](ctp:api:type:CustomerSetDefaultShippingAddressAction), [Add LineItem](ctp:api:type:CartAddLineItemAction), [Add CustomLineItem](ctp:api:type:CartAddCustomLineItemAction), [Set Shipping Address](ctp:api:type:CartSetShippingAddressAction), [Add LineItem](ctp:api:type:MyCartAddLineItemAction), [Add LineItem](ctp:api:type:StagedOrderAddLineItemAction), and [Add CustomLineItem](ctp:api:type:StagedOrderAddCustomLineItemAction) update actions
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests.
+    The error is also returned as a failed response to:
+
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/login:POST) requests and [Set CustomerGroup](ctp:api:type:CustomerSetCustomerGroupAction) update action on Customers.
+    - [Authenticate (sign in) Customer](ctp:api:endpoint:/{projectKey}/me/login:POST) and [Authenticate (sign in) Customer in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/login:POST) on My Customer Profile.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/carts:POST), [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts:POST), [Replicate Cart](ctp:api:endpoint:/{projectKey}/carts/replicate:POST), and [Replicate Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/carts/replicate:POST) requests on Carts.
+    - [Create Cart](ctp:api:endpoint:/{projectKey}/me/carts:POST) and [Create Cart in Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/carts:POST) and [Replicate My Cart](ctp:api:endpoint:/{projectKey}/me/carts/replicate:POST) requests on My Carts.
+    - [Create Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts:POST) and [Replicate Cart in Business Unit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/carts/replicate:POST) requests on Associate Carts.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) requests on Associate Orders.
 
     """
 
@@ -4896,6 +5058,7 @@ class GraphQLMoneyOverflowError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="MoneyOverflow", **kwargs)
 
@@ -4916,11 +5079,12 @@ class GraphQLMoneyOverflowError(GraphQLErrorObject):
 class GraphQLNoMatchingProductDiscountFoundError(GraphQLErrorObject):
     """Returned when a Product Discount could not be found that could be applied to the Price of a Product Variant.
 
-    The error is returned as a failed response to the [Get Matching ProductDiscount](/../api/projects/productDiscounts#get-matching-productdiscount) request.
+    The error is returned as a failed response to the [Get Matching ProductDiscount](ctp:api:endpoint:/{projectKey}/product-discounts/matching:POST) request.
 
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="NoMatchingProductDiscountFound", **kwargs)
 
@@ -4938,31 +5102,11 @@ class GraphQLNoMatchingProductDiscountFoundError(GraphQLErrorObject):
         return GraphQLNoMatchingProductDiscountFoundErrorSchema().dump(self)
 
 
-class GraphQLNotEnabledError(GraphQLErrorObject):
-    """Returned when the [Project-specific category recommendations feature](/../api/projects/categoryRecommendations#project-specific-category-recommendations) is not enabled for the Project."""
-
-    def __init__(self, **kwargs):
-        kwargs.pop("code", None)
-        super().__init__(code="NotEnabled", **kwargs)
-
-    @classmethod
-    def deserialize(
-        cls, data: typing.Dict[str, typing.Any]
-    ) -> "GraphQLNotEnabledError":
-        from ._schemas.error import GraphQLNotEnabledErrorSchema
-
-        return GraphQLNotEnabledErrorSchema().load(data)
-
-    def serialize(self) -> typing.Dict[str, typing.Any]:
-        from ._schemas.error import GraphQLNotEnabledErrorSchema
-
-        return GraphQLNotEnabledErrorSchema().dump(self)
-
-
 class GraphQLObjectNotFoundError(GraphQLErrorObject):
     """Returned when the requested resource was not found."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="ObjectNotFound", **kwargs)
 
@@ -4985,8 +5129,9 @@ class GraphQLOutOfStockError(GraphQLErrorObject):
 
     The error is returned as a failed response to:
 
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), and [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) requests on Orders.
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST), and [Create Order by Import](ctp:api:endpoint:/{projectKey}/orders/import:POST) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST), and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) and [Create Order from Quote in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders/quotes:POST) requests on Associate Orders.
 
     """
 
@@ -5025,6 +5170,7 @@ class GraphQLOverCapacityError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="OverCapacity", **kwargs)
 
@@ -5046,7 +5192,7 @@ class GraphQLOverlappingStandalonePriceValidityError(GraphQLErrorObject):
     """Returned when a given Price validity period conflicts with an existing one.
     Every Standalone Price associated with the same SKU and with the same combination of currency, country, Customer Group, and Channel, must have non-overlapping validity periods (`validFrom` and `validUntil`).
 
-    The error is returned as a failed response to the [Create StandalonePrice](/../api/projects/standalone-prices#create-standaloneprice) request.
+    The error is returned as a failed response to the [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
 
     """
 
@@ -5117,11 +5263,12 @@ class GraphQLPendingOperationError(GraphQLErrorObject):
     """Returned when a previous conflicting operation is still pending and needs to finish before the request can succeed.
 
     The client application should retry the request with exponential backoff up to a point where further delay is unacceptable.
-    If the error persists, report it using the [Support Portal](https://support.commercetools.com).
+    If the error persists, report it to the [Composable Commerce support team](https://support.commercetools.com).
 
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="PendingOperation", **kwargs)
 
@@ -5140,12 +5287,15 @@ class GraphQLPendingOperationError(GraphQLErrorObject):
 
 
 class GraphQLPriceChangedError(GraphQLErrorObject):
-    """Returned when the Price, Tax Rate, or Shipping Rate of some Line Items changed since they were last added to the Cart.
+    """Returned when the Price or Tax Rate of some Line Items or Shipping Rate of some Shipping Methods changed since they were last added to the Cart.
 
-    The error is returned as a failed response to:
+    When a Cart is frozen, the error can be returned as a failed response to all update actions on [Carts](ctp:api:type:CartUpdateAction) and [My Carts](ctp:api:type:MyCartUpdateAction).
 
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
-    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    The error is also returned as a failed response to:
+
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST), and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/orders/quotes:POST) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST), [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST), and [Create Order from Quote](ctp:api:endpoint:/{projectKey}/me/orders/quotes:POST) requests on My Orders.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) request on Associate Orders.
 
     """
 
@@ -5280,7 +5430,9 @@ class GraphQLProjectNotConfiguredForLanguagesError(GraphQLErrorObject):
 
 
 class GraphQLQueryComplexityLimitExceededError(GraphQLErrorObject):
+
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="QueryComplexityLimitExceeded", **kwargs)
 
@@ -5306,6 +5458,7 @@ class GraphQLQueryTimedOutError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="QueryTimedOut", **kwargs)
 
@@ -5417,6 +5570,7 @@ class GraphQLResourceNotFoundError(GraphQLErrorObject):
     """Returned when the resource addressed by the request URL does not exist."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="ResourceNotFound", **kwargs)
 
@@ -5438,6 +5592,7 @@ class GraphQLResourceSizeLimitExceededError(GraphQLErrorObject):
     """Returned when the resource exceeds the maximum allowed size of 16 MB."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="ResourceSizeLimitExceeded", **kwargs)
 
@@ -5463,6 +5618,7 @@ class GraphQLSearchDeactivatedError(GraphQLErrorObject):
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="SearchDeactivated", **kwargs)
 
@@ -5484,6 +5640,7 @@ class GraphQLSearchExecutionFailureError(GraphQLErrorObject):
     """Returned when a search query could not be completed due to an unexpected failure."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="SearchExecutionFailure", **kwargs)
 
@@ -5505,6 +5662,7 @@ class GraphQLSearchFacetPathNotFoundError(GraphQLErrorObject):
     """Returned when a search facet path could not be found."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="SearchFacetPathNotFound", **kwargs)
 
@@ -5526,6 +5684,7 @@ class GraphQLSearchIndexingInProgressError(GraphQLErrorObject):
     """Returned when the indexing of Product information is still in progress for Projects that have indexing activated."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="SearchIndexingInProgress", **kwargs)
 
@@ -5547,6 +5706,7 @@ class GraphQLSemanticErrorError(GraphQLErrorObject):
     """Returned when a [Discount predicate](/../api/predicates/predicate-operators) or [API Extension predicate](/../api/predicates/query#using-predicates-in-conditional-api-extensions) is not semantically correct."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="SemanticError", **kwargs)
 
@@ -5567,11 +5727,18 @@ class GraphQLSemanticErrorError(GraphQLErrorObject):
 class GraphQLShippingMethodDoesNotMatchCartError(GraphQLErrorObject):
     """Returned when the Cart contains a [ShippingMethod](ctp:api:type:ShippingMethod) that is not allowed for the [Cart](ctp:api:type:Cart). In this case, the [ShippingMethodState](ctp:api:type:ShippingMethodState) value is `DoesNotMatchCart`.
 
-    The error is returned as a failed response to the [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) or [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests.
+    When a Cart is frozen, the error can be returned as a failed response to all update actions on [Carts](ctp:api:type:CartUpdateAction) and [My Carts](ctp:api:type:MyCartUpdateAction).
+
+    The error is also returned as a failed response to:
+
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/orders:POST) requests on Orders.
+    - [Create Order from Cart](ctp:api:endpoint:/{projectKey}/me/orders:POST) and [Create Order in Store from Cart](ctp:api:endpoint:/{projectKey}/in-store/me/orders:POST) requests on My Orders.
+    - [Create Order from Cart in BusinessUnit](ctp:api:endpoint:/{projectKey}/as-associate/{associateId}/in-business-unit/key={businessUnitKey}/orders:POST) request on Associate Orders.
 
     """
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="ShippingMethodDoesNotMatchCart", **kwargs)
 
@@ -5625,6 +5792,7 @@ class GraphQLSyntaxErrorError(GraphQLErrorObject):
     """Returned when a [Discount predicate](/../api/predicates/predicate-operators), [API Extension predicate](/../api/predicates/query#using-predicates-in-conditional-api-extensions), or [search query](/../api/projects/products-search) does not have the correct syntax."""
 
     def __init__(self, **kwargs):
+
         kwargs.pop("code", None)
         super().__init__(code="SyntaxError", **kwargs)
 

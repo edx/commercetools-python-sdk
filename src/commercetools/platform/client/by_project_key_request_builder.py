@@ -81,6 +81,9 @@ from .product_projections.by_project_key_product_projections_request_builder imp
 from .product_selections.by_project_key_product_selections_request_builder import (
     ByProjectKeyProductSelectionsRequestBuilder,
 )
+from .product_tailoring.by_project_key_product_tailoring_request_builder import (
+    ByProjectKeyProductTailoringRequestBuilder,
+)
 from .product_types.by_project_key_product_types_request_builder import (
     ByProjectKeyProductTypesRequestBuilder,
 )
@@ -128,6 +131,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
 
@@ -292,6 +296,13 @@ class ByProjectKeyRequestBuilder:
 
         """
         return ByProjectKeyProductSelectionsRequestBuilder(
+            project_key=self._project_key,
+            client=self._client,
+        )
+
+    def product_tailoring(self) -> ByProjectKeyProductTailoringRequestBuilder:
+        """Product tailoring are used to contextualize product data for specific stores."""
+        return ByProjectKeyProductTailoringRequestBuilder(
             project_key=self._project_key,
             client=self._client,
         )

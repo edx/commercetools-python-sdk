@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyInStoreKeyByStoreKeyProductProjectionsByIDRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _store_key: str
@@ -45,10 +46,12 @@ class ByProjectKeyInStoreKeyByStoreKeyProductProjectionsByIDRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["ProductProjection"]:
-        """Gets the current or staged representation of a [Product](ctp:api:type:Product) by its ID from the specified [Store](ctp:api:type:Store).
-        If the Store has defined some languages, countries, distribution or supply Channels,
-        they are used for projections based on [locale](ctp:api:type:ProductProjectionLocales), [price](ctp:api:type:ProductProjectionPrices)
+        """Gets the current or staged representation of a [Product](ctp:api:type:Product) by its ID in the specified [Store](ctp:api:type:Store).
+        If the Store has defined some languages, countries, distribution, supply Channels, and/or Product Selection,
+        they are used for projections based on [locale](ctp:api:type:ProductProjectionLocales), [price](ctp:api:type:ProductProjectionPrices),
         and [inventory](ctp:api:type:ProductProjectionInventoryEntries).
+
+        If [ProductSelection](ctp:api:type:ProductSelection) is used, it affects the [availability of the Product](/projects/stores#products-available-in-store) in the specified Store.
 
         When used with an API Client that has the `view_published_products:{projectKey}` scope, this endpoint only returns published (current) Product Projections.
 

@@ -198,9 +198,9 @@ class AssignedProductSelectionPagedQueryResponse(_BaseType):
 
 
 class ProductSelection(BaseResource):
-    #: Present on resources updated after 1/02/2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: Present on resources updated after 1/02/2019 except for [events not tracked](/../api/general-concepts#events-tracked).
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1/02/2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: Present on resources created after 1/02/2019 except for [events not tracked](/../api/general-concepts#events-tracked).
     created_by: typing.Optional["CreatedBy"]
     #: User-defined unique identifier of the ProductSelection.
     key: typing.Optional[str]
@@ -494,6 +494,7 @@ class ProductSelectionResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.PRODUCT_SELECTION)
 
     @classmethod

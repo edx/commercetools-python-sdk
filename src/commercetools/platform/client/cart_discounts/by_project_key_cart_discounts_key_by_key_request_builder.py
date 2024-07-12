@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyCartDiscountsKeyByKeyRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _key: str
@@ -108,6 +109,7 @@ class ByProjectKeyCartDiscountsKeyByKeyRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["CartDiscount"]:
+        """Deleting a Cart Discount produces the [CartDiscountDeleted](ctp:api:type:CartDiscountDeletedMessage) Message."""
         headers = {} if headers is None else headers
         response = self._client._delete(
             endpoint=f"/{self._project_key}/cart-discounts/key={self._key}",

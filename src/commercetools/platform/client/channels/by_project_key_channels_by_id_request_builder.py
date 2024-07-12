@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyChannelsByIDRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _id: str
@@ -108,6 +109,7 @@ class ByProjectKeyChannelsByIDRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["Channel"]:
+        """Returns a [ReferenceExists](ctp:api:type:ReferenceExistsError) error if other resources reference the Channel to be deleted."""
         headers = {} if headers is None else headers
         response = self._client._delete(
             endpoint=f"/{self._project_key}/channels/{self._id}",

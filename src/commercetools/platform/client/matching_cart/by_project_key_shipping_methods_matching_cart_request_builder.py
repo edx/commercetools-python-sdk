@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyShippingMethodsMatchingCartRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
 
@@ -34,7 +35,7 @@ class ByProjectKeyShippingMethodsMatchingCartRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["ShippingMethodPagedQueryResponse"]:
-        """Retrieves all the ShippingMethods that can ship to the shipping address of the given Cart.
+        """Retrieves all the active ShippingMethods that can ship to the shipping address of the given Cart.
         Each ShippingMethod contains exactly one ShippingRate with the flag `isMatching` set to `true`.
         This ShippingRate is used when the ShippingMethod is [added to the Cart](ctp:api:type:CartSetShippingMethodAction).
 
@@ -62,7 +63,7 @@ class ByProjectKeyShippingMethodsMatchingCartRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional[None]:
-        """Checks if a ShippingMethod exists for the given Cart. Returns a `200 OK` status if the ShippingMethod exists or a `404 Not Found` otherwise."""
+        """Checks if an active ShippingMethod exists for the given Cart. Returns a `200 OK` status if the ShippingMethod exists or a `404 Not Found` otherwise."""
         headers = {} if headers is None else headers
         response = self._client._head(
             endpoint=f"/{self._project_key}/shipping-methods/matching-cart",

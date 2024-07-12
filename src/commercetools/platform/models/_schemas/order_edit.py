@@ -295,6 +295,12 @@ class OrderEditSchema(BaseResourceSchema):
                 "setShippingAddressCustomType": helpers.absmod(
                     __name__, ".StagedOrderSetShippingAddressCustomTypeActionSchema"
                 ),
+                "setShippingCustomField": helpers.absmod(
+                    __name__, ".StagedOrderSetShippingCustomFieldActionSchema"
+                ),
+                "setShippingCustomType": helpers.absmod(
+                    __name__, ".StagedOrderSetShippingCustomTypeActionSchema"
+                ),
                 "setShippingMethod": helpers.absmod(
                     __name__, ".StagedOrderSetShippingMethodActionSchema"
                 ),
@@ -378,6 +384,7 @@ class OrderEditSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderEdit(**data)
 
 
@@ -394,6 +401,7 @@ class OrderEditApplySchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderEditApply(**data)
 
 
@@ -649,6 +657,12 @@ class OrderEditDraftSchema(helpers.BaseSchema):
                 "setShippingAddressCustomType": helpers.absmod(
                     __name__, ".StagedOrderSetShippingAddressCustomTypeActionSchema"
                 ),
+                "setShippingCustomField": helpers.absmod(
+                    __name__, ".StagedOrderSetShippingCustomFieldActionSchema"
+                ),
+                "setShippingCustomType": helpers.absmod(
+                    __name__, ".StagedOrderSetShippingCustomTypeActionSchema"
+                ),
                 "setShippingMethod": helpers.absmod(
                     __name__, ".StagedOrderSetShippingMethodActionSchema"
                 ),
@@ -708,6 +722,7 @@ class OrderEditDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderEditDraft(**data)
 
 
@@ -731,6 +746,7 @@ class OrderEditPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderEditPagedQueryResponse(**data)
 
 
@@ -753,6 +769,7 @@ class OrderEditReferenceSchema(ReferenceSchema):
 
 
 class OrderEditResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -803,6 +820,7 @@ class OrderEditAppliedSchema(OrderEditResultSchema):
 
 
 class OrderEditNotProcessedSchema(OrderEditResultSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -943,6 +961,9 @@ class OrderEditPreviewFailureSchema(OrderEditResultSchema):
                 "LanguageUsedInStores": helpers.absmod(
                     __name__, ".error.LanguageUsedInStoresErrorSchema"
                 ),
+                "LockedField": helpers.absmod(
+                    __name__, ".error.LockedFieldErrorSchema"
+                ),
                 "MatchingPriceNotFound": helpers.absmod(
                     __name__, ".error.MatchingPriceNotFoundErrorSchema"
                 ),
@@ -967,7 +988,6 @@ class OrderEditPreviewFailureSchema(OrderEditResultSchema):
                 "NoMatchingProductDiscountFound": helpers.absmod(
                     __name__, ".error.NoMatchingProductDiscountFoundErrorSchema"
                 ),
-                "NotEnabled": helpers.absmod(__name__, ".error.NotEnabledErrorSchema"),
                 "ObjectNotFound": helpers.absmod(
                     __name__, ".error.ObjectNotFoundErrorSchema"
                 ),
@@ -1155,6 +1175,10 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 "BusinessUnitAddressRemoved": helpers.absmod(
                     __name__, ".message.BusinessUnitAddressRemovedMessagePayloadSchema"
                 ),
+                "BusinessUnitApprovalRuleModeChanged": helpers.absmod(
+                    __name__,
+                    ".message.BusinessUnitApprovalRuleModeChangedMessagePayloadSchema",
+                ),
                 "BusinessUnitAssociateAdded": helpers.absmod(
                     __name__, ".message.BusinessUnitAssociateAddedMessagePayloadSchema"
                 ),
@@ -1246,6 +1270,21 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 ),
                 "BusinessUnitStoresSet": helpers.absmod(
                     __name__, ".message.BusinessUnitStoresSetMessagePayloadSchema"
+                ),
+                "CartDiscountCreated": helpers.absmod(
+                    __name__, ".message.CartDiscountCreatedMessagePayloadSchema"
+                ),
+                "CartDiscountDeleted": helpers.absmod(
+                    __name__, ".message.CartDiscountDeletedMessagePayloadSchema"
+                ),
+                "CartDiscountStoreAdded": helpers.absmod(
+                    __name__, ".message.CartDiscountStoreAddedMessagePayloadSchema"
+                ),
+                "CartDiscountStoreRemoved": helpers.absmod(
+                    __name__, ".message.CartDiscountStoreRemovedMessagePayloadSchema"
+                ),
+                "CartDiscountStoresSet": helpers.absmod(
+                    __name__, ".message.CartDiscountStoresSetMessagePayloadSchema"
                 ),
                 "CategoryCreated": helpers.absmod(
                     __name__, ".message.CategoryCreatedMessagePayloadSchema"
@@ -1356,6 +1395,15 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 "CustomerTitleSet": helpers.absmod(
                     __name__, ".message.CustomerTitleSetMessagePayloadSchema"
                 ),
+                "DiscountCodeCreated": helpers.absmod(
+                    __name__, ".message.DiscountCodeCreatedMessagePayloadSchema"
+                ),
+                "DiscountCodeDeleted": helpers.absmod(
+                    __name__, ".message.DiscountCodeDeletedMessagePayloadSchema"
+                ),
+                "DiscountCodeKeySet": helpers.absmod(
+                    __name__, ".message.DiscountCodeKeySetMessagePayloadSchema"
+                ),
                 "InventoryEntryCreated": helpers.absmod(
                     __name__, ".message.InventoryEntryCreatedMessagePayloadSchema"
                 ),
@@ -1406,6 +1454,25 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 ),
                 "ProductPriceChanged": helpers.absmod(
                     __name__, ".message.ProductPriceChangedMessagePayloadSchema"
+                ),
+                "ProductPriceCustomFieldAdded": helpers.absmod(
+                    __name__,
+                    ".message.ProductPriceCustomFieldAddedMessagePayloadSchema",
+                ),
+                "ProductPriceCustomFieldChanged": helpers.absmod(
+                    __name__,
+                    ".message.ProductPriceCustomFieldChangedMessagePayloadSchema",
+                ),
+                "ProductPriceCustomFieldRemoved": helpers.absmod(
+                    __name__,
+                    ".message.ProductPriceCustomFieldRemovedMessagePayloadSchema",
+                ),
+                "ProductPriceCustomFieldsRemoved": helpers.absmod(
+                    __name__,
+                    ".message.ProductPriceCustomFieldsRemovedMessagePayloadSchema",
+                ),
+                "ProductPriceCustomFieldsSet": helpers.absmod(
+                    __name__, ".message.ProductPriceCustomFieldsSetMessagePayloadSchema"
                 ),
                 "ProductPriceDiscountsSet": helpers.absmod(
                     __name__, ".message.ProductPriceDiscountsSetMessagePayloadSchema"
@@ -1468,6 +1535,34 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 "ProductStateTransition": helpers.absmod(
                     __name__, ".message.ProductStateTransitionMessagePayloadSchema"
                 ),
+                "ProductTailoringCreated": helpers.absmod(
+                    __name__, ".message.ProductTailoringCreatedMessagePayloadSchema"
+                ),
+                "ProductTailoringDeleted": helpers.absmod(
+                    __name__, ".message.ProductTailoringDeletedMessagePayloadSchema"
+                ),
+                "ProductTailoringDescriptionSet": helpers.absmod(
+                    __name__,
+                    ".message.ProductTailoringDescriptionSetMessagePayloadSchema",
+                ),
+                "ProductTailoringImageAdded": helpers.absmod(
+                    __name__, ".message.ProductTailoringImageAddedMessagePayloadSchema"
+                ),
+                "ProductTailoringImagesSet": helpers.absmod(
+                    __name__, ".message.ProductTailoringImagesSetMessagePayloadSchema"
+                ),
+                "ProductTailoringNameSet": helpers.absmod(
+                    __name__, ".message.ProductTailoringNameSetMessagePayloadSchema"
+                ),
+                "ProductTailoringPublished": helpers.absmod(
+                    __name__, ".message.ProductTailoringPublishedMessagePayloadSchema"
+                ),
+                "ProductTailoringSlugSet": helpers.absmod(
+                    __name__, ".message.ProductTailoringSlugSetMessagePayloadSchema"
+                ),
+                "ProductTailoringUnpublished": helpers.absmod(
+                    __name__, ".message.ProductTailoringUnpublishedMessagePayloadSchema"
+                ),
                 "ProductUnpublished": helpers.absmod(
                     __name__, ".message.ProductUnpublishedMessagePayloadSchema"
                 ),
@@ -1476,6 +1571,14 @@ class OrderEditPreviewSuccessSchema(OrderEditResultSchema):
                 ),
                 "ProductVariantDeleted": helpers.absmod(
                     __name__, ".message.ProductVariantDeletedMessagePayloadSchema"
+                ),
+                "ProductVariantTailoringAdded": helpers.absmod(
+                    __name__,
+                    ".message.ProductVariantTailoringAddedMessagePayloadSchema",
+                ),
+                "ProductVariantTailoringRemoved": helpers.absmod(
+                    __name__,
+                    ".message.ProductVariantTailoringRemovedMessagePayloadSchema",
                 ),
                 "QuoteCreated": helpers.absmod(
                     __name__, ".message.QuoteCreatedMessagePayloadSchema"
@@ -1673,6 +1776,7 @@ class OrderEditUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderEditUpdate(**data)
 
 
@@ -1718,15 +1822,18 @@ class OrderExcerptSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.OrderExcerpt(**data)
 
 
 class StagedOrderSchema(OrderSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StagedOrder(**data)
 
 
@@ -1967,6 +2074,12 @@ class OrderEditAddStagedActionActionSchema(OrderEditUpdateActionSchema):
             ),
             "setShippingAddressCustomType": helpers.absmod(
                 __name__, ".StagedOrderSetShippingAddressCustomTypeActionSchema"
+            ),
+            "setShippingCustomField": helpers.absmod(
+                __name__, ".StagedOrderSetShippingCustomFieldActionSchema"
+            ),
+            "setShippingCustomType": helpers.absmod(
+                __name__, ".StagedOrderSetShippingCustomTypeActionSchema"
             ),
             "setShippingMethod": helpers.absmod(
                 __name__, ".StagedOrderSetShippingMethodActionSchema"
@@ -2319,6 +2432,12 @@ class OrderEditSetStagedActionsActionSchema(OrderEditUpdateActionSchema):
                 ),
                 "setShippingAddressCustomType": helpers.absmod(
                     __name__, ".StagedOrderSetShippingAddressCustomTypeActionSchema"
+                ),
+                "setShippingCustomField": helpers.absmod(
+                    __name__, ".StagedOrderSetShippingCustomFieldActionSchema"
+                ),
+                "setShippingCustomType": helpers.absmod(
+                    __name__, ".StagedOrderSetShippingCustomTypeActionSchema"
                 ),
                 "setShippingMethod": helpers.absmod(
                     __name__, ".StagedOrderSetShippingMethodActionSchema"
@@ -4597,6 +4716,57 @@ class StagedOrderSetShippingAddressCustomTypeActionSchema(
     def post_load(self, data, **kwargs):
         del data["action"]
         return models.StagedOrderSetShippingAddressCustomTypeAction(**data)
+
+
+class StagedOrderSetShippingCustomFieldActionSchema(StagedOrderUpdateActionSchema):
+    shipping_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="shippingKey",
+    )
+    name = marshmallow.fields.String(allow_none=True, load_default=None)
+    value = marshmallow.fields.Raw(
+        allow_none=True, metadata={"omit_empty": True}, load_default=None
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.StagedOrderSetShippingCustomFieldAction(**data)
+
+
+class StagedOrderSetShippingCustomTypeActionSchema(StagedOrderUpdateActionSchema):
+    shipping_key = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="shippingKey",
+    )
+    type = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".type.TypeResourceIdentifierSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
+    fields = FieldContainerField(
+        allow_none=True,
+        values=marshmallow.fields.Raw(allow_none=True),
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.StagedOrderSetShippingCustomTypeAction(**data)
 
 
 class StagedOrderSetShippingMethodActionSchema(StagedOrderUpdateActionSchema):

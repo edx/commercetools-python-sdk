@@ -112,12 +112,20 @@ class StagedQuoteSchema(BaseResourceSchema):
         load_default=None,
         data_key="businessUnit",
     )
+    store = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".store.StoreKeyReferenceSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
 
     class Meta:
         unknown = marshmallow.EXCLUDE
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StagedQuote(**data)
 
 
@@ -163,6 +171,7 @@ class StagedQuoteDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StagedQuoteDraft(**data)
 
 
@@ -186,6 +195,7 @@ class StagedQuotePagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StagedQuotePagedQueryResponse(**data)
 
 
@@ -208,6 +218,7 @@ class StagedQuoteReferenceSchema(ReferenceSchema):
 
 
 class StagedQuoteResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -253,6 +264,7 @@ class StagedQuoteUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StagedQuoteUpdate(**data)
 
 

@@ -83,9 +83,9 @@ __all__ = [
 
 
 class CartDiscount(BaseResource):
-    #: Present on resources updated after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that last modified the CartDiscount.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
+    #: IDs and references that created the CartDiscount.
     created_by: typing.Optional["CreatedBy"]
     #: Name of the CartDiscount.
     name: "LocalizedString"
@@ -352,6 +352,7 @@ class CartDiscountResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.CART_DISCOUNT)
 
     @classmethod
@@ -463,6 +464,7 @@ class CartDiscountShippingCostTarget(CartDiscountTarget):
     """Discount is applied to the shipping costs of the [Cart](ctp:api:type:Cart)."""
 
     def __init__(self):
+
         super().__init__(type="shipping")
 
     @classmethod
@@ -483,6 +485,7 @@ class CartDiscountTotalPriceTarget(CartDiscountTarget):
     """Discount is applied to the total price of the [Cart](ctp:api:type:Cart)."""
 
     def __init__(self):
+
         super().__init__(type="totalPrice")
 
     @classmethod
@@ -500,7 +503,8 @@ class CartDiscountTotalPriceTarget(CartDiscountTarget):
 
 
 class CartDiscountUpdate(_BaseType):
-    #: Expected version of the CartDiscount on which the changes should be applied. If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error is returned.
+    #: Expected version of the CartDiscount on which the changes should be applied.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the CartDiscount.
     actions: typing.List["CartDiscountUpdateAction"]
@@ -798,6 +802,8 @@ class CartDiscountValueFixedDraft(CartDiscountValueDraft):
 
 class CartDiscountValueGiftLineItem(CartDiscountValue):
     #: Reference to a Product.
+    #:
+    #: A Gift Line Item can be present on a Cart even if the referenced Product is unpublished.
     product: "ProductReference"
     #: [ProductVariant](ctp:api:type:ProductVariant) of the Product.
     variant_id: int
@@ -842,6 +848,8 @@ class CartDiscountValueGiftLineItemDraft(CartDiscountValueDraft):
     """
 
     #: ResourceIdentifier of a Product.
+    #:
+    #: A Gift Line Item is added to a Cart even if the referenced Product is unpublished.
     product: "ProductResourceIdentifier"
     #: [ProductVariant](ctp:api:type:ProductVariant) of the Product.
     variant_id: int
@@ -1034,7 +1042,11 @@ class StackingMode(enum.Enum):
 
 
 class CartDiscountAddStoreAction(CartDiscountUpdateAction):
-    """If a referenced Store does not exist, a [ReferencedResourceNotFound](ctp:api:type:ReferencedResourceNotFoundError) error is returned."""
+    """If a referenced Store does not exist, a [ReferencedResourceNotFound](ctp:api:type:ReferencedResourceNotFoundError) error is returned.
+
+    This action generates a [CartDiscountStoreAdded](ctp:api:type:CartDiscountStoreAddedMessage) Message.
+
+    """
 
     #: [Store](ctp:api:type:Store) to add.
     #:
@@ -1263,7 +1275,11 @@ class CartDiscountChangeValueAction(CartDiscountUpdateAction):
 
 
 class CartDiscountRemoveStoreAction(CartDiscountUpdateAction):
-    """If a referenced Store does not exist, a [ReferencedResourceNotFound](ctp:api:type:ReferencedResourceNotFoundError) error is returned."""
+    """If a referenced Store does not exist, a [ReferencedResourceNotFound](ctp:api:type:ReferencedResourceNotFoundError) error is returned.
+
+    This action generates a [CartDiscountStoreRemoved](ctp:api:type:CartDiscountStoreRemovedMessage) Message.
+
+    """
 
     #: [Store](ctp:api:type:Store) to remove.
     store: "StoreResourceIdentifier"
@@ -1394,7 +1410,11 @@ class CartDiscountSetKeyAction(CartDiscountUpdateAction):
 
 
 class CartDiscountSetStoresAction(CartDiscountUpdateAction):
-    """If a referenced Store does not exist, a [ReferencedResourceNotFound](ctp:api:type:ReferencedResourceNotFoundError) error is returned."""
+    """If a referenced Store does not exist, a [ReferencedResourceNotFound](ctp:api:type:ReferencedResourceNotFoundError) error is returned.
+
+    This action generates a [CartDiscountStoresSet](ctp:api:type:CartDiscountStoresSetMessage) Message.
+
+    """
 
     #: [Stores](ctp:api:type:Store) to set.
     #: Overrides the current list of Stores.
@@ -1404,11 +1424,9 @@ class CartDiscountSetStoresAction(CartDiscountUpdateAction):
     #:
     #: - If the referenced Stores exceed the [limit](/../api/limits#cart-discounts-stores), a [MaxStoreReferencesReached](ctp:api:type:MaxStoreReferencesReachedError) error is returned.
     #: - If the referenced Stores exceed the [limit](/../api/limits#cart-discounts) for Cart Discounts that do not require a Discount Code, a [StoreCartDiscountsLimitReached](ctp:api:type:StoreCartDiscountsLimitReachedError) error is returned.
-    stores: typing.Optional[typing.List["StoreResourceIdentifier"]]
+    stores: typing.List["StoreResourceIdentifier"]
 
-    def __init__(
-        self, *, stores: typing.Optional[typing.List["StoreResourceIdentifier"]] = None
-    ):
+    def __init__(self, *, stores: typing.List["StoreResourceIdentifier"]):
         self.stores = stores
 
         super().__init__(action="setStores")

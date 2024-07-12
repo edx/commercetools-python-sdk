@@ -19,6 +19,7 @@ if typing.TYPE_CHECKING:
     from .customer import CustomerReference
     from .quote_request import QuoteRequestReference, QuoteRequestResourceIdentifier
     from .state import StateReference, StateResourceIdentifier
+    from .store import StoreKeyReference
     from .type import (
         CustomFields,
         CustomFieldsDraft,
@@ -47,9 +48,9 @@ __all__ = [
 class StagedQuote(BaseResource):
     #: User-specific unique identifier of the staged quote.
     key: typing.Optional[str]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that last modified the StagedQuote.
     last_modified_by: typing.Optional["LastModifiedBy"]
-    #: Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+    #: IDs and references that created the StagedQuote.
     created_by: typing.Optional["CreatedBy"]
     #: Predefined states tracking the status of the Staged Quote.
     staged_quote_state: "StagedQuoteState"
@@ -73,6 +74,8 @@ class StagedQuote(BaseResource):
     purchase_order_number: typing.Optional[str]
     #: The [BusinessUnit](ctp:api:type:BusinessUnit) for the Staged Quote.
     business_unit: typing.Optional["BusinessUnitKeyReference"]
+    #: The Store to which the [Buyer](/../api/quotes-overview#buyer) belongs.
+    store: typing.Optional["StoreKeyReference"]
 
     def __init__(
         self,
@@ -93,7 +96,8 @@ class StagedQuote(BaseResource):
         custom: typing.Optional["CustomFields"] = None,
         state: typing.Optional["StateReference"] = None,
         purchase_order_number: typing.Optional[str] = None,
-        business_unit: typing.Optional["BusinessUnitKeyReference"] = None
+        business_unit: typing.Optional["BusinessUnitKeyReference"] = None,
+        store: typing.Optional["StoreKeyReference"] = None
     ):
         self.key = key
         self.last_modified_by = last_modified_by
@@ -108,6 +112,7 @@ class StagedQuote(BaseResource):
         self.state = state
         self.purchase_order_number = purchase_order_number
         self.business_unit = business_unit
+        self.store = store
 
         super().__init__(
             id=id,
@@ -256,6 +261,7 @@ class StagedQuoteResourceIdentifier(ResourceIdentifier):
     def __init__(
         self, *, id: typing.Optional[str] = None, key: typing.Optional[str] = None
     ):
+
         super().__init__(id=id, key=key, type_id=ReferenceTypeId.STAGED_QUOTE)
 
     @classmethod
@@ -282,7 +288,7 @@ class StagedQuoteState(enum.Enum):
 
 class StagedQuoteUpdate(_BaseType):
     #: Expected version of the [StagedQuote](ctp:api:type:StagedQuote) to which the changes should be applied.
-    #: If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+    #: If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error will be returned.
     version: int
     #: Update actions to be performed on the [StagedQuote](ctp:api:type:StagedQuote).
     actions: typing.List["StagedQuoteUpdateAction"]

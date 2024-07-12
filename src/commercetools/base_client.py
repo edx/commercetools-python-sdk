@@ -11,7 +11,6 @@ from urllib3 import Retry
 from commercetools.constants import HEADER_CORRELATION_ID
 from commercetools.exceptions import CommercetoolsError
 from commercetools.helpers import _concurrent_retry
-from commercetools.services import ServicesMixin
 from commercetools.utils import BaseTokenSaver, DefaultTokenSaver, fix_token_url
 from commercetools.version import __version__
 
@@ -26,7 +25,6 @@ class RefreshingOAuth2Session(OAuth2Session):
 class BaseClient:
     """The Commercetools Client, used to interact with the Commercetools API.
 
-    :param project_key: the key for the project with which you want to interact
     :param client_id: the oauth2 client id
     :param client_secret: the oauth2 client secret
     :param scope: the oauth2 scope. If None then 'manage_project:{project_key}'
@@ -42,7 +40,6 @@ class BaseClient:
 
     def __init__(
         self,
-        project_key: str = None,
         client_id: str = None,
         client_secret: str = None,
         scope: typing.List[str] = None,
@@ -53,7 +50,6 @@ class BaseClient:
     ) -> None:
         # Use environment variables as fallback
         config = {
-            "project_key": project_key,
             "client_id": client_id,
             "client_secret": client_secret,
             "url": url,
@@ -61,7 +57,7 @@ class BaseClient:
             "scope": scope,
         }
         # Make sure we use the config vars
-        del project_key, client_id, client_secret, url, token_url, scope
+        del client_id, client_secret, url, token_url, scope
 
         self._config = self._read_env_vars(config)
         self._config["token_url"] = fix_token_url(self._config["token_url"])
@@ -193,9 +189,6 @@ class BaseClient:
         return CommercetoolsError(obj.message, errors_raw, obj, correlation_id)
 
     def _read_env_vars(self, config: dict) -> dict:
-        if not config.get("project_key"):
-            config["project_key"] = os.environ.get("CTP_PROJECT_KEY")
-
         if not config.get("client_id"):
             config["client_id"] = os.environ.get("CTP_CLIENT_ID")
 
@@ -212,8 +205,6 @@ class BaseClient:
             config["scope"] = os.environ.get("CTP_SCOPES")
             if config["scope"]:
                 config["scope"] = config["scope"].split(",")
-            else:
-                config["scope"] = ["manage_project:%s" % config["project_key"]]
 
         for key, value in config.items():
             if value is None:
@@ -231,9 +222,3 @@ class BaseClient:
             sys.platform,
             arch,
         )
-
-
-class Client(BaseClient, ServicesMixin):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._base_url = f"{self._config['url']}/{self._config['project_key']}/"

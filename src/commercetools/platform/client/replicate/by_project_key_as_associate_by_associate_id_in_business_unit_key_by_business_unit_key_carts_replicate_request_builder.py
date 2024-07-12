@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyAsAssociateByAssociateIdInBusinessUnitKeyByBusinessUnitKeyCartsReplicateRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _associate_id: str
@@ -46,6 +47,11 @@ class ByProjectKeyAsAssociateByAssociateIdInBusinessUnitKeyByBusinessUnitKeyCart
         The new Cart does not contain Payments or Deliveries. The [State](ctp:api:type:ItemState) of Line Items and Custom Line Items is reset to `initial`.
 
         If the Cart exists in the [Project](ctp:api:type:Project) but does not reference the requested [BusinessUnit](ctp:api:type:BusinessUnit), this method returns an [InvalidOperation](ctp:api:type:InvalidOperationError) error.
+
+        Specific Error Codes:
+
+        - [MatchingPriceNotFound](ctp:api:type:MatchingPriceNotFoundError)
+        - [MissingTaxRateForCountry](ctp:api:type:MissingTaxRateForCountryError)
 
         """
         headers = {} if headers is None else headers

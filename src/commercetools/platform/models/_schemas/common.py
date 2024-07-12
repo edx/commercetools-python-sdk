@@ -13,11 +13,12 @@ import marshmallow_enum
 from commercetools import helpers
 
 from ... import models
-from ..common import MoneyType, ReferenceTypeId
+from ..common import AttributionSource, MoneyType, ReferenceTypeId
 
 
 # Fields
 class LocalizedStringField(marshmallow.fields.Dict):
+
     def _deserialize(self, value, attr, data, **kwargs):
         result = super()._deserialize(value, attr, data)
         return models.LocalizedString(**result)
@@ -47,6 +48,7 @@ class PagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.PagedQueryResponse(**data)
 
 
@@ -65,6 +67,7 @@ class UpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Update(**data)
 
 
@@ -76,6 +79,7 @@ class UpdateActionSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.UpdateAction(**data)
 
 
@@ -121,6 +125,7 @@ class AssetSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Asset(**data)
 
 
@@ -133,6 +138,7 @@ class AssetDimensionsSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.AssetDimensions(**data)
 
 
@@ -177,6 +183,7 @@ class AssetDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.AssetDraft(**data)
 
 
@@ -204,7 +211,28 @@ class AssetSourceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.AssetSource(**data)
+
+
+class AttributionSchema(helpers.BaseSchema):
+    client_id = marshmallow.fields.String(
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="clientId",
+    )
+    source = marshmallow_enum.EnumField(
+        AttributionSource, by_value=True, allow_none=True, load_default=None
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+
+        return models.Attribution(**data)
 
 
 class BaseAddressSchema(helpers.BaseSchema):
@@ -314,6 +342,7 @@ class BaseAddressSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.BaseAddress(**data)
 
 
@@ -331,6 +360,7 @@ class AddressSchema(BaseAddressSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Address(**data)
 
 
@@ -348,6 +378,7 @@ class AddressDraftSchema(BaseAddressSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.AddressDraft(**data)
 
 
@@ -366,6 +397,7 @@ class BaseResourceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.BaseResource(**data)
 
 
@@ -408,15 +440,26 @@ class ClientLoggingSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ClientLogging(**data)
 
 
 class CreatedBySchema(ClientLoggingSchema):
+    attributed_to = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".AttributionSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="attributedTo",
+    )
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CreatedBy(**data)
 
 
@@ -444,6 +487,7 @@ class DiscountedPriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DiscountedPrice(**data)
 
 
@@ -468,6 +512,7 @@ class DiscountedPriceDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.DiscountedPriceDraft(**data)
 
 
@@ -514,6 +559,7 @@ class ImageSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Image(**data)
 
 
@@ -526,6 +572,7 @@ class ImageDimensionsSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ImageDimensions(**data)
 
 
@@ -549,11 +596,21 @@ class KeyReferenceSchema(helpers.BaseSchema):
 
 
 class LastModifiedBySchema(ClientLoggingSchema):
+    attributed_to = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".AttributionSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="attributedTo",
+    )
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.LastModifiedBy(**data)
 
 
@@ -570,6 +627,7 @@ class MoneySchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Money(**data)
 
 
@@ -645,6 +703,7 @@ class PriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Price(**data)
 
 
@@ -718,6 +777,7 @@ class PriceDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.PriceDraft(**data)
 
 
@@ -740,6 +800,7 @@ class PriceTierSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.PriceTier(**data)
 
 
@@ -759,6 +820,7 @@ class PriceTierDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.PriceTierDraft(**data)
 
 
@@ -830,6 +892,7 @@ class QueryPriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.QueryPrice(**data)
 
 
@@ -948,6 +1011,7 @@ class ScopedPriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ScopedPrice(**data)
 
 
@@ -969,6 +1033,7 @@ class TypedMoneySchema(MoneySchema):
 
 
 class CentPrecisionMoneySchema(TypedMoneySchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -1017,6 +1082,7 @@ class TypedMoneyDraftSchema(MoneySchema):
 
 
 class CentPrecisionMoneyDraftSchema(TypedMoneyDraftSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 

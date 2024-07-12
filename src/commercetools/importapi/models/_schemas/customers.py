@@ -131,6 +131,7 @@ class CustomerAddressSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerAddress(**data)
 
 
@@ -273,4 +274,5 @@ class CustomerImportSchema(ImportResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerImport(**data)

@@ -15,7 +15,9 @@ from commercetools import helpers
 from ... import models
 from ..project import (
     BusinessUnitConfigurationStatus,
+    CustomerSearchStatus,
     OrderSearchStatus,
+    ProductSearchIndexingMode,
     SearchIndexingConfigurationStatus,
 )
 from ..shipping_method import ShippingRateTierType
@@ -24,6 +26,8 @@ from ..shipping_method import ShippingRateTierType
 
 
 # Marshmallow Schemas
+
+
 class BusinessUnitConfigurationSchema(helpers.BaseSchema):
     my_business_unit_status_on_creation = marshmallow_enum.EnumField(
         BusinessUnitConfigurationStatus,
@@ -48,6 +52,7 @@ class BusinessUnitConfigurationSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.BusinessUnitConfiguration(**data)
 
 
@@ -70,6 +75,7 @@ class CartsConfigurationSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CartsConfiguration(**data)
 
 
@@ -84,6 +90,7 @@ class ExternalOAuthSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ExternalOAuth(**data)
 
 
@@ -173,6 +180,7 @@ class ProjectSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Project(**data)
 
 
@@ -197,6 +205,9 @@ class ProjectUpdateSchema(helpers.BaseSchema):
                 ),
                 "changeCurrencies": helpers.absmod(
                     __name__, ".ProjectChangeCurrenciesActionSchema"
+                ),
+                "changeCustomerSearchStatus": helpers.absmod(
+                    __name__, ".ProjectChangeCustomerSearchStatusActionSchema"
                 ),
                 "changeLanguages": helpers.absmod(
                     __name__, ".ProjectChangeLanguagesActionSchema"
@@ -240,6 +251,7 @@ class ProjectUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ProjectUpdate(**data)
 
 
@@ -263,6 +275,14 @@ class SearchIndexingConfigurationSchema(helpers.BaseSchema):
         metadata={"omit_empty": True},
         load_default=None,
     )
+    products_search = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".SearchIndexingConfigurationValuesSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+        data_key="productsSearch",
+    )
     orders = helpers.LazyNestedField(
         nested=helpers.absmod(__name__, ".SearchIndexingConfigurationValuesSchema"),
         allow_none=True,
@@ -276,6 +296,7 @@ class SearchIndexingConfigurationSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.SearchIndexingConfiguration(**data)
 
 
@@ -307,6 +328,7 @@ class SearchIndexingConfigurationValuesSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.SearchIndexingConfigurationValues(**data)
 
 
@@ -343,6 +365,7 @@ class CartClassificationTypeSchema(ShippingRateInputTypeSchema):
 
 
 class CartScoreTypeSchema(ShippingRateInputTypeSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -353,6 +376,7 @@ class CartScoreTypeSchema(ShippingRateInputTypeSchema):
 
 
 class CartValueTypeSchema(ShippingRateInputTypeSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -375,6 +399,7 @@ class ShoppingListsConfigurationSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ShoppingListsConfiguration(**data)
 
 
@@ -455,6 +480,20 @@ class ProjectChangeCurrenciesActionSchema(ProjectUpdateActionSchema):
         return models.ProjectChangeCurrenciesAction(**data)
 
 
+class ProjectChangeCustomerSearchStatusActionSchema(ProjectUpdateActionSchema):
+    status = marshmallow_enum.EnumField(
+        CustomerSearchStatus, by_value=True, allow_none=True, load_default=None
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.ProjectChangeCustomerSearchStatusAction(**data)
+
+
 class ProjectChangeLanguagesActionSchema(ProjectUpdateActionSchema):
     languages = marshmallow.fields.List(
         marshmallow.fields.String(allow_none=True), allow_none=True, load_default=None
@@ -529,6 +568,13 @@ class ProjectChangeOrderSearchStatusActionSchema(ProjectUpdateActionSchema):
 
 class ProjectChangeProductSearchIndexingEnabledActionSchema(ProjectUpdateActionSchema):
     enabled = marshmallow.fields.Boolean(allow_none=True, load_default=None)
+    mode = marshmallow_enum.EnumField(
+        ProductSearchIndexingMode,
+        by_value=True,
+        allow_none=True,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
 
     class Meta:
         unknown = marshmallow.EXCLUDE

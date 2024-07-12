@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyOrdersEditsByIDApplyRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _id: str

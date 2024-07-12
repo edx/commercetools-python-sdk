@@ -41,6 +41,7 @@ class StagedPriceDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StagedPriceDraft(**data)
 
 
@@ -71,6 +72,7 @@ class StagedStandalonePriceSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StagedStandalonePrice(**data)
 
 
@@ -174,6 +176,7 @@ class StandalonePriceSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StandalonePrice(**data)
 
 
@@ -258,6 +261,7 @@ class StandalonePriceDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StandalonePriceDraft(**data)
 
 
@@ -281,6 +285,7 @@ class StandalonePricePagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StandalonePricePagedQueryResponse(**data)
 
 
@@ -303,6 +308,7 @@ class StandalonePriceReferenceSchema(ReferenceSchema):
 
 
 class StandalonePriceResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -372,6 +378,7 @@ class StandalonePriceUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.StandalonePriceUpdate(**data)
 
 
@@ -405,6 +412,7 @@ class StandalonePriceAddPriceTierActionSchema(StandalonePriceUpdateActionSchema)
 
 
 class StandalonePriceApplyStagedChangesActionSchema(StandalonePriceUpdateActionSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -461,6 +469,7 @@ class StandalonePriceRemovePriceTierActionSchema(StandalonePriceUpdateActionSche
 
 
 class StandalonePriceRemoveStagedChangesActionSchema(StandalonePriceUpdateActionSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 

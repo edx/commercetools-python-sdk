@@ -15,6 +15,7 @@ from commercetools import helpers
 from ... import models
 from ..approval_flow import ApprovalFlowStatus
 from .common import BaseResourceSchema
+from .type import FieldContainerField
 
 # Fields
 
@@ -100,12 +101,20 @@ class ApprovalFlowSchema(BaseResourceSchema):
         load_default=None,
         data_key="currentTierPendingApprovers",
     )
+    custom = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".type.CustomFieldsSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
 
     class Meta:
         unknown = marshmallow.EXCLUDE
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ApprovalFlow(**data)
 
 
@@ -125,6 +134,7 @@ class ApprovalFlowApprovalSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ApprovalFlowApproval(**data)
 
 
@@ -148,6 +158,7 @@ class ApprovalFlowPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ApprovalFlowPagedQueryResponse(**data)
 
 
@@ -170,6 +181,7 @@ class ApprovalFlowRejectionSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ApprovalFlowRejection(**data)
 
 
@@ -182,6 +194,12 @@ class ApprovalFlowUpdateSchema(helpers.BaseSchema):
             discriminator_schemas={
                 "approve": helpers.absmod(__name__, ".ApprovalFlowApproveActionSchema"),
                 "reject": helpers.absmod(__name__, ".ApprovalFlowRejectActionSchema"),
+                "setCustomField": helpers.absmod(
+                    __name__, ".ApprovalFlowSetCustomFieldActionSchema"
+                ),
+                "setCustomType": helpers.absmod(
+                    __name__, ".ApprovalFlowSetCustomTypeActionSchema"
+                ),
             },
         ),
         allow_none=True,
@@ -193,6 +211,7 @@ class ApprovalFlowUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ApprovalFlowUpdate(**data)
 
 
@@ -209,6 +228,7 @@ class ApprovalFlowUpdateActionSchema(helpers.BaseSchema):
 
 
 class ApprovalFlowApproveActionSchema(ApprovalFlowUpdateActionSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -230,3 +250,42 @@ class ApprovalFlowRejectActionSchema(ApprovalFlowUpdateActionSchema):
     def post_load(self, data, **kwargs):
         del data["action"]
         return models.ApprovalFlowRejectAction(**data)
+
+
+class ApprovalFlowSetCustomFieldActionSchema(ApprovalFlowUpdateActionSchema):
+    name = marshmallow.fields.String(allow_none=True, load_default=None)
+    value = marshmallow.fields.Raw(
+        allow_none=True, metadata={"omit_empty": True}, load_default=None
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.ApprovalFlowSetCustomFieldAction(**data)
+
+
+class ApprovalFlowSetCustomTypeActionSchema(ApprovalFlowUpdateActionSchema):
+    type = helpers.LazyNestedField(
+        nested=helpers.absmod(__name__, ".type.TypeResourceIdentifierSchema"),
+        allow_none=True,
+        unknown=marshmallow.EXCLUDE,
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
+    fields = FieldContainerField(
+        allow_none=True,
+        values=marshmallow.fields.Raw(allow_none=True),
+        metadata={"omit_empty": True},
+        load_default=None,
+    )
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+    @marshmallow.post_load
+    def post_load(self, data, **kwargs):
+        del data["action"]
+        return models.ApprovalFlowSetCustomTypeAction(**data)

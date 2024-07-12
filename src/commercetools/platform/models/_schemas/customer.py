@@ -161,7 +161,6 @@ class CustomerSchema(BaseResourceSchema):
         allow_none=True,
         many=True,
         unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
         load_default=None,
     )
     authentication_mode = marshmallow_enum.EnumField(
@@ -177,6 +176,7 @@ class CustomerSchema(BaseResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.Customer(**data)
 
 
@@ -195,6 +195,7 @@ class CustomerChangePasswordSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerChangePassword(**data)
 
 
@@ -212,6 +213,7 @@ class CustomerCreateEmailTokenSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerCreateEmailToken(**data)
 
 
@@ -229,6 +231,7 @@ class CustomerCreatePasswordResetTokenSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerCreatePasswordResetToken(**data)
 
 
@@ -396,10 +399,12 @@ class CustomerDraftSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerDraft(**data)
 
 
 class CustomerEmailTokenReferenceSchema(ReferenceSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -422,6 +427,7 @@ class CustomerEmailVerifySchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerEmailVerify(**data)
 
 
@@ -445,10 +451,12 @@ class CustomerPagedQueryResponseSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerPagedQueryResponse(**data)
 
 
 class CustomerPasswordTokenReferenceSchema(ReferenceSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -492,10 +500,12 @@ class CustomerResetPasswordSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerResetPassword(**data)
 
 
 class CustomerResourceIdentifierSchema(ResourceIdentifierSchema):
+
     class Meta:
         unknown = marshmallow.EXCLUDE
 
@@ -525,6 +535,7 @@ class CustomerSignInResultSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerSignInResult(**data)
 
 
@@ -571,6 +582,7 @@ class CustomerSigninSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerSignin(**data)
 
 
@@ -598,6 +610,7 @@ class CustomerTokenSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerToken(**data)
 
 
@@ -700,6 +713,7 @@ class CustomerUpdateSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.CustomerUpdate(**data)
 
 
@@ -729,6 +743,7 @@ class MyCustomerChangePasswordSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.MyCustomerChangePassword(**data)
 
 
@@ -742,6 +757,7 @@ class MyCustomerEmailVerifySchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.MyCustomerEmailVerify(**data)
 
 
@@ -758,6 +774,7 @@ class MyCustomerResetPasswordSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.MyCustomerResetPassword(**data)
 
 
@@ -784,6 +801,7 @@ class MyCustomerSigninSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.MyCustomerSignin(**data)
 
 
@@ -1333,7 +1351,6 @@ class CustomerSetStoresActionSchema(CustomerUpdateActionSchema):
         allow_none=True,
         many=True,
         unknown=marshmallow.EXCLUDE,
-        metadata={"omit_empty": True},
         load_default=None,
     )
 

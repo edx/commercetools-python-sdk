@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyOrdersOrderNumberByOrderNumberRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _order_number: str

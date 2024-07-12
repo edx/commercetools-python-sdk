@@ -129,6 +129,7 @@ class ProductDraftImportSchema(ImportResourceSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ProductDraftImport(**data)
 
 
@@ -244,6 +245,7 @@ class ProductVariantDraftImportSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.ProductVariantDraftImport(**data)
 
 
@@ -318,4 +320,5 @@ class PriceDraftImportSchema(helpers.BaseSchema):
 
     @marshmallow.post_load
     def post_load(self, data, **kwargs):
+
         return models.PriceDraftImport(**data)

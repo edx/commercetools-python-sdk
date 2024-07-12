@@ -25,6 +25,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyShoppingListsRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
 

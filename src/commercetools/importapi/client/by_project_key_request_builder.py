@@ -13,6 +13,9 @@ from .categories.by_project_key_categories_request_builder import (
 from .customers.by_project_key_customers_request_builder import (
     ByProjectKeyCustomersRequestBuilder,
 )
+from .discount_codes.by_project_key_discount_codes_request_builder import (
+    ByProjectKeyDiscountCodesRequestBuilder,
+)
 from .import_containers.by_project_key_import_containers_request_builder import (
     ByProjectKeyImportContainersRequestBuilder,
 )
@@ -56,6 +59,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
 
@@ -155,6 +159,12 @@ class ByProjectKeyRequestBuilder:
 
     def types(self) -> ByProjectKeyTypesRequestBuilder:
         return ByProjectKeyTypesRequestBuilder(
+            project_key=self._project_key,
+            client=self._client,
+        )
+
+    def discount_codes(self) -> ByProjectKeyDiscountCodesRequestBuilder:
+        return ByProjectKeyDiscountCodesRequestBuilder(
             project_key=self._project_key,
             client=self._client,
         )

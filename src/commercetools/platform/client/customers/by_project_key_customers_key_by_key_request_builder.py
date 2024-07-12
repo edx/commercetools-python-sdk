@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyCustomersKeyByKeyRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
     _key: str
@@ -83,6 +84,7 @@ class ByProjectKeyCustomersKeyByKeyRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["Customer"]:
+        """Simultaneously updating two Customers with the same email address can return a [LockedField](ctp:api:type:LockedFieldError) error."""
         headers = {} if headers is None else headers
         response = self._client._post(
             endpoint=f"/{self._project_key}/customers/key={self._key}",

@@ -25,6 +25,7 @@ if typing.TYPE_CHECKING:
 
 
 class ByProjectKeyCartDiscountsRequestBuilder:
+
     _client: "BaseClient"
     _project_key: str
 
@@ -122,6 +123,7 @@ class ByProjectKeyCartDiscountsRequestBuilder:
         headers: typing.Dict[str, str] = None,
         options: typing.Dict[str, typing.Any] = None,
     ) -> typing.Optional["CartDiscount"]:
+        """Creating a Cart Discount produces the [CartDiscountCreated](ctp:api:type:CartDiscountCreatedMessage) Message."""
         headers = {} if headers is None else headers
         response = self._client._post(
             endpoint=f"/{self._project_key}/cart-discounts",
