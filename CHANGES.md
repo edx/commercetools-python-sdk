@@ -1,3 +1,14 @@
+26.9.28
+-------
+- Add Python 3.12 support and drop Python 3.6-3.11 (`python_requires >= 3.12`).
+- Import `RAISE` from `marshmallow` instead of `marshmallow.utils`.
+- Require `marshmallow>=3.13`: deserialization fails on 3.10-3.12.
+- Cap `marshmallow<4`: 4.x removes APIs used by `helpers.Discriminator`.
+- Install setuptools explicitly for release builds (Python 3.12 ships without it).
+- Update test tooling for Python 3.12 (pytest, pytest-cov, flake8, mypy).
+- Pin `pypi-publish` and artifact actions instead of tracking `@master`.
+- Fix timing flake in `test_auto_refresh`.
+
 23.6.29
 --------
 - Regenerate code with latest RAML specifications, bringing the SDK up to date

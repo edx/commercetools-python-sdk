@@ -39,7 +39,8 @@ def test_auto_refresh(commercetools_api):
         token_url="https://auth.europe-west1.gcp.commercetools.com/oauth/token",
     )
     client.products.query()
-    time.sleep(1)
+    # oauthlib stores an integer expires_at, so wait past the 1s expiry with margin
+    time.sleep(2)
     client.products.query()
     client.products.query()
 
