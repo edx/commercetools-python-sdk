@@ -18,7 +18,7 @@ Python SDK for Commercetools
 ============================
 
 This is an unofficial Python SDK for the Commercetools platform. It only
-supports Python 3.6+ and uses type annotation for an improved development
+supports Python 3.12+ and uses type annotation for an improved development
 experience.
 
 The API is generated using the commercetools api RAML file and uses
