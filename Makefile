@@ -31,7 +31,7 @@ format:
 	black src/ tests/
 
 release:
-	pip install twine wheel
+	pip install setuptools twine wheel
 	rm -rf build/* dist/*
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
